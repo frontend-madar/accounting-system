@@ -11,11 +11,11 @@ interface FormSectionProps {
 
 export function FormSection({ title, children, className, gridClassName }: FormSectionProps) {
     return (
-        <section className={cn("space-y-4", className)}>
+        <div className={cn("space-y-4", className)}>
             <h2 className="text-[22px] font-bold text-[#0F1219]">{title}</h2>
             <div className={cn("grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4", gridClassName)}>
                 {children}
             </div>
-        </section>
+        </div>
     );
 }

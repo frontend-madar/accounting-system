@@ -1,15 +1,14 @@
 "use client";
 
-import * as React from "react";
 import { useMemo, useState } from "react";
-import { Plus, Search } from "lucide-react";
+import { Plus } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { getInvoiceColumns, Invoice } from "./InvoicesColumns";
 import { DataTable } from "./DataTable";
 import { DataTablePagination } from "./Pagination";
 import { InvoiceStatus } from "./StatusBadge";
+import MainButton from "./MainButton";
+import SearchInput from "./SearchInput";
 
 
 const PAGE_SIZE = 5;
@@ -67,27 +66,9 @@ export function InvoicesTableSection({
                 <h2 className="text-[18px] font-semibold text-foreground">{title}</h2>
                 <div className="flex items-center gap-2">
 
-                    <div className="relative w-full max-w-xs">
-                        <Search className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                        <Input
-                            type="search"
-                            placeholder="بحث"
-                            value={query}
-                            onChange={(event) => {
-                                setQuery(event.target.value);
-                                setPage(1);
-                            }}
-                            className="h-11 border-[#C8C2FC]   pr-9 text-right"
-                        />
-                    </div>
+                    <SearchInput query={query} setQuery={setQuery} setPage={setPage} />
 
-                    <Button
-                        onClick={onAddClick}
-                        className="gap-2 rounded-xl w-38 h-11 bg-[#463BAF] hover:bg-[#332a80] text-[18px]"
-                    >
-                        <Plus className="h-4 w-4" />
-                        {addButtonLabel}
-                    </Button>
+                    <MainButton  text={addButtonLabel} icon={<Plus className="h-4 w-4" />} />
                 </div>
 
             </div>

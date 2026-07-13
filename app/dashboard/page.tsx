@@ -35,7 +35,7 @@ export default function DashboardOverviewPage() {
                 />
 
                 <NavCard
-                    href="/dashboard/invoices/create"
+                    href="/dashboard/customers/create"
                     title="اضافة عملاء"
                     icon={<CirclePlus className="h-5 w-5 text-[#463BAF]" />  }
                     />

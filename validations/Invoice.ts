@@ -29,12 +29,36 @@ export const invoiceFormSchema = z.object({
     notes: z.string().optional(),
 });
 
+
+export const clientFormSchema = z.object({
+    clientType: z.enum(["individual", "commercial"]),
+    clientName: z.string().min(1, "اسم العميل مطلوب"),
+    clientPhone: z.string().min(1, "رقم الجوال مطلوب").min(9, "رقم الجوال غير صحيح"),
+    clientEmail: z.string().email("البريد الإلكتروني غير صحيح"),
+    clientCountry: z.string().min(1, "الدولة مطلوبة"),
+    clientCity: z.string().min(1, "المدينة مطلوبة"),
+
+    taxId: z.string().optional(),
+    idNumber: z.string().optional(),
+    commercialRecord: z.string().optional(),
+
+});
+
+
 export type InvoiceFormValues = z.infer<typeof invoiceFormSchema>;
+export type ClientFormValues = z.infer<typeof clientFormSchema>;
 
 export const SERVICE_OPTIONS = [
     { value: "istanbul-program", label: "برنامج اسطنبول" },
     { value: "dubai-program", label: "برنامج دبي" },
     { value: "umrah-program", label: "برنامج العمرة" },
+];
+
+
+export const COUNTRY_OPTIONS = [
+    { value: "saudi-arabia", label: "السعودية" },
+    { value: "uae", label: "الامارات" },
+    { value: "kuwait", label: "الكويت" },
 ];
 
 export const INCLUDES_OPTIONS = [

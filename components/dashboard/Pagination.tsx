@@ -79,10 +79,10 @@ export function DataTablePagination({
                             type="button"
                             onClick={() => onPageChange(item)}
                             className={cn(
-                                "flex h-8 w-8 items-center justify-center rounded-full text-[13px] font-medium transition-colors",
+                                "flex h-7 w-7 items-center border justify-center rounded-md text-[13px] font-medium transition-colors",
                                 item === page
-                                    ? "bg-[#40369F] text-white"
-                                    : "text-muted-foreground hover:bg-muted"
+                                    ? "bg-[#40369F] border-[#40369F] text-white"
+                                    : "text-[#F5F5F5] border-[#EEEEEE] hover:bg-muted text-[#404B52]"
                             )}
                         >
                             {item}
@@ -117,7 +117,7 @@ function PaginationArrow({
             onClick={onClick}
             aria-label={direction === "prev" ? "الصفحة السابقة" : "الصفحة التالية"}
             className={cn(
-                "flex h-8 w-8 items-center justify-center rounded-full border border-border text-muted-foreground transition-colors",
+                "flex h-8 w-8 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors",
                 disabled ? "cursor-not-allowed opacity-40" : "hover:bg-muted"
             )}
         >
