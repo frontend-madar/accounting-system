@@ -62,3 +62,44 @@ export interface ExpenseRecord {
   status: ExpenseRecordStatus;
   attachmentsCount: number;
 }
+
+export type NotificationType =
+  | "salary_paid"
+  | "salary_pending"
+  | "expense_created";
+
+export interface NotificationItemData {
+  id: string;
+  type: NotificationType;
+  title: string;
+  description: string;
+  time: string;
+  unread?: boolean;
+}
+
+export interface NotificationGroupData {
+  id: string;
+  label: string;
+  items: NotificationItemData[];
+}
+
+
+export type ServiceType =
+  | "انتقالات"
+  | "استقبال كوش"
+  | "جولات"
+  | "استقبال"
+  | "فنادق";
+
+export interface Vendor {
+  id: string;
+  vendorName: string;
+  clientName: string;
+  clientNumber: string;
+  travelDate: string;
+  returnDate: string;
+  serviceType: ServiceType;
+  servicePrice: number;
+  paidAmount: number;
+  remainingAmount: number;
+}

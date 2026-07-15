@@ -153,9 +153,50 @@ button {
    display: none !important;
 }
 
- select {
-  appearance: none;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  background-image: none;
+select {
+   appearance: none;
+   -webkit-appearance: none;
+   -moz-appearance: none;
+   background-image: none;
+}
+
+
+
+.iti__search-input {
+   outline: none;
+}
+
+.iti__arrow {
+   display: none;
+}
+
+.iti__selected-country-primary {
+   width: 65px;
+   justify-content: end;
+}
+
+:is(.iti--has-country-selector .iti__country-container:not(:has(+ input[disabled])):not(:has(+ input[readonly])) .iti__selected-country-primary:hover, .iti--has-country-selector .iti__country-container:not(:has(+ input[disabled])):not(:has(+ input[readonly])) .iti__selected-country:has(+ .iti__country-selector:hover) .iti__selected-country-primary) {
+   background: transparent !important;
+}
+
+.ctm-inp .iti input.iti__tel-input[type="tel"] {
+   /* margin-left: 20px !important; */
+   font-family: '__nextjs-Geist';
+}
+
+.iti__selected-dial-code {
+   font-family: '__nextjs-Geist';
+   position: relative;
+   padding-right: 10px;
+}
+
+.iti__selected-dial-code:before {
+    content: "";
+    background-color: #C0C1C3;
+    width: 1px;
+    height: 40px;
+    position: absolute;
+    top: 50%;
+    right: -0px;
+    transform: translateY(-50%);
 }

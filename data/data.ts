@@ -1,64 +1,63 @@
 import { CreditAccount } from "@/components/dashboard/credit-accounts/CreditAccountsColumns";
-import { DailyEntry, Employee, ExpenseRecord, ExpenseStat } from "@/types/types";
-import { Building2, Calendar, LayoutDashboard } from "lucide-react";
+import { DailyEntry, Employee, ExpenseRecord, ExpenseStat, NotificationGroupData, Vendor } from "@/types/types";
 
 export interface InvoiceListItem {
-    id: string;
-    invoiceNumber: string;
-    employeeName: string;
-    employeeAvatarSrc?: string;
-    clientName: string;
-    clientId: string;
-    createdDate: string;
-    remaining: number;
-    status: string;
+  id: string;
+  invoiceNumber: string;
+  employeeName: string;
+  employeeAvatarSrc?: string;
+  clientName: string;
+  clientId: string;
+  createdDate: string;
+  remaining: number;
+  status: string;
 }
 
 export const SAMPLE_INVOICES: InvoiceListItem[] = [
-    {
-        id: "1",
-        invoiceNumber: "193543",
-        employeeName: "سيف",
-        clientName: "محمود صلاح ماجد",
-        clientId: "101325",
-        createdDate: "15/6/2026",
-        remaining: 6532,
-        status: "مستحقة الدفع",
-    },
-    {
-        id: "2",
-        invoiceNumber: "193543",
-        employeeName: "شريف",
-        clientName: "عمر محمد ناصر",
-        clientId: "101325",
-        createdDate: "15/6/2026",
-        remaining: 6532,
-        status: "مستحقة الدفع",
-    },
-    {
-        id: "3",
-        invoiceNumber: "193543",
-        employeeName: "أحمد",
-        clientName: "ماجد غنيم احمد",
-        clientId: "101325",
-        createdDate: "15/6/2026",
-        remaining: 6532,
-        status: "مستحقة الدفع",
-    },
-    {
-        id: "4",
-        invoiceNumber: "193543",
-        employeeName: "أحمد",
-        clientName: "ماجد غنيم احمد",
-        clientId: "101325",
-        createdDate: "15/6/2026",
-        remaining: 6532,
-        status: "مستحقة الدفع",
-    },
+  {
+    id: "1",
+    invoiceNumber: "193543",
+    employeeName: "سيف",
+    clientName: "محمود صلاح ماجد",
+    clientId: "101325",
+    createdDate: "15/6/2026",
+    remaining: 6532,
+    status: "مستحقة الدفع",
+  },
+  {
+    id: "2",
+    invoiceNumber: "193543",
+    employeeName: "شريف",
+    clientName: "عمر محمد ناصر",
+    clientId: "101325",
+    createdDate: "15/6/2026",
+    remaining: 6532,
+    status: "مستحقة الدفع",
+  },
+  {
+    id: "3",
+    invoiceNumber: "193543",
+    employeeName: "أحمد",
+    clientName: "ماجد غنيم احمد",
+    clientId: "101325",
+    createdDate: "15/6/2026",
+    remaining: 6532,
+    status: "مستحقة الدفع",
+  },
+  {
+    id: "4",
+    invoiceNumber: "193543",
+    employeeName: "أحمد",
+    clientName: "ماجد غنيم احمد",
+    clientId: "101325",
+    createdDate: "15/6/2026",
+    remaining: 6532,
+    status: "مستحقة الدفع",
+  },
 ];
 
 
- 
+
 export const CREDIT_ACCOUNTS: CreditAccount[] = [
   {
     id: "1",
@@ -219,7 +218,7 @@ export const CREDIT_ACCOUNTS: CreditAccount[] = [
 ];
 
 
- 
+
 export const DAILY_ENTRIES: DailyEntry[] = [
   {
     id: "1",
@@ -485,3 +484,161 @@ export const EXPENSES: ExpenseRecord[] = [
     attachmentsCount: 1,
   },
 ];
+
+
+export const NOTIFICATION_GROUPS: NotificationGroupData[] = [
+  {
+    id: "today",
+    label: "اليوم",
+    items: [
+      {
+        id: "1",
+        type: "salary_paid",
+        title: "تم صرف الرواتب",
+        description: "تم صرف رواتب شهر يونيو بنجاح.",
+        time: "منذ 40 دقيقة",
+        unread: true,
+      },
+      {
+        id: "2",
+        type: "salary_pending",
+        title: "مسير رواتب بانتظار الاعتماد",
+        description: "مسير رواتب شهر يونيو بانتظار اعتمادك منذ 20 دقيقة.",
+        time: "منذ 40 دقيقة",
+      },
+      {
+        id: "3",
+        type: "expense_created",
+        title: "تم إنشاء مصروف جديد",
+        description: "تم تسجيل مصروف بقيمة EGP 4,500 .",
+        time: "منذ 40 دقيقة",
+      },
+    ],
+  },
+  {
+    id: "yesterday",
+    label: "امس",
+    items: [
+      {
+        id: "4",
+        type: "salary_paid",
+        title: "تم صرف الرواتب",
+        description: "تم صرف رواتب شهر يونيو بنجاح.",
+        time: "منذ 40 دقيقة",
+      },
+    ],
+  },
+];
+
+
+
+export const vendors: Vendor[] = [
+  {
+    id: "1",
+    vendorName: "احمد صلاح",
+    clientName: "سالم عبدالرحمن",
+    clientNumber: "986431456",
+    travelDate: "15/6/2026",
+    returnDate: "15/6/2026",
+    serviceType: "انتقالات",
+    servicePrice: 5466,
+    paidAmount: 5466,
+    remainingAmount: 5466,
+  },
+  {
+    id: "2",
+    vendorName: "احمد صلاح",
+    clientName: "سالم عبدالرحمن",
+    clientNumber: "986431456",
+    travelDate: "15/6/2026",
+    returnDate: "15/6/2026",
+    serviceType: "استقبال كوش",
+    servicePrice: 5466,
+    paidAmount: 5466,
+    remainingAmount: 5466,
+  },
+  {
+    id: "3",
+    vendorName: "احمد صلاح",
+    clientName: "سالم عبدالرحمن",
+    clientNumber: "986431456",
+    travelDate: "15/6/2026",
+    returnDate: "15/6/2026",
+    serviceType: "جولات",
+    servicePrice: 5466,
+    paidAmount: 5466,
+    remainingAmount: 5466,
+  },
+  {
+    id: "4",
+    vendorName: "احمد صلاح",
+    clientName: "سالم عبدالرحمن",
+    clientNumber: "986431456",
+    travelDate: "15/6/2026",
+    returnDate: "15/6/2026",
+    serviceType: "استقبال",
+    servicePrice: 5466,
+    paidAmount: 5466,
+    remainingAmount: 5466,
+  },
+  {
+    id: "5",
+    vendorName: "احمد صلاح",
+    clientName: "سالم عبدالرحمن",
+    clientNumber: "986431456",
+    travelDate: "15/6/2026",
+    returnDate: "15/6/2026",
+    serviceType: "فنادق",
+    servicePrice: 5466,
+    paidAmount: 5466,
+    remainingAmount: 5466,
+  },
+  {
+    id: "6",
+    vendorName: "مصطفى كامل",
+    clientName: "سالم عبدالرحمن",
+    clientNumber: "986431456",
+    travelDate: "16/6/2026",
+    returnDate: "18/6/2026",
+    serviceType: "انتقالات",
+    servicePrice: 3200,
+    paidAmount: 3200,
+    remainingAmount: 0,
+  },
+  {
+    id: "7",
+    vendorName: "مصطفى كامل",
+    clientName: "سالم عبدالرحمن",
+    clientNumber: "986431456",
+    travelDate: "16/6/2026",
+    returnDate: "18/6/2026",
+    serviceType: "استقبال",
+    servicePrice: 1800,
+    paidAmount: 900,
+    remainingAmount: 900,
+  },
+  {
+    id: "8",
+    vendorName: "خالد إبراهيم",
+    clientName: "سالم عبدالرحمن",
+    clientNumber: "986431456",
+    travelDate: "20/6/2026",
+    returnDate: "25/6/2026",
+    serviceType: "فنادق",
+    servicePrice: 9800,
+    paidAmount: 4900,
+    remainingAmount: 4900,
+  },
+  {
+    id: "9",
+    vendorName: "خالد إبراهيم",
+    clientName: "سالم عبدالرحمن",
+    clientNumber: "986431456",
+    travelDate: "20/6/2026",
+    returnDate: "25/6/2026",
+    serviceType: "جولات",
+    servicePrice: 2750,
+    paidAmount: 2750,
+    remainingAmount: 0,
+  },
+]; 

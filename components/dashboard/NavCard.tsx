@@ -34,7 +34,7 @@ export function NavCard({
 
 
             <div>
-                <p className="text-[24px] font-bold text-[#0F1219]">{title}</p>
+                <p className="text-[18px] sm:text-[24px] font-bold text-[#0F1219]">{title}</p>
                 {subtitle && (
                     <p className="mt-0.5 text-[14px] text-[#676A6E]">{subtitle}</p>
                 )}

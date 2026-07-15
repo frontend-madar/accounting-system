@@ -62,9 +62,9 @@ export function InvoicesTableSection({
 
     return (
         <section className={className}>
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <h2 className="text-[18px] font-semibold text-foreground">{title}</h2>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col md:flex-row md:items-center gap-2">
 
                     <SearchInput query={query} setQuery={setQuery} setPage={setPage} />
 

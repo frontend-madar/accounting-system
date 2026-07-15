@@ -22,6 +22,7 @@ import { DateTimeField } from "./DateTimeField";
 import { SingleAttachmentDropzone } from "./SingleAttachmentDropzone";
 import { ACCOUNT_OPTIONS, EXPENSE_CATEGORY_OPTIONS, expenseFormSchema, ExpenseFormValues } from "@/validations/ExpenseSettlement";
 import { CURRENCY_OPTIONS, PAYMENT_METHOD_OPTIONS } from "@/validations/CreditAccount";
+import { Card } from "@/components/ui/card";
 
 interface CreateExpenseFormProps {
     onSaveDraft?: (values: Partial<ExpenseFormValues>) => void;
@@ -84,7 +85,7 @@ export function CreateExpenseForm({
             </div>
 
 
-            <div className="border-b border-t py-10 border-[#0000001C]" >
+            <Card className="border py-10 px-5 border-[#0000001C] bg-[#eeeeee60]" >
                 <Controller
                     control={control}
                     name="amount"
@@ -108,7 +109,7 @@ export function CreateExpenseForm({
                         />
                     )}
                 />
-            </div>
+            </Card>
 
             <div className="grid grid-cols-3 items-center gap-4 "  >
                 <FormSection title="معلومات المصروف" className="col-span-2" gridClassName="!grid-cols-2">
@@ -192,7 +193,7 @@ export function CreateExpenseForm({
                 />
             </FormSection>
 
-            <div>
+            <Card className="px-5 border  bg-[#eeeeee60]" >
                 <FieldLabel htmlFor="notes" dropdown={false}>
                     <span className="mb-2 text-[18px] text-[#232323]">ملاحظات</span>
                 </FieldLabel>
@@ -202,7 +203,7 @@ export function CreateExpenseForm({
                     placeholder="اضف وصف..."
                     {...register("notes")}
                 />
-            </div>
+            </Card>
 
             <div className="flex items-center justify-end gap-3 border-t border-border pt-5">
                 <MainButton

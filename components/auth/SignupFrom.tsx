@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { useState } from "react";
 import { ChevronDown, Eye, EyeOff, Loader2 } from "lucide-react";
 
@@ -13,8 +12,9 @@ import Link from "next/link";
 import { signupSchema } from "@/validations/auth";
 import { z } from "zod";
 import { toast } from "sonner";
-import PhoneInput from "react-phone-input-2";
-import "react-phone-input-2/lib/style.css";
+
+import IntlTelInput from "@intl-tel-input/react";
+import "intl-tel-input/styles";
 
 type SignupFormValues = z.infer<typeof signupSchema>;
 type FieldErrors = Partial<Record<keyof SignupFormValues, string>>;
@@ -128,58 +128,53 @@ export function SignupForm() {
 
 
 
-
-
-
-
-
                     <div className="space-y-2">
                         <Label htmlFor="phone" className="sr-only">
-                            رقم الهاتف
+                            {/* رقم الهاتف */}
                         </Label>
+
                         <div
                             dir="ltr"
                             className={cn(
-                                "ctm-inp relative flex h-[50px] items-center !p-0",
+                                "ctm-inp relative h-[50px]",
                                 fieldErrors.phone && "!border-red-500"
                             )}
                         >
-                            {/* arrow icon — leftmost */}
-                            <ChevronDown className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                            <ChevronDown className="pointer-events-none absolute left-3 top-1/2 z-20 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
 
-                            <PhoneInput
-                                country={"eg"}
+                            <IntlTelInput
+                                initialCountry="eg"
                                 value={phone}
-                                onChange={(value, data: any) => {
-                                    setPhone(value);
-                                    if (data?.dialCode) setDialCode(data.dialCode);
-                                }}
+                                onChangeNumber={(number) => setPhone(number)}
+                                loadUtils={() => import("intl-tel-input/utils")}
                                 inputProps={{
                                     id: "phone",
                                     name: "phone",
                                     "aria-invalid": !!fieldErrors.phone,
+                                    className:
+                                        "w-full h-[50px] border-0 bg-transparent  pr-3 text-left focus:outline-none",
                                 }}
-                                disableSearchIcon
-                                containerClass="!w-full !h-full"
-                                buttonClass="!h-full !border-0 !bg-transparent !left-7 !w-[62px] !justify-start !pl-0"
-                                inputClass="!w-full !h-full !border-0 !pl-[92px] !bg-transparent !text-left focus:!ring-0 focus:!shadow-none"
-                                dropdownClass="!text-left"
                             />
 
-                            {/* separator between code and number */}
-                            <span className="pointer-events-none absolute left-[80px] top-1/2 h-5 w-px -translate-y-1/2 bg-border" />
-
-                            {/* fake placeholder, shown only when nothing but the dial code has been entered */}
-                            {(phone === "" || phone === dialCode) && (
-                                <span className="pointer-events-none absolute right-[10px] top-1/2 -translate-y-1/2 text-[15px] md:text-[20px] text-muted-foreground">
+                            {(phone === "" || phone === `+${dialCode}`) && (
+                                <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-[15px] md:text-[20px] text-muted-foreground">
                                     رقم الهاتف
                                 </span>
                             )}
                         </div>
+
                         {fieldErrors.phone && (
                             <p className="text-sm text-red-600">{fieldErrors.phone}</p>
                         )}
                     </div>
+
+
+
+
+
+
+
+
 
                     <div className="space-y-2">
                         <Label htmlFor="password" className="sr-only">

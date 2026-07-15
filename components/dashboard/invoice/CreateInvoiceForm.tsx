@@ -22,6 +22,7 @@ import { SelectField } from "./SelectField";
 import { MultiSelectField } from "./MultiSelectField";
 import { QuantityStepper } from "./QuantityStepper";
 import { FieldLabel } from "./FieldLabel";
+import { DateField } from "../Datefield";
 
 // Demo lookup — in a real app this would come from your clients API/table.
 const CLIENT_DETAILS: Record<string, { name: string; phone: string }> = {
@@ -192,16 +193,21 @@ export function CreateInvoiceForm({
                         />
                     )}
                 />
-                <InvoiceTextField
-                    label="تاريخ الدفع"
-                    type="date"
-                    dropdown
-                    error={errors.paymentDate?.message}
-                    {...register("paymentDate")}
+                <Controller
+                    control={control}
+                    name="paymentDate"
+                    render={({ field }) => (
+                        <DateField
+                            label="تاريخ الدفع"
+                            value={field.value}
+                            onChange={field.onChange}
+                            error={errors.paymentDate?.message}
+                        />
+                    )}
                 />
             </FormSection>
 
-            <FormSection title="تفاصيل السعر">
+            <FormSection title="تفاصيل السعر" className=" ">
                 <InvoiceTextField
                     label="السعر الاجمالي"
                     type="number"
@@ -217,7 +223,7 @@ export function CreateInvoiceForm({
                     {...register("paidAmount", { valueAsNumber: true })}
                 />
                 <div className="space-y-1.5">
-                    <FieldLabel> <span className="text-[#232323] text-[18px] mb-2">باقي</span> </FieldLabel>
+                    <FieldLabel> <span className="text-[#232323] text-[14px] md:text-[18px] mb-2">باقي</span> </FieldLabel>
                     <div className="flex h-11 ctm-inp  items-center rounded-lg border border-dashed border-input bg-muted/30 px-3 text-sm text-muted-foreground">
                         {remaining.toLocaleString("ar-SA")}
                     </div>
@@ -237,7 +243,7 @@ export function CreateInvoiceForm({
                 />
             </FormSection>
 
-            <div className="flex items-center gap-3 border-t border-border pt-5">
+            <div className="flex flex-col md:flex-row md:items-center gap-3 border-t border-border pt-5">
                 <Button type="submit" className="gap-2 w-[246px] text-[18px] h-[47px] rounded-lg bg-[#463BAF] hover:bg-[#332a80]">
                     <Printer className="h-4 w-4" />
                     حفظ وطباعة الفاتورة

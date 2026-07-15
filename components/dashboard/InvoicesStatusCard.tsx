@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { MoreVertical } from "lucide-react";
-import { Cell, Pie, PieChart, ResponsiveContainer } from "recharts";
+import { Cell, Pie, PieChart, ResponsiveContainer, Tooltip } from "recharts";
 
 import { cn } from "@/lib/utils";
 
@@ -51,6 +51,22 @@ export function InvoicesStatusCard({
             <div className="relative mx-auto mt-2 h-48 w-48">
                 <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
+                        <Tooltip
+                            cursor={false}
+                            content={({ active, payload }) => {
+                                if (!active || !payload?.length) return null;
+
+                                const item = payload[0].payload;
+
+                                return (
+                                    <div className="rounded-lg border bg-white px-3 py-2 shadow-lg">
+                                        <p className="font-medium text-sm">{item.label}</p>
+                                        <p className="text-xs" >{item.value}%</p>
+                                    </div>
+                                );
+                            }}
+                        />
+
                         <Pie
                             data={data}
                             dataKey="value"
@@ -99,9 +115,9 @@ export function InvoicesStatusCard({
 /** Rough label placement around the donut — good enough for 3–4 slices. */
 function ringLabelPosition(index: number, total: number): React.CSSProperties {
     const positions: React.CSSProperties[] = [
-        { top: "8%", left: "78%" },
-        { bottom: "10%", left: "40%" },
-        { top: "45%", left: "-4%" },
+        { top: "50%", left: "100%" },
+        { bottom: "4%", left: "9%" },
+        { top: "30%", left: "-10%" },
         { bottom: "40%", right: "-4%" },
     ];
     return positions[index % positions.length];

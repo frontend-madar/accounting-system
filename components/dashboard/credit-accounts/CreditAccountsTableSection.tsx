@@ -67,11 +67,11 @@ export function CreditAccountsTableSection({
 
   return (
     <section className={className}>
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
       
         <MainButton  text={addButtonLabel} icon={<Plus className="h-4 w-4" />} />
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col md:flex-row md:items-center gap-2">
          
           <FillterButton />
 

@@ -41,7 +41,7 @@ export function SelectField({
     return (
         <div className={cn("space-y-1.5", className)}>
             <FieldLabel dropdown>
-                <span className="text-[#232323] text-[18px] mb-2">{label}</span>
+                <span className="text-[#232323] text-[14px] md:text-[18px] mb-2">{label}</span>
             </FieldLabel>
 
             <div ref={rootRef} className="relative">

@@ -17,7 +17,7 @@ export const InvoiceTextField = React.forwardRef<HTMLInputElement, InvoiceTextFi
         return (
             <div className="space-y-1.5">
                 <FieldLabel htmlFor={fieldId} dropdown={dropdown} >
-                    <span className="text-[#232323] text-[18px] mb-2">{label}</span>
+                    <span className="text-[#232323] text-[14px] md:text-[18px] mb-2">{label}</span>
                 </FieldLabel>
                 <Input
                     id={fieldId}

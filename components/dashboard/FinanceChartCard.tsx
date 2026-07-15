@@ -13,7 +13,7 @@ import {
     YAxis,
 } from "recharts";
 
- import { cn } from "@/lib/utils";
+import { cn } from "@/lib/utils";
 import { StatPill } from "./StatPill";
 
 export interface FinancePoint {
@@ -56,8 +56,8 @@ export function FinanceChartCard({
 
     return (
         <div className={cn("rounded-2xl shadow-[0px_3px_10.3px_0px_#0000001A] bg-white p-5", className)}>
-            <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-2">
+            <div className="flex flex-wrap md:items-center justify-between gap-3">
+                <div className="flex flex-col md:flex-row md:items-center gap-2">
                     <StatPill label="الإيرادات" value={revenue.value} change={revenue.change} />
                     <StatPill label="المصروفات" value={expenses.value} change={expenses.change} />
                 </div>
@@ -73,7 +73,7 @@ export function FinanceChartCard({
                     </button>
 
                     {periodOpen && (
-                        <div className="absolute left-0 top-full z-20 mt-1 w-32 overflow-hidden rounded-lg border border-border bg-white py-1 shadow-lg">
+                        <div className="absolute z-10 left-0 top-full z-20 mt-1 w-32 overflow-hidden rounded-lg border border-border bg-white py-1 shadow-lg">
                             {PERIOD_OPTIONS.map((option) => (
                                 <button
                                     key={option}
@@ -117,7 +117,7 @@ export function FinanceChartCard({
                             width={40}
                         />
                         <Tooltip
-                            formatter={(value: number) => [`﷼ ${value}`, ""]}
+                            formatter={(value) => [`﷼ ${value}`, ""]}
                             labelFormatter={(label) => label}
                             contentStyle={{
                                 borderRadius: 10,

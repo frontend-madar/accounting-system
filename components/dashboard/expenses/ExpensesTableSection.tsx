@@ -39,8 +39,7 @@ export function ExpensesTableSection({
   return (
     <section
       className={`rounded-2xl bg-white shadow-[0px_3px_10.3px_0px_#0000001A] p-5 ${className ?? ""}`}
-      dir="rtl"
-    >
+     >
       <div className="flex items-center justify-between gap-4">
         <h2 className="text-[18px] font-semibold text-[#232323]">{title}</h2>
 

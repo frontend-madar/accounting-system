@@ -47,6 +47,7 @@ type NavDropdown = {
 
 type NavItem = NavLink | NavDropdown;
 
+const MOBILE_BREAKPOINT = 1024;
 
 const NAV_ITEMS: NavItem[] = [
     { key: "dashboard", label: "لوحة التحكم", icon: LayoutGrid, type: "link", href: "/dashboard", exact: true },
@@ -69,8 +70,8 @@ const NAV_ITEMS: NavItem[] = [
         icon: Users2,
         type: "dropdown",
         children: [
-            { key: "manage-employees", label: "ادارة الموظفين", href: "/dashboard/employees/manage" },
-            { key: "add-employee", label: "اضافة موظف", href: "/dashboard/employees/add" },
+            { key: "manage-employees", label: "ادارة الموظفين", href: "/dashboard/employees" },
+            { key: "add-employee", label: "اضافة موظف", href: "/dashboard/employees/create" },
         ],
     },
     {
@@ -83,7 +84,7 @@ const NAV_ITEMS: NavItem[] = [
             { key: "salary-list", label: "قائمة المرتبات", href: "/payroll/list" },
         ],
     },
-    { key: "vendors", label: "الموردون", icon: Briefcase, type: "link" },
+    { key: "vendors", label: "الموردون", icon: Briefcase, type: "link", href: "/dashboard/suppliers" },
 ];
 
 interface SidebarProps {
@@ -112,14 +113,32 @@ export function Sidebar({
     const [isExpanded, setIsExpanded] = useState(true);
     const sidebarRef = useRef<any>(null);
 
+    // Tracks whether we were already below the breakpoint, so we only force
+    // a collapse the moment we *cross into* mobile size — a manual toggle
+    // afterwards (e.g. opening it on a tablet) won't get immediately undone
+    // by another resize event while still under the breakpoint.
+    const wasMobileRef = useRef(false);
+
     React.useEffect(() => {
-        if (typeof window !== "undefined" && window.innerWidth < 1024) {
-            setIsExpanded(false);
+        function handleResize() {
+            const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
+
+            if (isMobile && !wasMobileRef.current) {
+                setIsExpanded(false);
+            }
+
+            wasMobileRef.current = isMobile;
         }
+
+        // Run once on mount so initial load respects the current size too.
+        handleResize();
+
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
     }, []);
 
     useClickOutside(sidebarRef, () => {
-        if (typeof window !== "undefined" && window.innerWidth < 1024) {
+        if (typeof window !== "undefined" && window.innerWidth <= MOBILE_BREAKPOINT) {
             setIsExpanded(false);
         }
     }, isExpanded);
@@ -205,9 +224,9 @@ export function Sidebar({
                                                 "flex w-full items-center gap-3 rounded-lg px-3 py-3 text-[15px] transition-colors hover:bg-[#0E1B6B99]",
                                                 !isExpanded ? "justify-center" : "justify-start",
                                                 item.type === "dropdown" &&
-                                                item.children.some(
-                                                    (sub) => pathname === sub.href || pathname.startsWith(sub.href + "/")
-                                                )
+                                                    item.children.some(
+                                                        (sub) => pathname === sub.href || pathname.startsWith(sub.href + "/")
+                                                    )
                                                     ? "bg-[#0E1B6B99]"
                                                     : ""
                                             )}

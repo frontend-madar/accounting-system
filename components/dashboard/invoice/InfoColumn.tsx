@@ -10,8 +10,8 @@ interface InfoColumnProps {
 export function InfoColumn({ label, value, className }: InfoColumnProps) {
     return (
         <div className={cn("text-center", className)}>
-            <p className="text-[16px] text-[#868DA6]">{label}</p>
-            <p className="mt-1 text-[20px] font-semibold text-[#1E2128]">{value} </p>
+            <p className=" text-[14px] md:text-[16px] text-[#868DA6]">{label}</p>
+            <p className="mt-1 md:text-[20px] font-semibold text-[#1E2128]">{value} </p>
         </div>
     );
 }

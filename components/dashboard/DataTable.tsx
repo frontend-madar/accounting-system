@@ -1,6 +1,7 @@
 "use client";
 
-import * as React from "react";
+import { usePathname } from "next/navigation";
+
 import {
     ColumnDef,
     flexRender,
@@ -16,7 +17,6 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { cn } from "@/lib/utils";
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[];
@@ -40,11 +40,14 @@ export function DataTable<TData, TValue>({
         getCoreRowModel: getCoreRowModel(),
     });
 
+     const pathname = usePathname();
+     const isSuppliersPage = pathname === "/dashboard/suppliers";
+
     return (
         <Table className={className}>
             <TableHeader className="[&_tr]:border-b-0">
                 {table.getHeaderGroups().map((headerGroup) => (
-                    <TableRow key={headerGroup.id} className="hover:bg-transparent bg-[#F5F6F7] rounded-lg overflow-hidden border-none">
+                    <TableRow key={headerGroup.id} className={` ${isSuppliersPage ? 'bg-[#EDEBF7] h-[65px]' : ' h-[65px] bg-[#F5F6F7] rounded-lg overflow-hidden border-none'} `}>
                         {headerGroup.headers.map((header) => (
                             <TableHead key={header.id}>
                                 {header.isPlaceholder
@@ -64,9 +67,7 @@ export function DataTable<TData, TValue>({
                         <TableRow
                             key={row.id}
                             className={
-                                typeof rowClassName === "function"
-                                    ? rowClassName(row.original)
-                                    : rowClassName
+                                `${typeof rowClassName === "function" ? rowClassName(row.original) : rowClassName}  !h-[60px]`
                             }
                         >
                             {row.getVisibleCells().map((cell) => (

@@ -9,6 +9,8 @@ import { getEmployeeColumns } from "./EmployeesColumns";
 import { Employee } from "@/types/types";
 import { DataTable } from "../DataTable";
 import { DataTablePagination } from "../Pagination";
+import MainButton from "../MainButton";
+import SecondaryButton from "../SecondaryButton";
 
 
 const PAGE_SIZE = 5;
@@ -44,36 +46,14 @@ export function EmployeesTableSection({
   return (
     <section
       className={`rounded-2xl bg-white shadow-[0px_3px_10.3px_0px_#0000001A] p-5 ${className ?? ""}`}
-      dir="rtl"
     >
-      <div className="flex items-center justify-between gap-4">
+      <div className="flex flex-col md:flex-row items-center justify-between w-full gap-4">
         <h2 className="text-[18px] font-semibold text-[#232323]">{title}</h2>
 
-        <div className="flex items-center gap-2">
-          <button
-            type="button"
-            onClick={onRefresh}
-            aria-label="تحديث"
-            className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#E4E2E9]"
-          >
-            <RefreshCw className="h-4 w-4 text-muted-foreground" />
-          </button>
-
-          <button
-            type="button"
-            aria-label="ترتيب"
-            className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#E4E2E9]"
-          >
-            <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
-          </button>
-
-          <Button
-            onClick={onAddClick}
-            className="gap-2 rounded-xl h-11 px-4 bg-[#463BAF] hover:bg-[#332a80] text-[16px]"
-          >
-            <Plus className="h-4 w-4" />
-            {addButtonLabel}
-          </Button>
+        <div className="flex flex-col sm:flex-row items-center gap-2">
+          <SecondaryButton text={""} icon={<RefreshCw className="h-4 w-4" />} className="!w-[187px] sm:!w-12" />
+          <SecondaryButton text={""} icon={<ArrowUpDown className="h-4 w-4" />} className="!w-[187px] sm:!w-12" />
+          <MainButton text={addButtonLabel} icon={<Plus className="h-4 w-4" />} className="!w-[187px]" href="employees/create" />
         </div>
       </div>
 

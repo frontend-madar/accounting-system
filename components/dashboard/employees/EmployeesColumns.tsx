@@ -11,6 +11,12 @@ export function getEmployeeColumns(): ColumnDef<Employee>[] {
     {
       accessorKey: "employeeNumber",
       header: "الرقم الوظيفي",
+      cell: ({ row }) => (
+        <span className="flex items-center gap-2">
+          <Checkbox />
+          {row.original.employeeNumber}
+        </span>
+      )
     },
     {
       accessorKey: "name",
@@ -46,23 +52,6 @@ export function getEmployeeColumns(): ColumnDef<Employee>[] {
           <span>{row.original.attachmentsCount}</span>
           <Paperclip className="h-4 w-4 text-muted-foreground" />
         </div>
-      ),
-    },
-    {
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={table.getIsAllPageRowsSelected()}
-          onCheckedChange={(value) =>
-            table.toggleAllPageRowsSelected(!!value)
-          }
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-        />
       ),
     },
     {

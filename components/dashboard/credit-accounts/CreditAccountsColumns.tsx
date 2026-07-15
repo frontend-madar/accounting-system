@@ -32,28 +32,16 @@ export function getCreditAccountColumns({
   onStatusChange,
 }: GetCreditAccountColumnsArgs): ColumnDef<CreditAccount>[] {
   return [
-    {
-      id: "select",
-      header: ({ table }) => (
-        <Checkbox
-          checked={table.getIsAllPageRowsSelected()}
-          onCheckedChange={(value) =>
-            table.toggleAllPageRowsSelected(!!value)
-          }
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          checked={row.getIsSelected()}
-          onCheckedChange={(value) => row.toggleSelected(!!value)}
-        />
-      ),
-    },
+
     {
       accessorKey: "employee",
       header: "الموظف",
       cell: ({ row }) => (
         <div className="flex items-center gap-2">
+          <Checkbox
+            checked={row.getIsSelected()}
+            onCheckedChange={(value) => row.toggleSelected(!!value)}
+          />
           <span className="text-[#232323]">{row.original.employee}</span>
           <span className="text-muted-foreground text-[13px]">
             {row.original.employeeCode}

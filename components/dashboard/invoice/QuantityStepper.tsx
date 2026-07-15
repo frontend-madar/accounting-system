@@ -25,7 +25,7 @@ export function QuantityStepper({
 }: QuantityStepperProps) {
     return (
         <div className={cn("space-y-1.5", className)}>
-            <FieldLabel> <span className="text-[#232323] text-[18px] mb-2">{label}</span>  </FieldLabel>
+            <FieldLabel> <span className="text-[#232323] text-[14px] md:text-[18px] mb-2">{label}</span>  </FieldLabel>
             <div
                 className={cn(
                     "flex h-[44px] ctm-inp  items-center justify-between rounded-lg border border-input px-2",
