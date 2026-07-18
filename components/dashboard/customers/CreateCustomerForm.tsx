@@ -90,7 +90,7 @@ export function CreateCustomerForm({
     return (
         <form
             onSubmit={handleSubmit(onSubmit)}
-            className="space-y-8 rounded-2xl  shadow-[0px_3px_10.3px_0px_#0000001A] bg-white p-6"
+            className="space-y-8 rounded-2xl  ctm-shadow bg-white p-6"
         >
 
             <FormSection title="بيانات العميل" >
@@ -258,7 +258,7 @@ export function CreateCustomerForm({
             <div className="flex items-center  gap-3 border-t border-border pt-5">
                 <MainButton text=" حفظ العميل" icon={<Plus className="h-4 w-4" />} />
                 <SecondaryButton text="   إلغاء" icon={<X className="h-4 w-4" />} className="!w-[110px]" />
-                                
+
             </div>
         </form>
     );

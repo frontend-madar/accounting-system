@@ -1,14 +1,33 @@
 "use client";
 
 import * as React from "react";
-import { Bell, ChevronDown, ChevronLeft, Search } from "lucide-react";
+import { useState } from "react";
+import { Bell, Check, ChevronDown, ChevronLeft, Search } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 import SearchInput from "./SearchInput";
+import { TopbarHomeIcon, TopbarNotificationIcon } from "@/icons";
+
+interface LanguageOption {
+    code: string;
+    label: string;
+    flag: string;
+}
+
+const LANGUAGE_OPTIONS: LanguageOption[] = [
+    { code: "sa", label: "العربية (السعودية)", flag: "/ksa.png" },
+    { code: "eg", label: "العربية (مصر)", flag: "/egypt.png" },
+];
 
 interface TopbarProps {
     title: string;
@@ -20,6 +39,14 @@ interface TopbarProps {
     className?: string;
     path?: string;
     search?: boolean
+    middleNestedLink?: string,
+    middleNestedLinkPath?: string,
+    nestedLink?: string,
+    nestedLinkPath?: string,
+    /** Language code to select initially. Defaults to the first option (Saudi Arabia). */
+    defaultLanguage?: string;
+    /** Called with the selected language's code whenever the user picks one. */
+    onLanguageChange?: (code: string) => void;
 }
 
 export function Topbar({
@@ -31,33 +58,57 @@ export function Topbar({
     hasNotification = true,
     className,
     path,
-    search
+    search,
+    nestedLink,
+    nestedLinkPath,
+    middleNestedLink,
+    middleNestedLinkPath,
+    defaultLanguage = LANGUAGE_OPTIONS[0].code,
+    onLanguageChange,
 }: TopbarProps) {
+    const [language, setLanguage] = useState<LanguageOption>(
+        LANGUAGE_OPTIONS.find((option) => option.code === defaultLanguage) ??
+            LANGUAGE_OPTIONS[0]
+    );
+
+    function handleLanguageSelect(option: LanguageOption) {
+        setLanguage(option);
+        onLanguageChange?.(option.code);
+    }
+
     return (
         <header
             className={cn(
-                "flex items-center justify-center  md:justify-between gap-4 rounded-2xl  shadow-[0px_3px_10.3px_0px_#0000001A] bg-white px-5 py-3",
+                "flex items-center justify-center  md:justify-between gap-4 rounded-2xl  ctm-shadow bg-white px-5 py-3",
                 className
             )}
         >
-            {!path && <h1 className="shrink-0 hidden md:block text-[16px] md:text-[24px] font-semibold text-[#0F1219]">{title}</h1>}
+            {!path && (
+                <div className="flex items-center gap-3" >
+                    <h1 className="shrink-0 hidden md:block text-[16px] md:text-[24px] font-semibold text-[#0F1219]">{title}</h1>
+                </div>
+            )}
 
             {path && (
                 <div className="hidden md:flex items-center md:gap-3 " >
                     <div className="flex items-center gap-1" >
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M11.9997 1.25C12.8657 1.25 13.6404 1.52703 14.4762 1.99609C15.2861 2.45058 16.2146 3.1211 17.3815 3.96484L18.8903 5.05664C19.8264 5.73348 20.5743 6.27401 21.1383 6.77441C21.7208 7.29123 22.1568 7.80702 22.4333 8.45508C22.7103 9.10463 22.778 9.77046 22.7409 10.5381C22.705 11.2789 22.5674 12.1726 22.3961 13.2871L22.0807 15.3389C21.8374 16.9225 21.6437 18.1836 21.359 19.166C21.0647 20.1819 20.65 20.9889 19.9088 21.6055C19.1707 22.2194 18.2906 22.4926 17.2165 22.623C16.1716 22.7499 14.8537 22.75 13.1891 22.75H10.8112C9.14624 22.75 7.82781 22.75 6.78287 22.623C5.70886 22.4926 4.82956 22.2193 4.09146 21.6055C3.35021 20.9889 2.93566 20.182 2.64127 19.166C2.35658 18.1835 2.16197 16.9226 1.91861 15.3389L1.60416 13.2871C1.43288 12.1726 1.2953 11.2789 1.25943 10.5381C1.22227 9.77046 1.28903 9.10463 1.56607 8.45508C1.84251 7.80694 2.27845 7.29128 2.86099 6.77441C3.42516 6.27389 4.1736 5.73369 5.11002 5.05664L6.61881 3.96484C7.7857 3.12112 8.71422 2.45055 9.52408 1.99609C10.3598 1.52715 11.1338 1.25005 11.9997 1.25ZM11.9997 15.75C10.5437 15.75 9.3931 16.9852 9.49674 18.4375L9.69693 21.248C10.058 21.2498 10.445 21.25 10.861 21.25H13.1383C13.5534 21.25 13.9401 21.2498 14.3004 21.248L14.5016 18.4375C14.6052 16.9854 13.4554 15.7503 11.9997 15.75ZM11.9997 2.75C11.4828 2.75005 10.9659 2.90617 10.2575 3.30371C9.53161 3.71105 8.67327 4.33121 7.4606 5.20801L6.02017 6.24902C5.04467 6.95435 4.35762 7.45152 3.85611 7.89648C3.36653 8.33086 3.10381 8.67383 2.94595 9.04395C2.78878 9.41259 2.72672 9.83043 2.75748 10.4658C2.78914 11.1193 2.9136 11.9358 3.09244 13.0996L3.39322 15.0586C3.64649 16.7067 3.82734 17.8712 4.0817 18.749C4.32948 19.604 4.62384 20.0973 5.05045 20.4521C5.48013 20.8095 6.03851 21.0214 6.96353 21.1338C7.32663 21.1779 7.73192 21.2047 8.19107 21.2217L8.00064 18.5449C7.83488 16.2243 9.67312 14.25 11.9997 14.25C14.326 14.2503 16.1635 16.2244 15.9977 18.5449L15.8063 21.2217C16.2664 21.2048 16.6721 21.178 17.0358 21.1338C17.9608 21.0214 18.5192 20.8094 18.9489 20.4521C19.3755 20.0973 19.6708 19.6041 19.9186 18.749C20.173 17.8712 20.3528 16.7066 20.6061 15.0586L20.9069 13.0996C21.0857 11.9358 21.2102 11.1193 21.2419 10.4658C21.2726 9.83054 21.2115 9.41254 21.0544 9.04395C20.8965 8.67382 20.6328 8.33087 20.1432 7.89648C19.6417 7.45153 18.9547 6.95434 17.9792 6.24902L16.5397 5.20801C15.327 4.33115 14.4677 3.71105 13.7419 3.30371C13.0335 2.90622 12.5166 2.75 11.9997 2.75Z" fill="#B1B2B4" />
-                        </svg>
-                        <Link href={'/dashboard'} className="text-[#B1B2B4] text-[12px] md:text-[18px]"> الرئيسية  </Link>
+                         <TopbarHomeIcon />
+                         <Link href={'/dashboard'} className="text-[#B1B2B4] text-[12px] md:text-[18px]"> الرئيسية  </Link>
                     </div>
 
-                    <span> <ChevronLeft className="text-[#161616]" /> </span>
-                    <span className="text-[#0F1219] text-[12px] md:text-[18px]" > {path} </span>
+                  
+                    <Link href={''} className="text-[#B1B2B4] text-[12px] md:text-[18px] flex items-center gap-1"> <ChevronLeft className="text-[#B1B2B4]" /> {path} </Link>
+                    {middleNestedLink && (
+                        <Link href={middleNestedLinkPath ?? '/dashboard'} className="text-[#B1B2B4] text-[12px] md:text-[18px] flex items-center gap-1"> <ChevronLeft className="text-[#B1B2B4]" /> {middleNestedLink} </Link>
+                    )}
+                    {nestedLink && (
+                        <Link href={nestedLinkPath ?? '/dashboard'} className="text-[#0F1219] text-[12px] md:text-[18px] flex items-center gap-1"> <ChevronLeft className="text-[#0F1219]" /> {nestedLink} </Link>
+                    )}
                 </div>
             )}
 
             <div className="flex items-center gap-3">
-                { search && (
+                {search && (
                     <div className="relative hidden md:block ">
                         <Search className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
                         <Input
@@ -68,23 +119,47 @@ export function Topbar({
                         />
                     </div>
 
-                    // <SearchInput />
                 )}
 
                 {/* Language */}
-                <button
-                    type="button"
-                    aria-label="اللغة / الدولة"
-                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border sm:h-10 sm:w-10"
-                >
-                    <Image
-                        src="/ksa.png"
-                        alt="اللغة / الدولة"
-                        width={25}
-                        height={20}
-                        className="h-auto w-5 sm:w-[25px]"
-                    />
-                </button>
+                <DropdownMenu>
+                    <DropdownMenuTrigger
+                        aria-label="اللغة / الدولة"
+                        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border sm:h-10 sm:w-10"
+                    >
+                        <Image
+                            src={language.flag}
+                            alt={language.label}
+                            width={25}
+                            height={20}
+                            className="h-auto w-5 sm:w-[25px]"
+                        />
+                    </DropdownMenuTrigger>
+
+                    <DropdownMenuContent align="end" className="w-48">
+                        {LANGUAGE_OPTIONS.map((option) => (
+                            <DropdownMenuItem
+                                key={option.code}
+                                onSelect={() => handleLanguageSelect(option)}
+                                className="flex items-center gap-2"
+                            >
+                                <Image
+                                    src={option.flag}
+                                    alt={option.label}
+                                    width={20}
+                                    height={16}
+                                    className="h-auto w-5 rounded-sm border border-border"
+                                />
+                                <span className="text-[14px] text-[#0F1219]">
+                                    {option.label}
+                                </span>
+                                {option.code === language.code && (
+                                    <Check className="mr-auto h-4 w-4 text-[#463BAF]" />
+                                )}
+                            </DropdownMenuItem>
+                        ))}
+                    </DropdownMenuContent>
+                </DropdownMenu>
 
                 {/* Notifications */}
                 <Link
@@ -92,17 +167,7 @@ export function Topbar({
                     aria-label="الإشعارات"
                     className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground sm:h-10 sm:w-10"
                 >
-                    <svg
-                        viewBox="0 0 28 28"
-                        fill="none"
-                        className="h-5 w-5 sm:h-[23px] sm:w-[23px]"
-                        xmlns="http://www.w3.org/2000/svg"
-                    >
-                        <path
-                            d="M14.0002 1.45801C19.1987 1.45801 23.4181 5.64851 23.4181 10.8232C23.4183 12.0269 23.4989 12.9354 24.0539 13.752C24.131 13.8638 24.2331 14.0042 24.3449 14.1572C24.5392 14.4232 24.7627 14.7279 24.9318 14.9922C25.2303 15.4586 25.522 16.0214 25.6222 16.6768C25.9491 18.8149 24.441 20.199 22.9396 20.8193C21.9637 21.2226 20.9191 21.5513 19.8312 21.8057C19.8385 21.9268 19.8279 22.0511 19.7951 22.1748C19.1218 24.7082 16.7645 26.542 14.0002 26.542C11.2361 26.5418 8.87945 24.708 8.20623 22.1748C8.17339 22.0511 8.1619 21.9268 8.16912 21.8057C7.08129 21.5513 6.03664 21.2226 5.06073 20.8193C3.55942 20.199 2.05217 18.8149 2.37908 16.6768C2.47932 16.0214 2.77107 15.4586 3.06951 14.9922C3.23855 14.728 3.46124 14.4231 3.65545 14.1572L3.94647 13.752C4.5014 12.9355 4.58307 12.0268 4.58319 10.8232C4.58323 5.64862 8.80182 1.45812 14.0002 1.45801ZM17.2726 22.2568C15.1193 22.5227 12.881 22.5227 10.7277 22.2568C11.3189 23.4006 12.5489 24.2088 14.0002 24.209C15.4515 24.209 16.6813 23.4005 17.2726 22.2568Z"
-                            fill="#161616"
-                        />
-                    </svg>
+                   <TopbarNotificationIcon />
 
                     {hasNotification && (
                         <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-rose-500 ring-2 ring-white sm:right-2.5 sm:top-2.5" />

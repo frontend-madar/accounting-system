@@ -6,8 +6,8 @@ import React from 'react'
 const page = () => {
   return (
     <div className='space-y-4 px-4' >
-        <Topbar title="   الحسابات الآجلة  " userName="mohamed ali" />
-      <div className="rounded-2xl shadow-[0px_3px_10.3px_0px_#0000001A] bg-white p-5">
+      <Topbar title="   الحسابات الآجلة  " userName="mohamed ali" />
+      <div className="rounded-2xl ctm-shadow bg-white p-5">
         <CreditAccountsTableSection data={CREDIT_ACCOUNTS} />
       </div>
     </div>

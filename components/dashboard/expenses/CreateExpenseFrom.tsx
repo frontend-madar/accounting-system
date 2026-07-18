@@ -73,7 +73,7 @@ export function CreateExpenseForm({
     return (
         <form
             onSubmit={handleSubmit(onSubmit)}
-            className="space-y-8 rounded-2xl bg-white p-6 shadow-[0px_3px_10.3px_0px_#0000001A]"
+            className="space-y-8 rounded-2xl bg-white p-6 ctm-shadow"
         >
             <div>
                 <h2 className="text-[24px] font-bold text-[#0F1219]">

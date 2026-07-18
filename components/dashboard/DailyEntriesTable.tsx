@@ -66,11 +66,10 @@ function RemainingBadge({ amount }: { amount: number | string }) {
 
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-[13px] font-medium tabular-nums ${
-        isSettled
+      className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-[13px] font-medium tabular-nums ${isSettled
           ? "bg-[#E7F6EC] text-[#1E9E4C]"
           : "bg-[#FDEDEA] text-[#E0472C]"
-      }`}
+        }`}
     >
       <span className="text-[11px] font-normal opacity-80">EGP</span>
       {value.toLocaleString()}
@@ -104,7 +103,7 @@ export function DailyEntriesTable({
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl bg-white shadow-[0px_3px_10.3px_0px_#0000001A]">
+    <div className="overflow-hidden rounded-2xl bg-white ctm-shadow">
       <div className="overflow-x-auto">
         <Table>
           <TableHeader className="[&_tr]:border-b-0">

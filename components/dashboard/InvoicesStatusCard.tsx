@@ -33,7 +33,7 @@ export function InvoicesStatusCard({
     return (
         <div
             className={cn(
-                "rounded-2xl shadow-[0px_3px_10.3px_0px_#0000001A] bg-white p-5",
+                "rounded-2xl ctm-shadow bg-white p-5",
                 className
             )}
         >

@@ -41,10 +41,12 @@ export interface Employee {
   id: string;
   employeeNumber: string;
   name: string;
+  jobNumber: string;
   department: string;
   jobTitle: string;
   hireDate: string;
   salary: number;
+  baseSalary: number;
   attachmentsCount: number;
 }
 

@@ -1,4 +1,6 @@
 import { CreditAccount } from "@/components/dashboard/credit-accounts/CreditAccountsColumns";
+import { Payroll } from "@/components/dashboard/payroll/Payrollcolumns";
+import { PayrollDetail } from "@/components/dashboard/payroll/Payrolldetailcolumns";
 import { DailyEntry, Employee, ExpenseRecord, ExpenseStat, NotificationGroupData, Vendor } from "@/types/types";
 
 export interface InvoiceListItem {
@@ -377,6 +379,8 @@ export const EMPLOYEES: Employee[] = [
     hireDate: "15/6/2026",
     salary: 5466,
     attachmentsCount: 1,
+    baseSalary: 5466,
+    jobNumber: ''
   },
   {
     id: "2",
@@ -387,6 +391,8 @@ export const EMPLOYEES: Employee[] = [
     hireDate: "15/6/2026",
     salary: 5466,
     attachmentsCount: 1,
+    baseSalary: 5466,
+    jobNumber: ''
   },
   {
     id: "3",
@@ -397,6 +403,8 @@ export const EMPLOYEES: Employee[] = [
     hireDate: "15/6/2026",
     salary: 5466,
     attachmentsCount: 1,
+    baseSalary: 5466,
+    jobNumber: ''
   },
   {
     id: "4",
@@ -407,6 +415,8 @@ export const EMPLOYEES: Employee[] = [
     hireDate: "15/6/2026",
     salary: 5466,
     attachmentsCount: 1,
+    baseSalary: 5466,
+    jobNumber: ''
   },
   {
     id: "5",
@@ -417,9 +427,10 @@ export const EMPLOYEES: Employee[] = [
     hireDate: "15/6/2026",
     salary: 5466,
     attachmentsCount: 1,
+    baseSalary: 5466,
+    jobNumber: ''
   },
 ];
-
 
 
 export const EXPENSES: ExpenseRecord[] = [
@@ -531,7 +542,6 @@ export const NOTIFICATION_GROUPS: NotificationGroupData[] = [
 ];
 
 
-
 export const vendors: Vendor[] = [
   {
     id: "1",
@@ -641,4 +651,131 @@ export const vendors: Vendor[] = [
     paidAmount: 2750,
     remainingAmount: 0,
   },
-]; 
+];
+
+export const payrollData: Payroll[] = [
+  {
+    id: "202648-6",
+    runNumber: "202648",
+    month: "يونيو 2026",
+    period: "1 - 30 يونيو",
+    employeesCount: 325,
+    netSalary: 5466,
+    status: "مدفوع",
+    createdAt: "15/6/2026",
+  },
+  {
+    id: "202648-5",
+    runNumber: "202648",
+    month: "مايو 2026",
+    period: "1 - 30 مايو",
+    employeesCount: 325,
+    netSalary: 5466,
+    status: "مدفوع",
+    createdAt: "15/6/2026",
+  },
+  {
+    id: "202648-4",
+    runNumber: "202648",
+    month: "ابريل 2026",
+    period: "1 - 30 ابريل",
+    employeesCount: 325,
+    netSalary: 5466,
+    status: "معتمد",
+    createdAt: "15/6/2026",
+  },
+  {
+    id: "202648-3",
+    runNumber: "202648",
+    month: "مارس 2026",
+    period: "1 - 30 مارس",
+    employeesCount: 325,
+    netSalary: 5466,
+    status: "مسودة",
+    createdAt: "15/6/2026",
+  },
+  {
+    id: "202648-2",
+    runNumber: "202648",
+    month: "فبراير 2026",
+    period: "1 - 30 فبراير",
+    employeesCount: 325,
+    netSalary: 5466,
+    status: "مدفوع",
+    createdAt: "15/6/2026",
+  },
+  {
+    id: "202648-1",
+    runNumber: "202648",
+    month: "يناير 2026",
+    period: "1 - 30 يناير",
+    employeesCount: 325,
+    netSalary: 5466,
+    status: "مدفوع",
+    createdAt: "15/6/2026",
+  },
+];
+
+
+export const payrollDetails: PayrollDetail[] = [
+    {
+        id: "1",
+        employee: { id: "e1", name: "احمد صلاح", role: "المبيعات" },
+        basicSalary: 5466,
+        allowances: 466,
+        bonuses: 466,
+        overtime: 5466,
+        deductions: 5466,
+        netSalary: 5466,
+    },
+    {
+        id: "2",
+        employee: { id: "e2", name: "مصطفى صالح", role: "المبيعات" },
+        basicSalary: 5466,
+        allowances: 5466,
+        bonuses: 5466,
+        overtime: 5466,
+        deductions: 5466,
+        netSalary: 10466,
+    },
+    {
+        id: "3",
+        employee: { id: "e3", name: "مصطفى صالح", role: "تقنية المعلومات" },
+        basicSalary: 5466,
+        allowances: 5466,
+        bonuses: 5466,
+        overtime: 5466,
+        deductions: 5466,
+        netSalary: 5466,
+    },
+    {
+        id: "4",
+        employee: { id: "e4", name: "محمد سالم", role: "المالية" },
+        basicSalary: 5466,
+        allowances: 5466,
+        bonuses: 5466,
+        overtime: 5466,
+        deductions: 5466,
+        netSalary: 5466,
+    },
+    {
+        id: "5",
+        employee: { id: "e5", name: "احمد صلاح", role: "المبيعات" },
+        basicSalary: 5466,
+        allowances: 5466,
+        bonuses: 5466,
+        overtime: 5466,
+        deductions: 5466,
+        netSalary: 5466,
+    },
+    {
+        id: "6",
+        employee: { id: "e6", name: "مصطفى صالح", role: "المبيعات" },
+        basicSalary: 5466,
+        allowances: 5466,
+        bonuses: 5466,
+        overtime: 5466,
+        deductions: 5466,
+        netSalary: 5466,
+    },
+];

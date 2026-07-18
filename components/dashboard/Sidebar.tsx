@@ -80,8 +80,8 @@ const NAV_ITEMS: NavItem[] = [
         icon: Banknote,
         type: "dropdown",
         children: [
-            { key: "run-payroll", label: "تشغيل مسير الرواتب", href: "/payroll/run" },
-            { key: "salary-list", label: "قائمة المرتبات", href: "/payroll/list" },
+            { key: "salary-list", label: "قائمة المرتبات", href: "/dashboard/payroll" },
+            { key: "run-payroll", label: "تشغيل مسير الرواتب", href: "/dashboard/payroll/run" },
         ],
     },
     { key: "vendors", label: "الموردون", icon: Briefcase, type: "link", href: "/dashboard/suppliers" },

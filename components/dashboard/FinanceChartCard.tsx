@@ -55,7 +55,7 @@ export function FinanceChartCard({
     const [periodOpen, setPeriodOpen] = useState(false);
 
     return (
-        <div className={cn("rounded-2xl shadow-[0px_3px_10.3px_0px_#0000001A] bg-white p-5", className)}>
+        <div className={cn("rounded-2xl ctm-shadow bg-white p-5", className)}>
             <div className="flex flex-wrap md:items-center justify-between gap-3">
                 <div className="flex flex-col md:flex-row md:items-center gap-2">
                     <StatPill label="الإيرادات" value={revenue.value} change={revenue.change} />

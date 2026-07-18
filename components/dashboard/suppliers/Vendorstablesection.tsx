@@ -66,7 +66,7 @@ export function VendorsTableSection({
 
   return (
     <div className={className}>
-      <div className="flex items-start justify-between gap-4">
+      <div className="flex flex-col md:flex-row items-start justify-between gap-4">
 
         <div>
           <h2 className="text-[24px] font-bold text-[#0F1219]">
@@ -77,19 +77,19 @@ export function VendorsTableSection({
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex flex-col sm:flex-row items-center  w-full sm:w-auto gap-2">
 
-          <SecondaryButton text={exportButtonLabel} icon={<Download className="h-4 w-4" />} className="!w-[111px]" />
-          <MainButton text={addButtonLabel} icon={<Plus className="h-4 w-4" />} className="!w-[155px]" href="suppliers/create" />
+          <SecondaryButton text={exportButtonLabel} icon={<Download className="h-4 w-4" />} className="sm:!w-[111px] w-full" />
+          <MainButton text={addButtonLabel} icon={<Plus className="h-4 w-4" />} className="sm:!w-[155px] w-full" href="suppliers/create" />
 
         </div>
       </div>
 
-      <section className="mt-4 rounded-2xl bg-white shadow-[0px_3px_10.3px_0px_#0000001A] p-5">
+      <section className="mt-4 rounded-2xl bg-white ctm-shadow p-5">
 
-        <div className="mt-4 flex items-center justify-between gap-2">
-          <div>
-            <h2 className="text-[24px] font-semibold text-[#0F1219]">
+        <div className="mt-4 flex flex-col sm:flex-row  items-center justify-between gap-2">
+          <div className="flex-row flex sm:flex-col" >
+            <h2 className="sm:text-[24px] text-[18px]  font-semibold text-[#0F1219]">
               {listTitle}
             </h2>
             <span className="rounded-full bg-[#E6F6F4] px-3 py-1 text-[13px] font-medium text-[#1BA915]">

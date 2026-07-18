@@ -12,7 +12,7 @@ export function NotificationsList({ groups, className }: NotificationsListProps)
         return (
             <div
                 className={cn(
-                    "rounded-2xl bg-white p-8 text-center text-[#6B6B70] shadow-[0px_3px_10.3px_0px_#0000001A]",
+                    "rounded-2xl bg-white p-8 text-center text-[#6B6B70] ctm-shadow",
                     className
                 )}
             >

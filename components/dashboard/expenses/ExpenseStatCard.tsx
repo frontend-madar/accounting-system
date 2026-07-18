@@ -3,7 +3,7 @@
 import * as React from "react";
 import { MoreVertical, LayoutDashboard, Building2, Calendar } from "lucide-react";
 import { ExpenseIconKey, ExpenseStat } from "@/types/types";
- 
+
 const ICON_MAP: Record<ExpenseIconKey, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
   total: LayoutDashboard,
   count: Building2,
@@ -21,7 +21,7 @@ export function ExpenseStatCard({ stat, onMenuClick }: ExpenseStatCardProps) {
 
   return (
     <div
-      className="flex-1 flex flex-col justify-between rounded-2xl h-[154px] bg-white shadow-[0px_3px_10.3px_0px_#0000001A] p-5"
+      className="flex-1 flex flex-col justify-between rounded-2xl h-[154px] bg-white ctm-shadow p-5"
     >
       <div className="flex  items-center justify-between">
         <div className="flex items-center gap-2">

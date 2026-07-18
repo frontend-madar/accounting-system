@@ -45,7 +45,7 @@ export function EmployeesTableSection({
 
   return (
     <section
-      className={`rounded-2xl bg-white shadow-[0px_3px_10.3px_0px_#0000001A] p-5 ${className ?? ""}`}
+      className={`rounded-2xl bg-white ctm-shadow p-5 ${className ?? ""}`}
     >
       <div className="flex flex-col md:flex-row items-center justify-between w-full gap-4">
         <h2 className="text-[18px] font-semibold text-[#232323]">{title}</h2>

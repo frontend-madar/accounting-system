@@ -25,7 +25,7 @@ export default function InvoicesPage() {
         <div className="space-y-4 px-4">
 
             <Topbar title=" الفواتير" userName="mohamed ali" search={false} />
-            <div className="bg-white p-4 space-y-4 shadow-[0px_3px_10.3px_0px_#0000001A] rounded-3xl" >
+            <div className="bg-white p-4 space-y-4 ctm-shadow rounded-3xl" >
                 <InvoicesToolbar
                     onSearch={setQuery}
                     onCreateInvoice={() => console.log("navigate to create invoice")}

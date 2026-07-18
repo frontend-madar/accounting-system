@@ -191,12 +191,40 @@ select {
 }
 
 .iti__selected-dial-code:before {
-    content: "";
-    background-color: #C0C1C3;
-    width: 1px;
-    height: 40px;
-    position: absolute;
-    top: 50%;
-    right: -0px;
-    transform: translateY(-50%);
+   content: "";
+   background-color: #C0C1C3;
+   width: 1px;
+   height: 40px;
+   position: absolute;
+   top: 50%;
+   right: -0px;
+   transform: translateY(-50%);
+}
+
+.ctm-shadow {
+   box-shadow: 0px 3px 10.3px 0px #0000001A;
+}
+
+/* Chrome, Edge, Safari */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f3f4f6; /* Track background */
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #40369F;
+  border-radius: 9999px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #322a80;
+}
+
+/* Firefox */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #40369F #f3f4f6;
 }

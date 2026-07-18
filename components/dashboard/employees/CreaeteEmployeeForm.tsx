@@ -80,7 +80,7 @@ export function CreaeteEmployeeForm({
     return (
         <form
             onSubmit={handleSubmit(onSubmit)}
-            className="space-y-8 rounded-2xl  shadow-[0px_3px_10.3px_0px_#0000001A] bg-white p-6"
+            className="space-y-8 rounded-2xl  ctm-shadow bg-white p-6"
         >
 
             <FormSection title="بيانات الموظف" gridClassName="!grid-cols-3">
@@ -146,7 +146,7 @@ export function CreaeteEmployeeForm({
                     {...register("jobTitle")}
                 />
 
-                
+
 
                 <Controller
                     control={control}

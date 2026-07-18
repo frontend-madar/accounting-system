@@ -69,13 +69,13 @@ export function CreateCreditAccountForm({
     return (
         <form
             onSubmit={handleSubmit(onSubmit)}
-            className="space-y-8 rounded-2xl  shadow-[0px_3px_10.3px_0px_#0000001A] bg-white p-6"
+            className="space-y-8 rounded-2xl  ctm-shadow bg-white p-6"
         >
 
-             <h1 className="text-[20px] md:text-[34px] font-bold text-[#171A1F] text-center md:text-right">  إضافة حساب جديد  </h1>
-                <p className="-mt-6 text-[15px] md:text-[18px] text-[##171A1F] text-center md:text-right">
-                   إضافة بيانات عميل جديد لتسجيل معاملاته المالية ومتابعة أرصدته المستحقة.
-                </p>
+            <h1 className="text-[20px] md:text-[34px] font-bold text-[#171A1F] text-center md:text-right">  إضافة حساب جديد  </h1>
+            <p className="-mt-6 text-[15px] md:text-[18px] text-[##171A1F] text-center md:text-right">
+                إضافة بيانات عميل جديد لتسجيل معاملاته المالية ومتابعة أرصدته المستحقة.
+            </p>
 
             <FormSection title="بيانات العميل" gridClassName="items-end">
                 <Controller
@@ -95,22 +95,22 @@ export function CreateCreditAccountForm({
 
 
                 <Button className="border border-[#837CC9] text-[#40369F] bg-white text-[18px] h-[50px] w-[167px] hover:text-[white] hover:bg-[#40369F]">
-                       اضافة حساب جديد 
-               </Button>
+                    اضافة حساب جديد
+                </Button>
 
 
             </FormSection>
 
             <FormSection title="   ">
-                
-                
+
+
                 <Controller
                     control={control}
                     name="employeeName"
                     render={({ field }) => (
                         <SelectField
                             label="اسم الموظف المسؤول"
-                            placeholder = "اختر الموظف المسؤول"  
+                            placeholder="اختر الموظف المسؤول"
                             value={field.value}
                             onChange={field.onChange}
                             options={EMPLOYEE_OPTIONS}
@@ -133,7 +133,7 @@ export function CreateCreditAccountForm({
                     render={({ field }) => (
                         <SelectField
                             label="تاريخ الدفع"
-                            placeholder = "اختر تاريخ الدفع"  
+                            placeholder="اختر تاريخ الدفع"
                             value={field.value}
                             onChange={field.onChange}
                             options={PAYMENT_DATE_OPTIONS}
@@ -148,7 +148,7 @@ export function CreateCreditAccountForm({
                     render={({ field }) => (
                         <SelectField
                             label="العملة"
-                            placeholder = "EGP جنيه مصري"  
+                            placeholder="EGP جنيه مصري"
                             value={field.value}
                             onChange={field.onChange}
                             options={CURRENCY_OPTIONS}
@@ -159,26 +159,26 @@ export function CreateCreditAccountForm({
 
                 <InvoiceTextField
                     label="المبلغ الكلي"
-                    placeholder = "EGP 15,000"  
+                    placeholder="EGP 15,000"
                     error={errors.totalAmount?.message}
                     {...register("totalAmount")}
                 />
 
-                 <InvoiceTextField
+                <InvoiceTextField
                     label="المدفوع"
                     placeholder="  EGP 15,000  "
-                     error={errors.paidAmount?.message}
+                    error={errors.paidAmount?.message}
 
                     {...register("paidAmount")}
                 />
 
-                  <Controller
+                <Controller
                     control={control}
                     name="paymentMethod"
                     render={({ field }) => (
                         <SelectField
                             label="طريقة الدفع"
-                            placeholder = "اختر طريقة الدفع"  
+                            placeholder="اختر طريقة الدفع"
                             value={field.value}
                             onChange={field.onChange}
                             options={PAYMENT_METHOD_OPTIONS}
@@ -190,18 +190,18 @@ export function CreateCreditAccountForm({
                 <InvoiceTextField
                     label=" المتبقي "
                     value={'EGP 5,000'}
-                     error={errors.remainingAmount?.message}
+                    error={errors.remainingAmount?.message}
                     {...register("remainingAmount")}
                     disabled
                 />
 
-                 <Controller
+                <Controller
                     control={control}
                     name="status"
                     render={({ field }) => (
                         <SelectField
                             label="الحالة"
-                            placeholder = "اختر الحالة"  
+                            placeholder="اختر الحالة"
                             value={field.value}
                             onChange={field.onChange}
                             options={STATUS_OPTIONS}
