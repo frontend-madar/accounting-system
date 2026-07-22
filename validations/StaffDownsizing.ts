@@ -3,7 +3,6 @@ import { z } from "zod";
 export const staffDownsizingSchema = z.object({
   searchName: z.string().optional(),
   department: z.string().optional(),
-  branch: z.string().optional(),
 });
 
 export type StaffDownsizingValues = z.infer<typeof staffDownsizingSchema>;

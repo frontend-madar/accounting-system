@@ -1,19 +1,12 @@
 "use client";
 
-import * as React from "react";
-import { useMemo } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FileText, Plus, Printer, Save, X } from "lucide-react";
+import { FileText, Plus, X } from "lucide-react";
 import { useRef, useState } from "react";
 
-import { Button } from "@/components/ui/button";
-
 import {
-    clientFormSchema,
-    ClientFormValues,
     InvoiceFormValues,
-    COUNTRY_OPTIONS,
 } from "@/validations/Invoice";
 import { FormSection } from "../invoice/FormSection";
 import { InvoiceTextField } from "../invoice/TextField";
@@ -25,20 +18,27 @@ import MainButton from "../MainButton";
 import { Card } from "@/components/ui/card";
 import SecondaryButton from "../SecondaryButton";
 
+import { useCreateClient } from "@/hooks/use-client";
+import { toast } from "sonner";
+import { ClientType } from "@/types/client.types";
+import { clientFormSchema, ClientFormValues } from "@/validations/client-schema";
 
-type ClientType = "individual" | "commercial";
-
+const CURRENCY_OPTIONS = [
+    { label: "ريال سعودي (SAR)", value: "SAR" },
+    { label: "دولار أمريكي (USD)", value: "USD" },
+    { label: "جنيه مصري (EGP)", value: "EGP" },
+    { label: "درهم إماراتي (AED)", value: "AED" },
+];
 
 interface CreateInvoiceFormProps {
     invoiceNumber?: string;
     onSaveDraft?: (values: Partial<InvoiceFormValues>) => void;
     onSaveAndPrint?: (values: InvoiceFormValues) => void;
 }
-
+ 
 export function CreateCustomerForm({
     onSaveDraft,
 }: CreateInvoiceFormProps) {
-
 
     const {
         control,
@@ -60,31 +60,44 @@ export function CreateCustomerForm({
             taxId: "",
             idNumber: "",
             commercialRecord: "",
+            currency: "",
         },
     });
 
-
-
-    // inside your component:
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
     const [clientType, setClientType] = useState<ClientType>("individual");
 
+    const { mutate: createClient, isPending } = useCreateClient();
 
     const handleFileSelect = (file: File) => {
+        if (file.type !== "application/pdf") {
+            toast.error("الملف يجب أن يكون بصيغة PDF فقط");
+            return;
+        }
+        if (file.size > 10 * 1024 * 1024) {
+            toast.error("حجم الملف يجب ألا يتجاوز 10 ميجابايت");
+            return;
+        }
         setSelectedFile(file);
-        // TODO: upload logic here, e.g. call your API or set form state
     };
 
-
-
-    function handleSaveDraft() {
-        // Drafts are saved as-is, without requiring full validation.
-        onSaveDraft?.(getValues());
-    }
-
     function onSubmit(values: ClientFormValues) {
+        createClient({
+            clientType,
+            name: values.clientName,
+            email: values.clientEmail,
+            mobile: values.clientPhone,
+            country: values.clientCountry,
+            city: values.clientCity,
+            commercialRegister: values.commercialRecord,
+            taxCard: values.idNumber,
+            taxNumber: values.taxId,
+            currency: values.currency,
+            notes: values.notes,
+            attachments: selectedFile,
+        });
     }
 
     return (
@@ -115,8 +128,8 @@ export function CreateCustomerForm({
 
                         <label className="flex items-center gap-2 cursor-pointer">
                             <RadioGroupItem
-                                value="commercial"
-                                id="commercial"
+                                value="business"
+                                id="business"
                                 className="w-6 h-6 border-[#BEBCC1] data-[state=checked]:border-[#463BAF] [&_svg]:w-4 [&_svg]:h-4 [&_svg]:fill-[#463BAF] [&_svg]:stroke-none"
                             />
                             <span className="text-[#232323] text-[16px]">تجاري</span>
@@ -142,34 +155,35 @@ export function CreateCustomerForm({
                 />
                 <InvoiceTextField
                     label="البريد الإلكتروني"
-                    placeholder="ادخل رقم الجوال"
+                    placeholder="ادخل البريد الإلكتروني"
                     inputMode="email"
-                    error={errors.clientPhone?.message}
-                    {...register("clientPhone")}
+                    error={errors.clientEmail?.message}
+                    {...register("clientEmail")}
                 />
                 <InvoiceTextField
-                    label="المدينة, الدولة"
-                    placeholder="ادخل المدينة والدولة"
+                    label="المدينة"
+                    placeholder="ادخل المدينة"
                     error={errors.clientCity?.message}
                     {...register("clientCity")}
-
                 />
                 <InvoiceTextField
-                    label=" سجل تجاري (اختياري)  "
+                    label="الدولة"
+                    placeholder="ادخل الدولة"
+                    error={errors.clientCountry?.message}
+                    {...register("clientCountry")}
+                />
+                <InvoiceTextField
+                    label=" سجل تجاري (اختياري)  "
                     placeholder="ادخل رقم السجل التجاري"
                     error={errors.commercialRecord?.message}
                     {...register("commercialRecord")}
-
                 />
                 <InvoiceTextField
-                    label=" سجل تجاري (اختياري)  "
-                    placeholder="ادخل رقم السجل التجاري"
+                    label=" الرقم الضريبي (اختياري)  "
+                    placeholder="ادخل الرقم الضريبي"
                     error={errors.idNumber?.message}
                     {...register("idNumber")}
-
                 />
-
-
             </FormSection>
 
             <FormSection title="البيانات المالية">
@@ -181,15 +195,15 @@ export function CreateCustomerForm({
                 />
                 <Controller
                     control={control}
-                    name="clientCountry"
+                    name="currency"
                     render={({ field }) => (
                         <SelectField
-                            label="الدولة"
-                            placeholder="ادخل الدولة"
+                            label="العملة"
+                            placeholder="اختر العملة"
                             value={field.value}
                             onChange={field.onChange}
-                            options={COUNTRY_OPTIONS}
-                            error={errors.clientCountry?.message}
+                            options={CURRENCY_OPTIONS}
+                            error={errors.currency?.message}
                         />
                     )}
                 />
@@ -198,13 +212,14 @@ export function CreateCustomerForm({
 
             <Card className="grid md:grid-cols-2 gap-4 bg-[#eeeeee60] border  p-5">
                 <div>
-                    <FieldLabel htmlFor={"comments"} dropdown={false} >
+                    <FieldLabel htmlFor={"notes"} dropdown={false} >
                         <span className="text-[#232323] text-[14px] md:text-[18px] mb-2">ملاحظات </span>
                     </FieldLabel>
                     <Textarea
-                        id="comments"
+                        id="notes"
                         className="h-[132px] border border-[#C0C0C0] text-[#40369F] md:text-[19px] text-[15px]"
                         placeholder="اضف وصف..."
+                        {...register("notes")}
                     />
                 </div>
 
@@ -238,11 +253,10 @@ export function CreateCustomerForm({
 
                         </div>
 
-
-
                         <input
                             ref={fileInputRef}
                             type="file"
+                            accept="application/pdf"
                             className="hidden"
                             onChange={(e) => {
                                 const file = e.target.files?.[0];
@@ -250,15 +264,28 @@ export function CreateCustomerForm({
                             }}
                         />
                     </div>
+                    {selectedFile && (
+                        <div className="flex items-center justify-between gap-2 mt-2 text-sm text-[#463BAF]">
+                            <span className="truncate">{selectedFile.name}</span>
+                            <button
+                                type="button"
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    setSelectedFile(null);
+                                    if (fileInputRef.current) fileInputRef.current.value = "";
+                                }}
+                                className="text-red-500 hover:underline"
+                            >
+                                إزالة
+                            </button>
+                        </div>
+                    )}
                 </div>
             </Card>
 
-
-
             <div className="flex items-center  gap-3 border-t border-border pt-5">
-                <MainButton text=" حفظ العميل" icon={<Plus className="h-4 w-4" />} />
+                <MainButton text=" حفظ العميل" icon={<Plus className="h-4 w-4" />} disabled={isPending} />
                 <SecondaryButton text="   إلغاء" icon={<X className="h-4 w-4" />} className="!w-[110px]" />
-
             </div>
         </form>
     );

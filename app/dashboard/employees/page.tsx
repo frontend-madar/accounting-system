@@ -7,8 +7,8 @@ const page = () => {
     return (
         <div className='px-4 space-y-4' >
             <Topbar title='ادارة الموظفين' />
-            <StaffDownsizing />
-            <EmployeesTableSection data={EMPLOYEES} totalRecords={148} />
+            
+            <EmployeesTableSection />
         </div>
     )
 }

@@ -1,12 +1,29 @@
+
+
 "use client";
 
 import * as React from "react";
-import { MoreVertical, Paperclip } from "lucide-react";
+import { MoreVertical, Paperclip, Pencil, Trash2 } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
-import { Employee } from "@/types/types";
-import { Checkbox } from "@/components/ui/checkbox";
+import { EmployeeData } from "@/types/employee.types";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
-export function getEmployeeColumns(): ColumnDef<Employee>[] {
+import { Checkbox } from "@/components/ui/checkbox";
+interface GetEmployeeColumnsProps {
+  onEdit?: (employee: EmployeeData) => void;
+  onDelete?: (employee: EmployeeData) => void;
+}
+
+
+export function getEmployeeColumns({
+  onEdit,
+  onDelete,
+}: GetEmployeeColumnsProps = {}): ColumnDef<EmployeeData>[] {
   return [
     {
       accessorKey: "employeeNumber",
@@ -14,12 +31,12 @@ export function getEmployeeColumns(): ColumnDef<Employee>[] {
       cell: ({ row }) => (
         <span className="flex items-center gap-2">
           <Checkbox />
-          {row.original.employeeNumber}
+          {/* {row.original.id} */}
         </span>
       )
     },
     {
-      accessorKey: "name",
+      accessorKey: "fullName",
       header: "اسم الموظف",
     },
     {
@@ -33,23 +50,24 @@ export function getEmployeeColumns(): ColumnDef<Employee>[] {
     {
       accessorKey: "hireDate",
       header: "تاريخ التعيين",
+      cell: ({ row }) => new Date(row.original.hireDate).toLocaleDateString("ar-EG"),
     },
     {
-      accessorKey: "salary",
+      accessorKey: "basicSalary",
       header: "الراتب",
       cell: ({ row }) => (
         <span className="font-medium">
           <span className="text-muted-foreground text-[13px] ml-1">EGP</span>
-          {row.original.salary.toLocaleString()}
+          {Number(row.original.basicSalary).toLocaleString()}
         </span>
       ),
     },
     {
-      accessorKey: "attachmentsCount",
+      id: "attachments",
       header: "المرفقات",
       cell: ({ row }) => (
         <div className="flex items-center gap-1">
-          <span>{row.original.attachmentsCount}</span>
+          <span>{row.original.attachments.length}</span>
           <Paperclip className="h-4 w-4 text-muted-foreground" />
         </div>
       ),
@@ -57,10 +75,27 @@ export function getEmployeeColumns(): ColumnDef<Employee>[] {
     {
       id: "actions",
       header: "",
-      cell: () => (
-        <button type="button" className="text-muted-foreground">
-          <MoreVertical className="h-4 w-4" />
-        </button>
+      cell: ({ row }) => (
+        <DropdownMenu>
+          <DropdownMenuTrigger className="text-muted-foreground">
+            <MoreVertical className="h-4 w-4" />
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem
+              onClick={() => onEdit?.(row.original)}
+            >
+              <Pencil className="h-4 w-4" />
+              تعديل
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => onDelete?.(row.original)}
+              className="text-red-600 focus:text-red-600"
+            >
+              <Trash2 className="h-4 w-4" />
+              حذف
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       ),
     },
   ];

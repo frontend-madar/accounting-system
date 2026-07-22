@@ -22,6 +22,7 @@ const INVOICES: Invoice[] = Array.from({ length: 45 }, (_, i) => ({
     status: i % 5 === 2 ? "partial" : i % 5 === 4 ? "cancelled" : "completed",
 }));
 
+
 export default function DashboardOverviewPage() {
     return (
         <div className="space-y-4 px-4">
@@ -35,7 +36,7 @@ export default function DashboardOverviewPage() {
                 />
 
                 <NavCard
-                    href="/dashboard/customers/create"
+                    href="/dashboard/clients/create"
                     title="اضافة عملاء"
                     icon={<CirclePlus className="h-5 w-5 text-[#463BAF]" />}
                 />

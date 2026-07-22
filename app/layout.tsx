@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { El_Messiri, } from "next/font/google";
 import "./globals.css";
 import { Toaster } from "sonner";
+import { Providers } from "@/providers/provider";
+import DevToolsBlocker from "@/components/DevToolBlocker";
 
 
 const elMessiri = El_Messiri({
@@ -23,13 +25,17 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html
       lang="en"
     >
       <body className={`min-h-full flex flex-col ${elMessiri.className}`}>
-        {children}
-        <Toaster position="top-right" richColors />
+        <Providers>
+          {/* <DevToolsBlocker />  */}
+          {children}
+          <Toaster position="top-right" richColors />
+        </Providers>
       </body>
     </html>
   );

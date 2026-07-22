@@ -2,7 +2,8 @@
 
 import * as React from "react";
 import { useState } from "react";
-import { Bell, Check, ChevronDown, ChevronLeft, Search } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Bell, Check, ChevronDown, ChevronLeft, Search, LogOut } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -10,6 +11,9 @@ import {
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
+    DropdownMenuSeparator,
+    DropdownMenuLabel,
+    DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -17,6 +21,8 @@ import Image from "next/image";
 import Link from "next/link";
 import SearchInput from "./SearchInput";
 import { TopbarHomeIcon, TopbarNotificationIcon } from "@/icons";
+import { Button } from "../ui/button";
+import { useAuthStore } from "@/store/auth-store";
 
 interface LanguageOption {
     code: string;
@@ -31,7 +37,6 @@ const LANGUAGE_OPTIONS: LanguageOption[] = [
 
 interface TopbarProps {
     title: string;
-    userName?: string;
     avatarSrc?: string;
     searchPlaceholder?: string;
     onSearch?: (value: string) => void;
@@ -51,7 +56,6 @@ interface TopbarProps {
 
 export function Topbar({
     title,
-    userName = "المستخدم",
     avatarSrc = "/user.png",
     searchPlaceholder = "بحث",
     onSearch,
@@ -66,6 +70,13 @@ export function Topbar({
     defaultLanguage = LANGUAGE_OPTIONS[0].code,
     onLanguageChange,
 }: TopbarProps) {
+    const router = useRouter();
+    const user = useAuthStore((s) => s.user);
+    const logout = useAuthStore((s) => s.logout);
+
+    const userName = user?.businessName || user?.businessName || "المستخدم";
+    const userEmail = user?.email || "user@example.com";
+
     const [language, setLanguage] = useState<LanguageOption>(
         LANGUAGE_OPTIONS.find((option) => option.code === defaultLanguage) ??
             LANGUAGE_OPTIONS[0]
@@ -74,6 +85,11 @@ export function Topbar({
     function handleLanguageSelect(option: LanguageOption) {
         setLanguage(option);
         onLanguageChange?.(option.code);
+    }
+
+    function handleLogout() {
+        logout();
+        router.push("/login");
     }
 
     return (
@@ -175,18 +191,37 @@ export function Topbar({
                 </Link>
 
                 {/* User */}
-                <button
-                    type="button"
-                    className="flex shrink-0 items-center gap-1 sm:gap-1.5"
-                    aria-label="حساب المستخدم"
-                >
-                    <ChevronDown className="h-3.5 w-3.5 text-muted-foreground sm:h-4 sm:w-4" />
+                <DropdownMenu>
+                    <DropdownMenuTrigger
+                        className="flex shrink-0 items-center gap-1 sm:gap-1.5 outline-none"
+                        aria-label="حساب المستخدم"
+                    >
+                        <ChevronDown className="h-3.5 w-3.5 text-muted-foreground sm:h-4 sm:w-4" />
 
-                    <Avatar className="h-9 w-9 sm:h-10 sm:w-10">
-                        <AvatarImage src={avatarSrc} alt={userName} />
-                        <AvatarFallback>{userName.slice(0, 1)}</AvatarFallback>
-                    </Avatar>
-                </button>
+                        <Avatar className="h-9 w-9 sm:h-10 sm:w-10">
+                            <AvatarImage src={avatarSrc} alt={userName} />
+                            <AvatarFallback>{userName.slice(0, 1)}</AvatarFallback>
+                        </Avatar>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end" className="w-56" sideOffset={8}>
+                        <DropdownMenuGroup>
+                            <DropdownMenuLabel className="font-normal flex flex-col gap-1.5 p-2">
+                                <p className="text-sm font-medium leading-none text-[#0F1219]">{userName}</p>
+                                <p className="text-xs leading-none text-muted-foreground">
+                                    {userEmail}
+                                </p>
+                            </DropdownMenuLabel>
+                        </DropdownMenuGroup>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                            onClick={handleLogout}
+                            className="text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer flex items-center gap-2 p-2"
+                        >
+                            <LogOut className="h-4 w-4" />
+                            <span className="font-medium">تسجيل الخروج</span>
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
 
 
             </div>

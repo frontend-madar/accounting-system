@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import {
@@ -20,6 +20,8 @@ import {
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useClickOutside } from "@/hooks/UseClickOutside";
+import { DailyLimitsIcon, DashboardIcon, EmployeesIcon, ExpemsessIcon, ForwardAccountsIcon, InvitePersonIcon, IvoicesIcons, LogoutIcon, SalariesIcon, SuppliersIcon } from "@/icons";
+import { InviteFrom } from "../auth/InviteFrom";
 
 // ---- Types ----
 type SubLink = {
@@ -50,14 +52,14 @@ type NavItem = NavLink | NavDropdown;
 const MOBILE_BREAKPOINT = 1024;
 
 const NAV_ITEMS: NavItem[] = [
-    { key: "dashboard", label: "لوحة التحكم", icon: LayoutGrid, type: "link", href: "/dashboard", exact: true },
-    { key: "credit-accounts", label: "الحسابات الآجلة", icon: CircleDollarSign, type: "link", href: "/dashboard/credit-accounts" },
-    { key: "daily-entries", label: "القيود اليومية", icon: NotebookPen, type: "link", href: "/dashboard/daily-entries" },
-    { key: "invoices", label: "الفواتير", icon: FileText, type: "link", href: "/dashboard/invoices" },
+    { key: "dashboard", label: "لوحة التحكم", icon: DashboardIcon, type: "link", href: "/dashboard", exact: true },
+    { key: "credit-accounts", label: "الحسابات الآجلة", icon: ForwardAccountsIcon, type: "link", href: "/dashboard/credit-accounts" },
+    { key: "daily-entries", label: "القيود اليومية", icon: DailyLimitsIcon, type: "link", href: "/dashboard/daily-entries" },
+    { key: "invoices", label: "الفواتير", icon: IvoicesIcons, type: "link", href: "/dashboard/invoices" },
     {
         key: "expenses",
         label: "المصروفات",
-        icon: Wallet,
+        icon: ExpemsessIcon,
         type: "dropdown",
         children: [
             { key: "manage-expenses", label: "اضافة مصروفات", href: "/dashboard/expenses/add-expense" },
@@ -67,7 +69,7 @@ const NAV_ITEMS: NavItem[] = [
     {
         key: "employees",
         label: "الموظفين",
-        icon: Users2,
+        icon: EmployeesIcon,
         type: "dropdown",
         children: [
             { key: "manage-employees", label: "ادارة الموظفين", href: "/dashboard/employees" },
@@ -77,14 +79,14 @@ const NAV_ITEMS: NavItem[] = [
     {
         key: "payroll",
         label: "الرواتب",
-        icon: Banknote,
+        icon: SalariesIcon,
         type: "dropdown",
         children: [
             { key: "salary-list", label: "قائمة المرتبات", href: "/dashboard/payroll" },
             { key: "run-payroll", label: "تشغيل مسير الرواتب", href: "/dashboard/payroll/run" },
         ],
     },
-    { key: "vendors", label: "الموردون", icon: Briefcase, type: "link", href: "/dashboard/suppliers" },
+    { key: "vendors", label: "الموردون", icon: SuppliersIcon, type: "link", href: "/dashboard/suppliers" },
 ];
 
 interface SidebarProps {
@@ -111,7 +113,9 @@ export function Sidebar({
 
     const [openDropdown, setOpenDropdown] = useState<string | null>(initialOpen);
     const [isExpanded, setIsExpanded] = useState(true);
+    const [showUserMenu, setShowUserMenu] = useState(false);
     const sidebarRef = useRef<any>(null);
+    const userMenuRef = useRef<HTMLDivElement>(null);
 
     // Tracks whether we were already below the breakpoint, so we only force
     // a collapse the moment we *cross into* mobile size — a manual toggle
@@ -143,6 +147,20 @@ export function Sidebar({
         }
     }, isExpanded);
 
+    const [showInvite, setShowInvite] = useState(false);
+    
+
+    useEffect(() => {
+        if (!showUserMenu) return;
+        function handleOutsideClick(e: MouseEvent) {
+            if (userMenuRef.current && !userMenuRef.current.contains(e.target as Node)) {
+                setShowUserMenu(false);
+            }
+        }
+        document.addEventListener("mousedown", handleOutsideClick);
+        return () => document.removeEventListener("mousedown", handleOutsideClick);
+    }, [showUserMenu]);
+
     function toggleDropdown(key: string) {
         setOpenDropdown((prev) => (prev === key ? null : key));
     }
@@ -151,7 +169,7 @@ export function Sidebar({
         <aside
             ref={sidebarRef}
             className={cn(
-                "relative flex h-full flex-col overflow-hidden rounded-2xl text-white bg-[#695BE1] bg-[linear-gradient(180deg,_#25198A_0%,_rgba(37,25,138,0.35)_104.8%,_rgba(37,25,138,0)_169.64%)] transition-all duration-300 ease-in-out shrink-0",
+                "relative flex h-full flex-col  rounded-2xl text-white bg-[#695BE1] bg-[linear-gradient(180deg,_#25198A_0%,_rgba(37,25,138,0.35)_104.8%,_rgba(37,25,138,0)_169.64%)] transition-all duration-300 ease-in-out shrink-0",
                 isExpanded ? "w-[283px]" : "w-[80px]"
             )}
         >
@@ -161,7 +179,7 @@ export function Sidebar({
                 alt=""
                 fill
                 priority
-                className="pointer-events-none select-none object-cover opacity-20"
+                className="pointer-events-none select-none object-cover rounded-2xl opacity-20"
             />
 
             {/* content sits above the pattern */}
@@ -289,15 +307,54 @@ export function Sidebar({
                 </nav>
 
                 {/* footer / current user */}
-                <div className={cn("flex items-center gap-3 px-5 py-4 border-t border-white/10", !isExpanded ? "justify-center" : "justify-start")}>
-                    <div className="relative h-10 w-10 shrink-0 overflow-hidden rounded-full">
-                        <Image src={avatarSrc} alt={userName} fill className="object-cover" />
+                {/* footer / current user */}
+                <div ref={userMenuRef} className="relative">
+                    {/* Popup */}
+                    <div
+                        className={cn(
+                            "absolute bottom-full mb-2 left-2 w-[260px] p-4 shadow-[0px_1px_10px_0px_#00000040] bg-white rounded-xl z-50 transition-all duration-200 ease-out",
+                            showUserMenu
+                                ? "opacity-100 translate-y-0 pointer-events-auto"
+                                : "opacity-0 translate-y-2 pointer-events-none"
+                        )}
+                    >
+                        <div onClick={() => setShowInvite(true)} className="flex items-center gap-3 px-2 py-1.5 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                            <InvitePersonIcon />
+                            <p className="text-[18px] font-medium text-[#1E2128]">دعوة اشخاص</p>
+                        </div>
+                        <div className="my-2 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+                        <Link
+                            href="/"
+                            className="flex items-center gap-3 px-2 py-1.5 rounded-lg hover:bg-red-50 transition-colors group"
+                            onClick={() => setShowUserMenu(false)}
+                        >
+                            <LogoutIcon />
+                            <p className="text-[18px] font-medium text-[#B01212] group-hover:text-red-700 transition-colors">
+                                تسجيل خروج
+                            </p>
+                        </Link>
                     </div>
-                    <div className={cn("min-w-0 text-right", !isExpanded && "hidden")}>
-                        <p className="truncate text-[16px] font-medium">{userName}</p>
-                        <p className="truncate text-[16px] font-medium opacity-80">{userEmail}</p>
+
+                    {/* Trigger */}
+                    <div
+                        onClick={() => setShowUserMenu((v) => !v)}
+                        className={cn(
+                            "flex items-center gap-3 px-5 py-4 border-t border-white/10 cursor-pointer hover:bg-white/5 transition-colors",
+                            !isExpanded ? "justify-center" : "justify-start"
+                        )}
+                    >
+                        <div className="relative h-10 w-10 shrink-0 rounded-full overflow-hidden">
+                            <Image src={avatarSrc} alt={userName} fill className="object-cover" />
+                        </div>
+                        <div className={cn("min-w-0 text-right", !isExpanded && "hidden")}>
+                            <p className="truncate text-[16px] font-medium">{userName}</p>
+                            <p className="truncate text-[16px] font-medium opacity-80">{userEmail}</p>
+                        </div>
                     </div>
                 </div>
+
+                {showInvite && <InviteFrom onClose={() => setShowInvite(false)} />}
+
             </div>
         </aside>
     );
