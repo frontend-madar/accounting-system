@@ -2,19 +2,18 @@
 
 import * as React from "react";
 import { useMemo, useState } from "react";
-import { Plus, Search, SlidersHorizontal, ChevronDown } from "lucide-react";
+import { Plus } from "lucide-react";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   getCreditAccountColumns,
   CreditAccount,
 } from "./CreditAccountsColumns";
- 
+
 import { CreditAccountStatus } from "./CreditAccountStatusBadge";
 import { DataTable } from "../DataTable";
 import { DataTablePagination } from "../Pagination";
-import MainButton from "../MainButton";
+import MainButton from "../shared/MainButton";
+import SecondaryButton from "../shared/SecondaryButton";
 import FillterButton from "../FillterButton";
 import SearchInput from "../SearchInput";
 
@@ -68,15 +67,14 @@ export function CreditAccountsTableSection({
   return (
     <section className={className}>
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-      
-        <MainButton  text={addButtonLabel} icon={<Plus className="h-4 w-4" />} />
 
+        <SearchInput query={query} setQuery={setQuery} setPage={setPage} />
         <div className="flex flex-col md:flex-row md:items-center gap-2">
-         
-          <FillterButton />
 
-         <SearchInput query={query} setQuery={setQuery} setPage={setPage} />
+          <MainButton text={addButtonLabel} href="/dashboard/credit-accounts/create" icon={<Plus className="h-4 w-4" />} />
+          <FillterButton />
         </div>
+
       </div>
 
       <div className="mt-4 overflow-hidden">

@@ -14,9 +14,9 @@ import { SelectField } from "../invoice/SelectField";
 import { FieldLabel } from "../invoice/FieldLabel";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import MainButton from "../MainButton";
+import MainButton from "../shared/MainButton";
+import SecondaryButton from "../shared/SecondaryButton";
 import { Card } from "@/components/ui/card";
-import SecondaryButton from "../SecondaryButton";
 
 import { useCreateClient } from "@/hooks/use-client";
 import { toast } from "sonner";

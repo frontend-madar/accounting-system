@@ -10,7 +10,8 @@ import { cn } from "@/lib/utils";
 import { useClickOutside } from "@/hooks/UseClickOutside";
 import SearchInput from "../SearchInput";
 import FillterButton from "../FillterButton";
-import MainButton from "../MainButton";
+import MainButton from "../shared/MainButton";
+import SecondaryButton from "../shared/SecondaryButton";
 
 const FILTER_OPTIONS = ["الكل", "مستحقة الدفع", "مدفوعة", "ملغاة"];
 
@@ -62,15 +63,9 @@ export function InvoicesToolbar({
                     )}
                 </div>
 
-                <Button
-                    type="button"
-                    variant="outline"
-                    onClick={onOpenDrafts}
-                    className="gap-2 rounded-lg w-32 h-11 "
-                >
-                    <FileEdit className="h-4 w-4" />
-                    المسودة
-                </Button>
+                
+
+                <SecondaryButton text="المسودة" icon={<FileEdit className="h-4 w-4" />} className="!w-32" />
 
                 <MainButton text="إنشاء فاتورة" icon={<Plus className="h-4 w-4" />} />
             </div>

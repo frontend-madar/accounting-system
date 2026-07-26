@@ -24,7 +24,7 @@ export default function InvoicesPage() {
     return (
         <div className="space-y-4 px-4">
 
-            <Topbar title=" الفواتير" userName="mohamed ali" search={false} />
+            <Topbar title=" الفواتير"  search={false} />
             <div className="bg-white p-4 space-y-4 ctm-shadow rounded-3xl" >
                 <InvoicesToolbar
                     onSearch={setQuery}

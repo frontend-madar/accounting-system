@@ -14,8 +14,8 @@ import { SelectField } from "../invoice/SelectField";
 import { FieldLabel } from "../invoice/FieldLabel";
 import { Textarea } from "@/components/ui/textarea";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import MainButton from "../MainButton";
-import SecondaryButton from "../SecondaryButton";
+import MainButton from "../shared/MainButton";
+import SecondaryButton from "../shared/SecondaryButton";
 import { useUpdateClient } from "@/hooks/use-client";
 import { ClientData, ClientType, UpdateClientPayload } from "@/types/client.types";
 import {

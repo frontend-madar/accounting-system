@@ -3,7 +3,7 @@
 import { useMemo, useState } from "react";
 import { Plus } from "lucide-react";
 import { getPayrollColumns, Payroll } from "./Payrollcolumns";
-import MainButton from "../MainButton";
+import MainButton from "../shared/MainButton";
 import { SelectFilter } from "./Selectfilter";
 import SearchInput from "../SearchInput";
 import { DataTablePagination } from "../Pagination";

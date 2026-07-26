@@ -16,7 +16,7 @@ export function ExpenseStatsSection({
   className,
 }: ExpenseStatsSectionProps) {
   return (
-    <div className={`flex items-stretch gap-4 ${className ?? ""}`}>
+    <div className={`grid grid-cols-2 md:grid-cols-3 items-stretch gap-4 ${className ?? ""}`}>
       {stats.map((stat) => (
         <ExpenseStatCard key={stat.id} stat={stat} onMenuClick={onMenuClick} />
       ))}

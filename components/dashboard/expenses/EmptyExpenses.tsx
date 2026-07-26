@@ -1,4 +1,4 @@
-import MainButton from '../MainButton'
+import MainButton from "../shared/MainButton";
 import { Plus } from 'lucide-react'
 
 const EmptyExpenses = () => {

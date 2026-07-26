@@ -1,6 +1,8 @@
 "use client";
 
 import { Calendar as CalendarIcon } from "lucide-react";
+import { format } from "date-fns";
+import { ar } from "date-fns/locale";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -11,8 +13,6 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover";
 import { FieldLabel } from "./invoice/FieldLabel";
-import { ar } from "date-fns/locale";
-import { format } from "date-fns";
 
 interface DateFieldProps {
     label: string;
@@ -37,12 +37,16 @@ export function DateField({
     className,
 }: DateFieldProps) {
     const fieldId = id ?? label;
-    const selectedDate = value ? new Date(value) : undefined;
+
+    const selectedDate = value
+        ? new Date(value)
+        : undefined;
 
     return (
-        <div className="space-y-1.5 w-full">
+        <div className="w-full space-y-2">
+            {/* Label */}
             <FieldLabel htmlFor={fieldId} dropdown={false}>
-                <span className="text-[#232323] text-[14px] md:text-[18px] mb-2">
+                <span className="text-[14px] font-semibold text-[#232323] md:text-[17px]">
                     {label}
                 </span>
             </FieldLabel>
@@ -56,32 +60,88 @@ export function DateField({
                         disabled={disabled}
                         aria-invalid={!!error}
                         className={cn(
-                            "ctm-inp w-full justify-between font-normal  bg-transparent",
-                            !selectedDate && "text-muted-foreground",
-                            error && "border-red-500 focus-visible:ring-red-500",
+                            "flex h-[47px] w-full items-center justify-between",
+                            "rounded-xl",
+                            "border border-[#C8C2FC]",
+                            "bg-white",
+                            "px-4",
+                            "text-[15px] font-normal",
+                            "text-[#232323]",
+                            "shadow-sm",
+                            "transition-colors",
+
+                            "hover:bg-[#FAF9FF]",
+                            "hover:border-[#837CC9]",
+
+                            "focus-visible:border-[#40369F]",
+                            "focus-visible:ring-2",
+                            "focus-visible:ring-[#40369F]/20",
+
+                            !selectedDate && "text-[#9CA3AF]",
+
+                            error &&
+                                "border-red-500 focus-visible:border-red-500 focus-visible:ring-red-200",
+
+                            disabled &&
+                                "cursor-not-allowed opacity-60",
+
                             className
                         )}
                     >
                         <span>
-                            {selectedDate ? format(selectedDate, "dd/MM/yyyy") : placeholder}
+                            {selectedDate
+                                ? format(selectedDate, "dd/MM/yyyy")
+                                : placeholder}
                         </span>
-                        <CalendarIcon className="h-4 w-4 shrink-0 text-gray-500" />
+
+                        <span
+                            className="
+                                flex
+                                h-8
+                                w-8
+                                items-center
+                                justify-center
+                                rounded-lg
+                                bg-[#F5F3FF]
+                                text-[#40369F]
+                            "
+                        >
+                            <CalendarIcon className="h-4 w-4" />
+                        </span>
                     </Button>
                 </PopoverTrigger>
 
-                <PopoverContent className="w-auto p-0" align="start">
+                <PopoverContent
+                    align="start"
+                    className="
+                        w-auto
+                        rounded-xl
+                        border
+                        border-[#E4E2E9]
+                        bg-white
+                        p-2
+                        shadow-lg
+                    "
+                >
                     <Calendar
                         mode="single"
                         selected={selectedDate}
                         onSelect={(date) => {
-                            if (date) onChange(format(date, "yyyy-MM-dd"));
+                            if (date) {
+                                onChange(format(date, "yyyy-MM-dd"));
+                            }
                         }}
                         locale={ar}
+                        className="rounded-lg"
                     />
                 </PopoverContent>
             </Popover>
 
-            {error && <p className="text-xs text-red-600">{error}</p>}
+            {error && (
+                <p className="text-sm font-medium text-red-500">
+                    {error}
+                </p>
+            )}
         </div>
     );
 }

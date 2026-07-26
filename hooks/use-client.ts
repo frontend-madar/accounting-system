@@ -10,6 +10,8 @@ import type {
   GetClientsParams,
 } from "@/types/client.types";
 import { useRouter } from "next/navigation";
+import { useClientStore } from "@/store/client.store";
+import { useEffect } from "react";
 
 export const CLIENTS_QUERY_KEY = "clients"; 
 
@@ -63,4 +65,20 @@ export function useDeleteClient() {
       toast.error(getErrorMessage(error, "حدث خطأ أثناء حذف العميل"));
     },
   });
+}
+
+export function useGetClients() {
+  const clients = useClientStore((s) => s.clients);
+  const isLoading = useClientStore((s) => s.isLoading);
+  const isError = useClientStore((s) => s.isError);
+  const hasFetched = useClientStore((s) => s.hasFetched);
+  const fetchClients = useClientStore((s) => s.fetchClients);
+
+  useEffect(() => {
+    if (!hasFetched) {
+      fetchClients();
+    }
+  }, [hasFetched, fetchClients]);
+
+  return { data: clients, isLoading, isError };
 }

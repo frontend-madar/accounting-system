@@ -10,27 +10,83 @@ interface InvoiceTextFieldProps extends React.ComponentProps<"input"> {
     dropdown?: boolean;
 }
 
-export const InvoiceTextField = React.forwardRef<HTMLInputElement, InvoiceTextFieldProps>(
-    ({ label, error, dropdown, id, className, ...props }, ref) => {
+export const InvoiceTextField = React.forwardRef<
+    HTMLInputElement,
+    InvoiceTextFieldProps
+>(
+    (
+        {
+            label,
+            error,
+            dropdown,
+            id,
+            className,
+            disabled,
+            ...props
+        },
+        ref
+    ) => {
         const fieldId = id ?? props.name;
 
         return (
-            <div className="space-y-1.5">
-                <FieldLabel htmlFor={fieldId} dropdown={dropdown} >
-                    <span className="text-[#232323] text-[14px] md:text-[18px] mb-2">{label}</span>
+            <div className="w-full space-y-2">
+                {/* Label */}
+                <FieldLabel
+                    htmlFor={fieldId}
+                    dropdown={dropdown}
+                >
+                    <span className="text-[14px] font-semibold text-[#232323] md:text-[17px]">
+                        {label}
+                    </span>
                 </FieldLabel>
+
+                {/* Input */}
                 <Input
                     id={fieldId}
                     ref={ref}
+                    disabled={disabled}
                     aria-invalid={!!error}
                     className={cn(
-                        "ctm-inp",
-                        error && "border-red-500 focus-visible:ring-red-500",
+                        "h-[47px] w-full",
+                        "rounded-xl",
+                        "border border-[#C8C2FC]",
+                        "bg-white",
+                        "px-4",
+                        "text-[15px] text-[#232323]",
+
+                        "placeholder:text-[#9CA3AF]",
+
+                        "shadow-sm",
+
+                        "transition-colors duration-200",
+
+                        "hover:border-[#837CC9]",
+
+                        "focus-visible:border-[#40369F]",
+                        "focus-visible:ring-2",
+                        "focus-visible:ring-[#40369F]/20",
+
+                        disabled &&
+                            "cursor-not-allowed opacity-60",
+
+                        error &&
+                            "border-red-500",
+                        error &&
+                            "focus-visible:border-red-500",
+                        error &&
+                            "focus-visible:ring-red-200",
+
                         className
                     )}
                     {...props}
                 />
-                {error && <p className="text-xs text-red-600">{error}</p>}
+
+                {/* Error */}
+                {error && (
+                    <p className="text-sm font-medium text-red-500">
+                        {error}
+                    </p>
+                )}
             </div>
         );
     }

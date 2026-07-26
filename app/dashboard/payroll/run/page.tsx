@@ -1,7 +1,8 @@
 "use client";
-import MainButton from "@/components/dashboard/MainButton";
+
 import { PayrollEmployeeSelectionSection } from "@/components/dashboard/payroll/Payrollemployeeselectionsection";
 import { PayrollInfo } from "@/components/dashboard/payroll/PayrollInfo";
+import MainButton from "@/components/dashboard/shared/MainButton";
 import { Topbar } from "@/components/dashboard/Topbar"
 import { Employee } from "@/types/types";
 import { Plus } from "lucide-react";

@@ -1,7 +1,6 @@
 import * as React from "react";
 import { UserRound } from "lucide-react";
 
-
 import { cn } from "@/lib/utils";
 import { InvoiceListItem } from "@/data/data";
 import { RowAction, RowActionsMenu } from "./RowActionsMenu";
@@ -15,18 +14,52 @@ interface InvoiceCardProps {
     className?: string;
 }
 
-export function InvoiceCard({ invoice, actions = [], onClick, className }: InvoiceCardProps) {
+export function InvoiceCard({
+    invoice,
+    actions = [],
+    onClick,
+    className,
+}: InvoiceCardProps) {
     return (
         <div
             className={cn(
-                "rounded-2xl border border-border bg-white",
+                " rounded-2xl border border-[#E8E5F6] bg-white shadow-sm transition-colors",
+                "hover:border-[#D7D2F5]",
                 className
             )}
         >
-            {/* header */}
-            <div className="flex flex-col gap-2 rounded-t-2xl bg-[#EFEDF8] px-4 py-2.5 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-center gap-2">
-                    <span className="flex h-7 w-7 items-center justify-center rounded-full bg-white text-muted-foreground ring-1 ring-border">
+            {/* Header */}
+            <div
+                className="
+                    flex
+                    flex-col
+                    gap-3
+                    border-b
+                    border-[#ECEAF8]
+                    bg-[#F7F6FD]
+                    px-5
+                    py-4
+                    rounded-t-2xl
+                    sm:flex-row
+                    sm:items-center
+                    sm:justify-between
+                "
+            >
+                <div className="flex items-center gap-3">
+                    <span
+                        className="
+                            flex
+                            h-10
+                            w-10
+                            items-center
+                            justify-center
+                            rounded-full
+                            border
+                            border-[#DDD8F5]
+                            bg-white
+                            text-[#40369F]
+                        "
+                    >
                         {invoice.employeeAvatarSrc ? (
                             // eslint-disable-next-line @next/next/no-img-element
                             <img
@@ -35,57 +68,112 @@ export function InvoiceCard({ invoice, actions = [], onClick, className }: Invoi
                                 className="h-full w-full rounded-full object-cover"
                             />
                         ) : (
-                            <UserRound className="h-4 w-4" />
+                            <UserRound className="h-5 w-5" />
                         )}
                     </span>
-                    <p className="text-[16px]  ">
-                        <span className="text-[#676A6E]">الموظف: </span>
-                        <span className="font-medium text-[#101011]">{invoice.employeeName}</span>
-                    </p>
+
+                    <div>
+                        <p className="text-[13px] text-[#7B7E83]">
+                            الموظف
+                        </p>
+
+                        <p className="text-[17px] font-semibold text-[#101011]">
+                            {invoice.employeeName}
+                        </p>
+                    </div>
                 </div>
 
-                <p className="text-[16px] text-[#585B5F]">
-                    رقم الفاتورة: {invoice.invoiceNumber}
-                </p>
+                <div className="text-right">
+                    <p className="text-[13px] text-[#7B7E83]">
+                        رقم الفاتورة
+                    </p>
+
+                    <p className="text-[17px] font-semibold text-[#40369F]">
+                        #{invoice.invoiceNumber}
+                    </p>
+                </div>
             </div>
 
-            {/* body */}
+            {/* Body */}
             <div
                 role={onClick ? "button" : undefined}
                 tabIndex={onClick ? 0 : undefined}
                 onClick={onClick}
                 onKeyDown={(event) => {
-                    if (onClick && (event.key === "Enter" || event.key === " ")) {
+                    if (
+                        onClick &&
+                        (event.key === "Enter" || event.key === " ")
+                    ) {
                         event.preventDefault();
                         onClick();
                     }
                 }}
                 className={cn(
-                    "flex w-full flex-col gap-4 px-4 py-3 text-right transition-colors sm:flex-row sm:flex-wrap sm:items-center sm:justify-between",
-                    onClick && "cursor-pointer hover:bg-muted/30"
+                    `
+                    px-5
+                    py-5
+
+                    transition-colors
+
+                    `,
+                    onClick &&
+                        "cursor-pointer hover:bg-[#FCFCFE]"
                 )}
             >
-                <div className="flex items-center gap-3">
-                    <InitialsAvatar name={invoice.clientName} />
-                    <div>
-                        <p className="md:text-[20px] font-semibold text-[#101011]">
-                            {invoice.clientName}
-                        </p>
-                        <p className="text-[16px] text-[#1B1B1BCC]">#{invoice.clientId}</p>
+                <div className="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+                    {/* Client */}
+                    <div className="flex items-center gap-4">
+                        <InitialsAvatar name={invoice.clientName} />
+
+                        <div>
+                            <p className="text-[20px] font-bold text-[#101011]">
+                                {invoice.clientName}
+                            </p>
+
+                            <p className="mt-1 text-[14px] text-[#7B7E83]">
+                                العميل #{invoice.clientId}
+                            </p>
+                        </div>
                     </div>
-                </div>
 
-                <div className="flex flex-wrap items-center gap-4 sm:contents">
-                    <InfoColumn label="انشأت" value={invoice.createdDate} />
-                    <InfoColumn label="باقي" value={invoice.remaining} />
-                    <InfoColumn label="الحالة" value={invoice.status} />
-                </div>
+                    {/* Information */}
+                    <div className="grid flex-1 grid-cols-2 gap-6 lg:grid-cols-3 lg:px-8">
+                        <InfoColumn
+                            label="تاريخ الإنشاء"
+                            value={invoice.createdDate}
+                        />
 
-                <div
-                    onClick={(event) => event.stopPropagation()}
-                    className="flex justify-end sm:block"
-                >
-                    <RowActionsMenu actions={actions} className="shrink-0" />
+                        <InfoColumn
+                            label="المبلغ المتبقي"
+                            value={invoice.remaining}
+                        />
+
+                        <InfoColumn
+                            label="الحالة"
+                            value={invoice.status}
+                        />
+                    </div>
+
+                    {/* Actions */}
+                    <div
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex justify-end"
+                    >
+                        <div
+                            className="
+                                rounded-xl
+                                border
+                                border-[#ECEAF8]
+                                bg-[#FAFAFD]
+                                p-1
+                            "
+                        >
+                            <RowActionsMenu
+                                actions={actions}
+                                className="shrink-0"
+                            />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

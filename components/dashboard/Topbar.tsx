@@ -3,13 +3,13 @@
 import * as React from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Bell, Check, ChevronDown, ChevronLeft, Search, LogOut } from "lucide-react";
+import { Bell, Check, ChevronDown, ChevronLeft, Search, LogOut, Menu } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
     DropdownMenu,
     DropdownMenuContent,
-    DropdownMenuItem,
+    DropdownMenuItem, 
     DropdownMenuTrigger,
     DropdownMenuSeparator,
     DropdownMenuLabel,
@@ -19,10 +19,9 @@ import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
-import SearchInput from "./SearchInput";
 import { TopbarHomeIcon, TopbarNotificationIcon } from "@/icons";
-import { Button } from "../ui/button";
 import { useAuthStore } from "@/store/auth-store";
+import { useUiStore } from "@/store/ui-store";
 
 interface LanguageOption {
     code: string;
@@ -73,6 +72,7 @@ export function Topbar({
     const router = useRouter();
     const user = useAuthStore((s) => s.user);
     const logout = useAuthStore((s) => s.logout);
+    const toggleMobileSidebar = useUiStore((s) => s.toggleMobileSidebar);
 
     const userName = user?.businessName || user?.businessName || "المستخدم";
     const userEmail = user?.email || "user@example.com";
@@ -101,13 +101,27 @@ export function Topbar({
         >
             {!path && (
                 <div className="flex items-center gap-3" >
+                    <button
+                        type="button"
+                        onClick={toggleMobileSidebar}
+                        className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
+                    >
+                        <Menu className="h-6 w-6 text-[#0F1219]" />
+                    </button>
                     <h1 className="shrink-0 hidden md:block text-[16px] md:text-[24px] font-semibold text-[#0F1219]">{title}</h1>
                 </div>
             )}
 
             {path && (
-                <div className="hidden md:flex items-center md:gap-3 " >
-                    <div className="flex items-center gap-1" >
+                <div className="flex items-center md:gap-3 " >
+                    <button
+                        type="button"
+                        onClick={toggleMobileSidebar}
+                        className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors ml-2"
+                    >
+                        <Menu className="h-6 w-6 text-[#0F1219]" />
+                    </button>
+                    <div className="hidden md:flex items-center gap-1" >
                          <TopbarHomeIcon />
                          <Link href={'/dashboard'} className="text-[#B1B2B4] text-[12px] md:text-[18px]"> الرئيسية  </Link>
                     </div>

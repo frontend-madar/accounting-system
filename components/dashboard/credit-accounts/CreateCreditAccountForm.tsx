@@ -22,6 +22,9 @@ import {
 import { FormSection } from "../invoice/FormSection";
 import { InvoiceTextField } from "../invoice/TextField";
 import { SelectField } from "../invoice/SelectField";
+import MainButton from "../shared/MainButton";
+import SecondaryButton from "../shared/SecondaryButton";
+ 
 
 
 interface CreateCreditAccountFormProps {
@@ -94,12 +97,14 @@ export function CreateCreditAccountForm({
                 />
 
 
-                <Button className="border border-[#837CC9] text-[#40369F] bg-white text-[18px] h-[50px] w-[167px] hover:text-[white] hover:bg-[#40369F]">
+                <Button
+                    className=" h-[52px] min-w-[180px] rounded-xl border border-[#CFC8F7] bg-white px-5 text-[16px] font-semibold text-[#40369F] shadow-sm transition-colors hover:bg-[#40369F] hover:text-white" >
                     اضافة حساب جديد
                 </Button>
 
-
             </FormSection>
+
+            
 
             <FormSection title="   ">
 
@@ -214,19 +219,8 @@ export function CreateCreditAccountForm({
 
 
             <div className="flex items-center gap-3 pt-5">
-                <Button type="submit" className="gap-2 w-[246px] text-[18px] h-[47px] rounded-lg bg-[#463BAF] hover:bg-[#332a80]">
-                    <Plus className="h-4 w-4" />
-                    حفظ العميل
-                </Button>
-                <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleSaveDraft}
-                    className="gap-2 rounded-lg w-[110px] h-[47px] text-[18px]"
-                >
-                    <X className="h-4 w-4" />
-                    إلغاء
-                </Button>
+                <MainButton text="حفظ" icon={<Plus className="h-4 w-4" />} />
+                <SecondaryButton text="إلغاء" icon={<X className="h-4 w-4" />} />
             </div>
         </form>
     );

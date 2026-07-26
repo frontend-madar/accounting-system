@@ -7,7 +7,7 @@ import { getInvoiceColumns, Invoice } from "./InvoicesColumns";
 import { DataTable } from "./DataTable";
 import { DataTablePagination } from "./Pagination";
 import { InvoiceStatus } from "./StatusBadge";
-import MainButton from "./MainButton";
+import MainButton from "./shared/MainButton";
 import SearchInput from "./SearchInput";
 
 

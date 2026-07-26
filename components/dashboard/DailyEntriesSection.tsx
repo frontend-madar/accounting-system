@@ -10,7 +10,7 @@ import { DailyEntry } from "@/types/types";
 import { DataTablePagination } from "./Pagination";
 import SearchInput from "./SearchInput";
 import FillterButton from "./FillterButton";
-import MainButton from "./MainButton";
+import MainButton from "./shared/MainButton";
 
 
 const PAGE_SIZE = 6;

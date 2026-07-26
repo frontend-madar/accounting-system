@@ -5,14 +5,6 @@ import { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import {
-    LayoutGrid,
-    CircleDollarSign,
-    NotebookPen,
-    FileText,
-    Wallet,
-    Users2,
-    Banknote,
-    Briefcase,
     ChevronDown,
     ChevronUp,
 } from "lucide-react";
@@ -22,6 +14,7 @@ import Link from "next/link";
 import { useClickOutside } from "@/hooks/UseClickOutside";
 import { DailyLimitsIcon, DashboardIcon, EmployeesIcon, ExpemsessIcon, ForwardAccountsIcon, InvitePersonIcon, IvoicesIcons, LogoutIcon, SalariesIcon, SuppliersIcon } from "@/icons";
 import { InviteFrom } from "../auth/InviteFrom";
+import { useUiStore } from "@/store/ui-store";
 
 // ---- Types ----
 type SubLink = {
@@ -96,6 +89,16 @@ interface SidebarProps {
     avatarSrc?: string;
 }
 
+// Shared transition classes for any label/text block that should fade + shrink
+// smoothly in sync with the sidebar's own width transition (duration-300),
+// instead of snapping via `hidden` (display:none can't be animated).
+const collapsibleLabel = (visible: boolean, extra?: string) =>
+    cn(
+        "overflow-hidden whitespace-nowrap transition-all duration-300 ease-in-out",
+        visible ? "opacity-100 max-w-[220px]" : "opacity-0 max-w-0",
+        extra
+    );
+
 export function Sidebar({
     companyName = "اسم الشركة",
     userName = "mohamed ali",
@@ -114,8 +117,17 @@ export function Sidebar({
     const [openDropdown, setOpenDropdown] = useState<string | null>(initialOpen);
     const [isExpanded, setIsExpanded] = useState(true);
     const [showUserMenu, setShowUserMenu] = useState(false);
+    const [isMobileScreen, setIsMobileScreen] = useState(false);
     const sidebarRef = useRef<any>(null);
     const userMenuRef = useRef<HTMLDivElement>(null);
+
+    const { isMobileSidebarOpen, setMobileSidebarOpen } = useUiStore();
+
+    // On mobile, content visibility follows the mobile drawer's open state
+    // (isExpanded is a desktop-only collapse toggle and gets forced to
+    // false the moment we cross into mobile width — see the resize
+    // handler below — so it can't be used to decide text visibility here).
+    const showContent = isMobileScreen ? isMobileSidebarOpen : isExpanded;
 
     // Tracks whether we were already below the breakpoint, so we only force
     // a collapse the moment we *cross into* mobile size — a manual toggle
@@ -126,6 +138,7 @@ export function Sidebar({
     React.useEffect(() => {
         function handleResize() {
             const isMobile = window.innerWidth <= MOBILE_BREAKPOINT;
+            setIsMobileScreen(isMobile);
 
             if (isMobile && !wasMobileRef.current) {
                 setIsExpanded(false);
@@ -143,12 +156,12 @@ export function Sidebar({
 
     useClickOutside(sidebarRef, () => {
         if (typeof window !== "undefined" && window.innerWidth <= MOBILE_BREAKPOINT) {
-            setIsExpanded(false);
+            setMobileSidebarOpen(false);
         }
-    }, isExpanded);
+    }, isMobileSidebarOpen);
 
     const [showInvite, setShowInvite] = useState(false);
-    
+
 
     useEffect(() => {
         if (!showUserMenu) return;
@@ -169,8 +182,11 @@ export function Sidebar({
         <aside
             ref={sidebarRef}
             className={cn(
-                "relative flex h-full flex-col  rounded-2xl text-white bg-[#695BE1] bg-[linear-gradient(180deg,_#25198A_0%,_rgba(37,25,138,0.35)_104.8%,_rgba(37,25,138,0)_169.64%)] transition-all duration-300 ease-in-out shrink-0",
-                isExpanded ? "w-[283px]" : "w-[80px]"
+                "flex flex-col rounded-2xl text-white bg-[#695BE1] bg-[linear-gradient(180deg,_#25198A_0%,_rgba(37,25,138,0.35)_104.8%,_rgba(37,25,138,0)_169.64%)] transition-all duration-300 ease-in-out shrink-0 z-[100]",
+                "fixed top-4 bottom-4 right-4 lg:relative lg:top-0 lg:bottom-0 lg:right-0 lg:h-full",
+                isMobileScreen
+                    ? (isMobileSidebarOpen ? "translate-x-0 w-[283px]" : "translate-x-[120%]")
+                    : (isExpanded ? "translate-x-0 w-[283px]" : "translate-x-0 w-[80px]")
             )}
         >
             {/* decorative background pattern */}
@@ -186,18 +202,24 @@ export function Sidebar({
             <div className="relative z-10 flex h-full flex-col">
                 {/* header / company switcher */}
                 <div className="p-3">
-                    <div className={cn("bg-[#0E1B6B99] flex items-center justify-between gap-3 h-[65px] px-3 rounded-xl", !isExpanded ? "justify-center" : "justify-between")} >
-                        <div className={cn("flex items-center gap-2", !isExpanded && "hidden")}>
+                    <div className={cn("bg-[#0E1B6B99] flex items-center gap-3 h-[65px] px-3 rounded-xl transition-all duration-300 ease-in-out", !showContent ? "justify-center" : "justify-between")} >
+                        <div className={collapsibleLabel(showContent, "flex items-center gap-2")}>
                             <span className="flex-1 text-center text-[17px] font-semibold">
                                 {companyName}
                             </span>
-                            <ChevronDown className="h-4 w-4" />
+                            <ChevronDown className="h-4 w-4 shrink-0" />
                         </div>
 
                         <button
                             type="button"
-                            onClick={() => setIsExpanded(!isExpanded)}
-                            className="focus:outline-none hover:opacity-80 transition-opacity"
+                            onClick={() => {
+                                if (isMobileScreen) {
+                                    setMobileSidebarOpen(!isMobileSidebarOpen);
+                                } else {
+                                    setIsExpanded(!isExpanded);
+                                }
+                            }}
+                            className="focus:outline-none hover:opacity-80 transition-opacity shrink-0"
                         >
                             <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
                                 <path d="M16.9173 4.08333V23.9167M25.6673 14C25.6673 9.625 25.6673 7.4375 24.5532 5.9045C24.1934 5.40936 23.758 4.97392 23.2628 4.61417C21.7298 3.5 19.5412 3.5 15.1673 3.5H12.834C8.45898 3.5 6.27148 3.5 4.73848 4.61417C4.24344 4.97357 3.808 5.40861 3.44815 5.90333C2.33398 7.4375 2.33398 9.62617 2.33398 14C2.33398 18.3738 2.33398 20.5625 3.44815 22.0955C3.80791 22.5906 4.24335 23.0261 4.73848 23.3858C6.27148 24.5 8.46015 24.5 12.834 24.5H15.1673C19.5423 24.5 21.7298 24.5 23.2628 23.3858C23.758 23.0261 24.1934 22.5906 24.5532 22.0955C25.6673 20.5625 25.6673 18.3738 25.6673 14Z" stroke="white" strokeWidth="1.5" strokeLinejoin="round" />
@@ -209,7 +231,7 @@ export function Sidebar({
                 </div>
 
                 {/* nav */}
-                <nav className="flex-1 overflow-y-auto px-3 py-5">
+                <nav className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-5">
                     <ul className="space-y-1">
                         {NAV_ITEMS.map((item) => (
                             <li key={item.key}>
@@ -219,7 +241,7 @@ export function Sidebar({
                                         type="Link"
                                         className={cn(
                                             "flex w-full items-center gap-3 rounded-lg px-3 py-3 text-[15px] transition-colors",
-                                            !isExpanded ? "justify-center" : "justify-start",
+                                            !showContent ? "justify-center" : "justify-start",
                                             "hover:bg-[#0E1B6B99]",
                                             item.href && (
                                                 item.exact
@@ -230,8 +252,10 @@ export function Sidebar({
                                                 : ""
                                         )}
                                     >
-                                        <item.icon className="h-5 w-5 shrink-0" />
-                                        <span className={cn("flex-1 text-right", !isExpanded && "hidden")}>{item.label}</span>
+                                        <span className="flex h-5 w-5 shrink-0 items-center justify-center [&>svg]:h-5 [&>svg]:w-5">
+                                            <item.icon className="h-5 w-5" />
+                                        </span>
+                                        <span className={collapsibleLabel(showContent, "flex-1 text-right")}>{item.label}</span>
                                     </Link>
                                 ) : (
                                     <div>
@@ -240,7 +264,6 @@ export function Sidebar({
                                             onClick={() => toggleDropdown(item.key)}
                                             className={cn(
                                                 "flex w-full items-center gap-3 rounded-lg px-3 py-3 text-[15px] transition-colors hover:bg-[#0E1B6B99]",
-                                                !isExpanded ? "justify-center" : "justify-start",
                                                 item.type === "dropdown" &&
                                                     item.children.some(
                                                         (sub) => pathname === sub.href || pathname.startsWith(sub.href + "/")
@@ -249,9 +272,11 @@ export function Sidebar({
                                                     : ""
                                             )}
                                         >
-                                            <item.icon className="h-5 w-5 shrink-0" />
-                                            <span className={cn("flex-1 text-right", !isExpanded && "hidden")}>{item.label}</span>
-                                            <span className={cn(!isExpanded && "hidden")}>
+                                            <span className="flex h-5 w-5 shrink-0 items-center justify-center [&>svg]:h-5 [&>svg]:w-5">
+                                                <item.icon className="h-5 w-5" />
+                                            </span>
+                                            <span className={collapsibleLabel(showContent, "flex-1 text-right")}>{item.label}</span>
+                                            <span className={collapsibleLabel(showContent, "shrink-0")}>
                                                 {openDropdown === item.key ? (
                                                     <ChevronUp className="h-4 w-4 shrink-0" />
                                                 ) : (
@@ -264,12 +289,12 @@ export function Sidebar({
                                         <div
                                             className={cn(
                                                 "grid overflow-hidden relative transition-[grid-template-rows] duration-300 ease-in-out",
-                                                openDropdown === item.key
+                                                openDropdown === item.key && showContent
                                                     ? "grid-rows-[1fr]"
                                                     : "grid-rows-[0fr]"
                                             )}
                                         >
-                                            <div className={cn("absolute top-2 right-5", !isExpanded && "hidden")} >
+                                            <div className={cn("absolute top-2 right-5 transition-opacity duration-300 ease-in-out", !showContent ? "opacity-0" : "opacity-100")} >
                                                 <svg width="11" height="62" viewBox="0 0 11 62" fill="none" xmlns="http://www.w3.org/2000/svg">
                                                     <path d="M10 4V9.5C10 15.0228 5.52285 19.5 0 19.5" stroke="white" strokeWidth="0.5" />
                                                     <path d="M10 0V51C10 56.5228 5.52285 61 0 61" stroke="white" strokeWidth="0.5" />
@@ -284,12 +309,12 @@ export function Sidebar({
                                                                 type="Link"
                                                                 href={sub.href}
                                                                 className={cn(
-                                                                    "block w-full rounded-lg px-3 py-2.5 text-right text-[14px] transition-colors",
+                                                                    "block w-full rounded-lg px-3 py-2.5 text-right text-[14px] transition-all duration-300 ease-in-out",
                                                                     "hover:bg-[#0E1B6B99]",
                                                                     pathname === sub.href
                                                                         ? "bg-[#0E1B6B99]"
                                                                         : "",
-                                                                    !isExpanded && "hidden"
+                                                                    !showContent ? "opacity-0 pointer-events-none" : "opacity-100"
                                                                 )}
                                                             >
                                                                 {sub.label}
@@ -306,7 +331,6 @@ export function Sidebar({
                     </ul>
                 </nav>
 
-                {/* footer / current user */}
                 {/* footer / current user */}
                 <div ref={userMenuRef} className="relative">
                     {/* Popup */}
@@ -340,13 +364,13 @@ export function Sidebar({
                         onClick={() => setShowUserMenu((v) => !v)}
                         className={cn(
                             "flex items-center gap-3 px-5 py-4 border-t border-white/10 cursor-pointer hover:bg-white/5 transition-colors",
-                            !isExpanded ? "justify-center" : "justify-start"
+                            !showContent ? "justify-center" : "justify-start"
                         )}
                     >
                         <div className="relative h-10 w-10 shrink-0 rounded-full overflow-hidden">
                             <Image src={avatarSrc} alt={userName} fill className="object-cover" />
                         </div>
-                        <div className={cn("min-w-0 text-right", !isExpanded && "hidden")}>
+                        <div className={collapsibleLabel(showContent, "min-w-0 text-right")}>
                             <p className="truncate text-[16px] font-medium">{userName}</p>
                             <p className="truncate text-[16px] font-medium opacity-80">{userEmail}</p>
                         </div>

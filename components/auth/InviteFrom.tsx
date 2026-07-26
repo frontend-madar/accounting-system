@@ -9,8 +9,8 @@ import { cn } from "@/lib/utils";
 import { inviteAccountantSchema } from "@/validations/auth";
 import { z } from "zod";
 import { useInviteAccountant } from "@/hooks/use-auth";
-import MainButton from "../dashboard/MainButton";
 import { toast } from "sonner";
+import MainButton from "../dashboard/shared/MainButton";
 
 type InviteAccountantFormValues = z.infer<typeof inviteAccountantSchema>;
 type FieldErrors = Partial<Record<keyof InviteAccountantFormValues, string>>;

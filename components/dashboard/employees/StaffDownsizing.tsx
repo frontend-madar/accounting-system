@@ -11,9 +11,10 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { useMemo } from "react";
 import { useGetDepartments } from "@/hooks/use-department";
-import MainButton from "../MainButton";
+import MainButton from "../shared/MainButton";
+import SecondaryButton from "../shared/SecondaryButton"; 
 import { Check } from "lucide-react";
-import SecondaryButton from "../SecondaryButton";
+
 
 interface StaffDownsizingProps {
     onFilterChange: (filters: { search: string; department: string }) => void;
@@ -30,7 +31,7 @@ const StaffDownsizing = ({ onFilterChange }: StaffDownsizingProps) => {
         resolver: zodResolver(staffDownsizingSchema),
         defaultValues: { searchName: "", department: "" },
     });
-    
+
 
     const {
         data: departments,
@@ -93,7 +94,7 @@ const StaffDownsizing = ({ onFilterChange }: StaffDownsizingProps) => {
                             onChange={field.onChange}
                             options={departmentOptions}
                             error={errors.department?.message}
-                         />
+                        />
                     )}
                 />
 

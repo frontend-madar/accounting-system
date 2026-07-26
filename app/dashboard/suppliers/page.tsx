@@ -7,7 +7,7 @@ const page = () => {
     return (
         <div className='px-4 space-y-4' >
             <Topbar title='الموردين' search />
-            <VendorsTableSection data={vendors} totalRecords={vendors.length} />
+            <VendorsTableSection   />
         </div>
 
     )

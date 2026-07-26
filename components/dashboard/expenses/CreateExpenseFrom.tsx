@@ -15,7 +15,8 @@ import { FormSection } from "../invoice/FormSection";
 import { InvoiceTextField } from "../invoice/TextField";
 import { SelectField } from "../invoice/SelectField";
 import { FieldLabel } from "../invoice/FieldLabel";
-import MainButton from "../MainButton";
+import MainButton from "../shared/MainButton";
+import SecondaryButton from "../shared/SecondaryButton";
 
 import { AmountField } from "./AmountField";
 import { DateTimeField } from "./DateTimeField";
@@ -85,34 +86,22 @@ export function CreateExpenseForm({
             </div>
 
 
-            <Card className="border py-10 px-5 border-[#0000001C] bg-[#eeeeee60]" >
-                <Controller
-                    control={control}
-                    name="amount"
-                    render={({ field: amountField }) => (
-                        <Controller
-                            control={control}
-                            name="currency"
-                            render={({ field: currencyField }) => (
-                                <AmountField
-                                    label="المبلغ"
-                                    required
-                                    currency={currencyField.value}
-                                    onCurrencyChange={currencyField.onChange}
-                                    currencyOptions={CURRENCY_OPTIONS}
-                                    amount={amountField.value}
-                                    onAmountChange={amountField.onChange}
-                                    error={errors.amount?.message}
-                                    className="flex items-center gap-4"
-                                />
-                            )}
-                        />
-                    )}
-                />
-            </Card>
-
-            <div className="grid grid-cols-3 items-center gap-4 "  >
-                <FormSection title="معلومات المصروف" className="col-span-2" gridClassName="!grid-cols-2">
+            <div className="grid lg:grid-cols-3 items-center gap-4 bg-red-100 "  >
+                <FormSection title="معلومات المصروف" className="col-span-2" gridClassName="md:!grid-cols-2">
+                    <Controller
+                        control={control}
+                        name="currency"
+                        render={({ field }) => (
+                            <SelectField
+                                label="المبلغ"
+                                value={field.value}
+                                placeholder=" آخر 30 يوم  "
+                                onChange={field.onChange}
+                                options={CURRENCY_OPTIONS}
+                                error={errors.amount?.message}
+                            />
+                        )}
+                    />
                     <Controller
                         control={control}
                         name="category"
@@ -133,7 +122,6 @@ export function CreateExpenseForm({
                         render={({ field }) => (
                             <DateTimeField
                                 label="تاريخ المصروف"
-                                value={field.value}
                                 onChange={field.onChange}
                                 error={errors.expenseDate?.message}
                             />
@@ -173,7 +161,6 @@ export function CreateExpenseForm({
 
                 <SingleAttachmentDropzone
                     onFileSelect={handleAttachmentSelect}
-                    className="h-full"
                 />
             </div>
 
@@ -193,32 +180,42 @@ export function CreateExpenseForm({
                 />
             </FormSection>
 
-            <Card className="px-5 border  bg-[#eeeeee60]" >
-                <FieldLabel htmlFor="notes" dropdown={false}>
-                    <span className="mb-2 text-[18px] text-[#232323]">ملاحظات</span>
-                </FieldLabel>
-                <Textarea
-                    id="notes"
-                    className="h-[132px] border border-[#C0C0C0] text-[15px] md:text-[16px]"
-                    placeholder="اضف وصف..."
-                    {...register("notes")}
-                />
-            </Card>
+            <Card className="overflow-hidden rounded-3xl border border-slate-200/70 bg-gradient-to-br from-white via-white to-slate-50 shadow-sm transition-all duration-300 hover:shadow-md">
+                <div className=" border-slate-100 px-6 ">
+                    <div className="flex items-center gap-3">
+                        <div className="h-10 w-1.5 rounded-full bg-gradient-to-b from-[#463BAF] to-[#0e065e]" />
 
-            <div className="flex items-center justify-end gap-3 border-t border-border pt-5">
+                        <div>
+                            <FieldLabel htmlFor="notes" dropdown={false}>
+                                <span className="text-xl font-bold text-slate-900">
+                                    ملاحظات
+                                </span>
+                            </FieldLabel>
+
+                            <p className="mt-1 text-sm text-slate-500">
+                                يمكنك إضافة أي ملاحظات أو تفاصيل إضافية هنا.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+
+                <div className="p-6">
+                    <Textarea
+                        id="notes"
+                        placeholder="اكتب ملاحظاتك هنا..."
+                        className=" min-h-[180px] resize-none rounded-2xl border-slate-200 bg-slate-50/50 px-4 py-3 text-base leading-7 placeholder:text-slate-400 transition-all duration-200 focus:border-[#102e4f] focus:bg-white focus:ring-4 focus:ring-[#102e4f]/10 "
+                        {...register("notes")}
+                    />
+
+
+                </div>
+            </Card>
+            <div className="flex flex-col md:flex-row items-center justify-end gap-3 pt-5">
                 <MainButton
                     text="حفظ المصروف"
                     icon={<Save className="h-4 w-4" />}
                 />
-                <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleSaveDraft}
-                    className="h-[47px] w-[130px] gap-2 rounded-lg text-[16px]"
-                >
-                    <X className="h-4 w-4" />
-                    حفظ كمسودة
-                </Button>
+                <SecondaryButton text=" حفظ كمسودة" icon={<X className="h-4 w-4" />} />
             </div>
         </form>
     );

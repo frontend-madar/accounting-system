@@ -1,83 +1,77 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import { Controller, useForm, useWatch } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Save, X } from "lucide-react";
+import { useMemo } from "react";
 import { FormSection } from "../invoice/FormSection";
 import { InvoiceTextField } from "../invoice/TextField";
 import { SelectField } from "../invoice/SelectField";
-import MainButton from "../MainButton";
+import { MultiSelectField } from "../invoice/MultiSelectField";
 import {
-    CURRENCY_OPTIONS,
-    VENDOR_SERVICE_TYPE_OPTIONS,
-    vendorFormSchema,
-    VendorFormValues,
-} from "@/validations/Vendorsettlement";
-import SecondaryButton from "../SecondaryButton";
+    supplierFormSchema,
+    SupplierFormValues,
+    SUPPLIER_CURRENCY_OPTIONS,
+    SUPPLIER_SERVICE_TYPE_OPTIONS,
+} from "@/validations/supplier-schema";
+import { useCreateSupplier } from "@/hooks/use-supplier";
+import { useGetClients } from "@/hooks/use-client";
+import MainButton from "../shared/MainButton";
+import SecondaryButton from "../shared/SecondaryButton";
 
-interface CreateVendorFormProps {
-    onSaveDraft?: (values: Partial<VendorFormValues>) => void;
-    onSaveVendor?: (values: VendorFormValues) => void;
-}
+const EMPTY_VALUES: SupplierFormValues = {
+    supplierName: "",
+    supplierPhone: "",
+    clientName: "",
+    serviceTypes: [],
+    travelDate: "",
+    returnDate: "",
+    currency: "SAR",
+    servicePrice: "",
+    amountPaid: "",
+};
 
-export function CreateVendorForm({
-    onSaveDraft,
-    onSaveVendor,
-}: CreateVendorFormProps) {
+export function CreateSupplierForm() {
     const {
         control,
         register,
         handleSubmit,
-        getValues,
-        setValue,
+        reset,
         formState: { errors },
-    } = useForm<VendorFormValues>({
-        resolver: zodResolver(vendorFormSchema),
-        defaultValues: {
-            currency: "EGP",
-            clientName: "",
-            clientNumber: "",
-            vendorName: "",
-            serviceType: "",
-            vendorPhone: "",
-            travelDate: "",
-            servicePrice: "",
-            paidAmount: "",
-            remainingAmount: "",
-            notes: "",
-        },
+    } = useForm<SupplierFormValues>({
+        resolver: zodResolver(supplierFormSchema),
+        defaultValues: EMPTY_VALUES,
     });
 
-    const attachmentRef = useRef<File | null>(null);
+    const { mutate: createSupplier, isPending } = useCreateSupplier();
 
-    const servicePrice = useWatch({ control, name: "servicePrice" });
-    const paidAmount = useWatch({ control, name: "paidAmount" });
+    const {
+        data: clients,
+        isLoading: isClientsLoading,
+        isError: isClientsError,
+    } = useGetClients();
 
-    useEffect(() => {
-        const price = Number(servicePrice);
-        const paid = Number(paidAmount);
+    const clientOptions = useMemo(
+        () => clients.map((client) => ({ label: client.name, value: client.name })),
+        [clients]
+    );
 
-        if (!Number.isNaN(price) && !Number.isNaN(paid)) {
-            const remaining = price - paid;
-            setValue("remainingAmount", remaining >= 0 ? String(remaining) : "0", {
-                shouldValidate: true,
-            });
-        }
-    }, [servicePrice, paidAmount, setValue]);
-
-    function handleAttachmentSelect(file: File) {
-        attachmentRef.current = file;
-        // TODO: upload logic here, e.g. call your API or set form state
+    function onSubmit(values: SupplierFormValues) {
+        createSupplier({
+            supplierName: values.supplierName,
+            supplierPhone: values.supplierPhone,
+            clientName: values.clientName,
+            serviceTypes: values.serviceTypes,
+            travelDate: new Date(values.travelDate).toISOString(),
+            returnDate: new Date(values.returnDate).toISOString(),
+            currency: values.currency,
+            servicePrice: Number(values.servicePrice),
+            amountPaid: Number(values.amountPaid),
+        });
     }
 
-    function handleSaveDraft() {
-        // Drafts are saved as-is, without requiring full validation.
-        onSaveDraft?.(getValues());
-    }
-
-    function onSubmit(values: VendorFormValues) {
-        onSaveVendor?.(values);
+    function handleCancel() {
+        reset(EMPTY_VALUES);
     }
 
     return (
@@ -86,115 +80,116 @@ export function CreateVendorForm({
             className="space-y-8 rounded-2xl bg-white p-6 ctm-shadow"
         >
             <div>
-                <h2 className="text-[24px] font-bold text-[#0F1219]">
-                    إضافة مورد
-                </h2>
+                <h2 className="text-[24px] font-bold text-[#0F1219]">إضافة مورد</h2>
                 <p className="mt-1 font-medium text-[16px] text-[#0F1219]">
                     إضافة بيانات مورد جديد.
                 </p>
             </div>
 
-            <FormSection title=" بيانات المورد والعميل  " className="col-span-2" gridClassName="!grid-cols-1 md:!grid-cols-2 lg:!grid-cols-3">
-                <InvoiceTextField
-                    label="اسم العميل"
-                    placeholder="ادخل اسم العميل"
-                    error={errors.clientName?.message}
-                    {...register("clientName")}
-                />
-                <InvoiceTextField
-                    label="رقم العميل"
-                    placeholder="ادخل رقم العميل"
-                    inputMode="numeric"
-                    error={errors.clientNumber?.message}
-                    {...register("clientNumber")}
-                />
+            <FormSection title="بيانات المورد والعميل" gridClassName="!grid-cols-1 md:!grid-cols-2 lg:!grid-cols-3">
                 <InvoiceTextField
                     label="اسم المورد"
                     placeholder="ادخل اسم المورد"
-                    error={errors.vendorName?.message}
-                    {...register("vendorName")}
+                    error={errors.supplierName?.message}
+                    {...register("supplierName")}
+                />
+                <InvoiceTextField
+                    label="رقم هاتف المورد"
+                    placeholder="ادخل رقم هاتف المورد"
+                    inputMode="tel"
+                    error={errors.supplierPhone?.message}
+                    {...register("supplierPhone")}
+                />
+                <Controller
+                    control={control}
+                    name="clientName"
+                    render={({ field }) => (
+                        <SelectField
+                            label="اسم العميل"
+                            placeholder={
+                                isClientsLoading
+                                    ? "جاري تحميل العملاء..."
+                                    : isClientsError
+                                    ? "تعذر تحميل العملاء"
+                                    : "اختر اسم العميل"
+                            }
+                            value={field.value}
+                            onChange={field.onChange}
+                            options={clientOptions}
+                            error={errors.clientName?.message}
+                         />
+                    )}
                 />
             </FormSection>
 
-            <FormSection title=" بيانات الخدمة  " gridClassName="!grid-cols-1 md:!grid-cols-2 lg:!grid-cols-3">
-                <Controller
-                    control={control}
-                    name="serviceType"
-                    render={({ field }) => (
-                        <SelectField
-                            label="نوع الخدمة"
-                            placeholder="اختر نوع الخدمة"
-                            value={field.value}
-                            onChange={field.onChange}
-                            options={VENDOR_SERVICE_TYPE_OPTIONS}
-                            error={errors.serviceType?.message}
-                        />
-                    )}
-                />
-                <InvoiceTextField
-                    label="رقم الهاتف"
-                    placeholder="ادخل رقم الهاتف"
-                    inputMode="tel"
-                    error={errors.vendorPhone?.message}
-                    {...register("vendorPhone")}
-                />
+            <FormSection title="بيانات الخدمة" gridClassName="!grid-cols-1 md:!grid-cols-2 lg:!grid-cols-3">
                 <InvoiceTextField
                     label="تاريخ السفر"
-                    placeholder="اختر تاريخ السفر"
                     type="date"
                     error={errors.travelDate?.message}
                     {...register("travelDate")}
                 />
+                <InvoiceTextField
+                    label="تاريخ العودة"
+                    type="date"
+                    error={errors.returnDate?.message}
+                    {...register("returnDate")}
+                />
+                <Controller
+                    control={control}
+                    name="serviceTypes"
+                    render={({ field }) => (
+                        <MultiSelectField
+                            label="نوع الخدمة"
+                            placeholder="اختر نوع الخدمة"
+                            value={field.value}
+                            onChange={field.onChange}
+                            options={SUPPLIER_SERVICE_TYPE_OPTIONS}
+                            error={errors.serviceTypes?.message}
+                        />
+                    )}
+                />
             </FormSection>
 
-            <FormSection title="بيانات الدفع">
+            <FormSection title="بيانات الدفع" gridClassName="!grid-cols-1 md:!grid-cols-2 lg:!grid-cols-3">
                 <Controller
                     control={control}
                     name="currency"
                     render={({ field }) => (
                         <SelectField
-                            label=" العملة "
+                            label="العملة"
                             placeholder="اختر العملة"
                             value={field.value}
                             onChange={field.onChange}
-                            options={CURRENCY_OPTIONS}
+                            options={SUPPLIER_CURRENCY_OPTIONS}
                             error={errors.currency?.message}
                         />
                     )}
                 />
                 <InvoiceTextField
-                    label="  سعر الخدمة    "
+                    label="سعر الخدمة"
                     placeholder="ادخل سعر الخدمة"
                     inputMode="numeric"
                     error={errors.servicePrice?.message}
                     {...register("servicePrice")}
                 />
                 <InvoiceTextField
-                    label="    المدفوع     "
+                    label="المدفوع"
                     placeholder="ادخل المبلغ المدفوع"
                     inputMode="numeric"
-                    error={errors.paidAmount?.message}
-                    {...register("paidAmount")}
-                />
-                <InvoiceTextField
-                    label="    المتبقي    "
-                    placeholder="0"
-                    inputMode="numeric"
-                    readOnly
-                    error={errors.remainingAmount?.message}
-                    {...register("remainingAmount")}
+                    error={errors.amountPaid?.message}
+                    {...register("amountPaid")}
                 />
             </FormSection>
 
-            <div className="flex items-center  gap-3 border-t border-border pt-5">
-                <MainButton
-                    text=" حفظ المورد  "
-                    icon={<Save className="h-4 w-4" />}
-                />
+            <div className="flex items-center gap-3 border-t border-border pt-5">
+                <MainButton text="حفظ المورد" icon={<Save className="h-4 w-4" />} disabled={isPending} />
                 <SecondaryButton
+                    type="button"
                     text="إلغاء"
-                    icon={< X className="h-4 w-4" />}
+                    icon={<X className="h-4 w-4" />}
                     className="!w-[110px]"
+                    onClick={handleCancel}
                 />
             </div>
         </form>

@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { useRef, useState } from "react";
-import { Upload } from "lucide-react";
+import { Upload, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface SingleAttachmentDropzoneProps {
@@ -32,7 +32,10 @@ export function SingleAttachmentDropzone({
       tabIndex={0}
       onClick={() => inputRef.current?.click()}
       onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") inputRef.current?.click();
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          inputRef.current?.click();
+        }
       }}
       onDragOver={(e) => e.preventDefault()}
       onDrop={(e) => {
@@ -41,21 +44,48 @@ export function SingleAttachmentDropzone({
         if (file) handleFile(file);
       }}
       className={cn(
-        "flex h-full flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-[#D8D6E5] bg-[#FAFCFE] px-4 py-6 text-center cursor-pointer transition-colors hover:bg-[#F5F4FB]",
+        "group flex  h-full  w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#D8D2F6] bg-[#FCFCFE] px-6 py-8 text-center",
+        "transition-colors duration-200",
+        "hover:border-[#463BAF] hover:bg-[#FAF9FF]",
         className
       )}
     >
+      {/* Upload Icon */}
+      <div className="mb-5 flex h-20 w-20 items-center justify-center rounded-full bg-[#F5F3FF]">
+        <Upload
+          className="h-10 w-10 text-[#463BAF]"
+          strokeWidth={2}
+        />
+      </div>
 
-      <svg width="47" height="56" viewBox="0 0 47 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M16.6667 41.975H30C31.8333 41.975 33.3333 40.475 33.3333 38.6417V21.975H38.6333C41.6 21.975 43.1 18.375 41 16.275L25.7 0.975C24.4 -0.325 22.3 -0.325 21 0.975L5.7 16.275C3.6 18.375 5.06667 21.975 8.03333 21.975H13.3333V38.6417C13.3333 40.475 14.8333 41.975 16.6667 41.975ZM3.33333 48.6417H43.3333C45.1667 48.6417 46.6667 50.1417 46.6667 51.975C46.6667 53.8083 45.1667 55.3083 43.3333 55.3083H3.33333C1.5 55.3083 0 53.8083 0 51.975C0 50.1417 1.5 48.6417 3.33333 48.6417Z" fill="#463BAF" />
-      </svg>
+      {/* Title */}
+      <h3 className="text-[20px] font-bold text-[#1F2937]">
+        {fileName ? "تم اختيار الملف" : title}
+      </h3>
 
-      <p className="text-[18px] font-bold text-[#463BAF]">
-        {fileName ?? title}
-      </p>
-      {!fileName && (
-        <p className="text-[13px] font-medium text-[#3C3F45]">{subtitle}</p>
+      {/* Subtitle / File */}
+      {fileName ? (
+        <div className="mt-4 flex max-w-full items-center gap-2 rounded-xl bg-[#F5F3FF] px-4 py-2">
+          <FileText className="h-5 w-5 shrink-0 text-[#463BAF]" />
+
+          <span className="max-w-[240px] truncate text-[14px] font-medium text-[#463BAF]">
+            {fileName}
+          </span>
+        </div>
+      ) : (
+        <>
+          <p className="mt-2 max-w-[320px] text-[15px] leading-7 text-[#6B7280]">
+            {subtitle}
+          </p>
+
+          <span className="mt-5 rounded-lg bg-[#463BAF] px-5 py-2 text-[14px] font-semibold text-white">
+            اختر ملف
+          </span>
+
+         
+        </>
       )}
+
       <input
         ref={inputRef}
         type="file"
