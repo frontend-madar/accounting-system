@@ -24,7 +24,7 @@ import { InvoiceTextField } from "../invoice/TextField";
 import { SelectField } from "../invoice/SelectField";
 import MainButton from "../shared/MainButton";
 import SecondaryButton from "../shared/SecondaryButton";
- 
+
 
 
 interface CreateCreditAccountFormProps {
@@ -72,7 +72,7 @@ export function CreateCreditAccountForm({
     return (
         <form
             onSubmit={handleSubmit(onSubmit)}
-            className="space-y-8 rounded-2xl  ctm-shadow bg-white p-6"
+            className="space-y-8 rounded-2xl  ctm-shadow bg-white p-2 md:p-6"
         >
 
             <h1 className="text-[20px] md:text-[34px] font-bold text-[#171A1F] text-center md:text-right">  إضافة حساب جديد  </h1>
@@ -104,7 +104,7 @@ export function CreateCreditAccountForm({
 
             </FormSection>
 
-            
+
 
             <FormSection title="   ">
 

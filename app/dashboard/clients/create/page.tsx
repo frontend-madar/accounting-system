@@ -19,7 +19,7 @@ export default function CreateCustomerPage() {
 
     return (
         <div className="px-4 space-y-5">
-            <Topbar path="إضافة عميل" title="" userName="mohamed ali" />
+            <Topbar  />
             <CreateCustomerForm
                 invoiceNumber="676534"
                 onSaveDraft={handleSaveDraft}

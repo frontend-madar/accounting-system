@@ -35,7 +35,7 @@ interface CreateInvoiceFormProps {
     onSaveDraft?: (values: Partial<InvoiceFormValues>) => void;
     onSaveAndPrint?: (values: InvoiceFormValues) => void;
 }
- 
+
 export function CreateCustomerForm({
     onSaveDraft,
 }: CreateInvoiceFormProps) {
@@ -103,7 +103,7 @@ export function CreateCustomerForm({
     return (
         <form
             onSubmit={handleSubmit(onSubmit)}
-            className="space-y-8 rounded-2xl  ctm-shadow bg-white p-6"
+            className="space-y-8 rounded-2xl  ctm-shadow bg-white p-2 md:p-6"
         >
 
             <FormSection title="بيانات العميل" >

@@ -18,7 +18,7 @@ export default function CreateInvoicePage() {
 
     return (
         <div  className="px-4 space-y-5">
-            <Topbar path="إضافة فاتورة" title="" userName="mohamed ali" />
+            <Topbar isNested={true} path="إضافة فاتورة" />
             <CreateInvoiceForm
                 invoiceNumber="676534"
                 onSaveDraft={handleSaveDraft}

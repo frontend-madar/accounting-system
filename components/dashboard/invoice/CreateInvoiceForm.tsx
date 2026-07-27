@@ -23,6 +23,9 @@ import { MultiSelectField } from "./MultiSelectField";
 import { QuantityStepper } from "./QuantityStepper";
 import { FieldLabel } from "./FieldLabel";
 import { DateField } from "../Datefield";
+import { cn } from "@/lib/utils";
+import MainButton from "../shared/MainButton";
+import SecondaryButton from "../shared/SecondaryButton";
 
 // Demo lookup — in a real app this would come from your clients API/table.
 const CLIENT_DETAILS: Record<string, { name: string; phone: string }> = {
@@ -85,20 +88,15 @@ export function CreateInvoiceForm({
         }
     }
 
-    function handleSaveDraft() {
-        // Drafts are saved as-is, without requiring full validation.
-        onSaveDraft?.(getValues());
-    }
-
+     
     function onSubmit(values: InvoiceFormValues) {
         onSaveAndPrint?.(values);
     }
 
     return (
         <form
-            dir="rtl"
             onSubmit={handleSubmit(onSubmit)}
-            className="space-y-8 rounded-2xl  ctm-shadow bg-white p-6"
+            className="space-y-8 rounded-2xl  ctm-shadow bg-white p-2 md:p-6"
         >
             <FormSection title="بيانات العميل">
                 <InvoiceTextField
@@ -223,8 +221,15 @@ export function CreateInvoiceForm({
                     {...register("paidAmount", { valueAsNumber: true })}
                 />
                 <div className="space-y-1.5">
-                    <FieldLabel> <span className="text-[#232323] text-[14px] md:text-[18px] mb-2">باقي</span> </FieldLabel>
-                    <div className="flex h-11 ctm-inp  items-center rounded-lg border border-dashed border-input bg-muted/30 px-3 text-sm text-muted-foreground">
+                    <FieldLabel htmlFor="remaining" dropdown={false}>
+                        <span className="text-[14px] font-semibold text-[#232323] md:text-[17px]">
+                            المتبقي
+                        </span>
+                    </FieldLabel>
+                    <div
+                        id="remaining"
+                        className={  "flex h-[47px] w-full select-none hover:border-[#837CC9] px-4 shadow-sm items-center rounded-xl border border-[#C8C2FC] transition-colors duration-200 bg-white text-[15px] font-medium text-[#232323]"}
+                    >
                         {remaining.toLocaleString("ar-SA")}
                     </div>
                 </div>
@@ -244,19 +249,8 @@ export function CreateInvoiceForm({
             </FormSection>
 
             <div className="flex flex-col md:flex-row md:items-center gap-3 border-t border-border pt-5">
-                <Button type="submit" className="gap-2 w-[246px] text-[18px] h-[47px] rounded-lg bg-[#463BAF] hover:bg-[#332a80]">
-                    <Printer className="h-4 w-4" />
-                    حفظ وطباعة الفاتورة
-                </Button>
-                <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleSaveDraft}
-                    className="gap-2 rounded-lg w-[246px] h-[47px] text-[18px]"
-                >
-                    <Save className="h-4 w-4" />
-                    حفظ كمسودة
-                </Button>
+                <MainButton  text=" حفظ وطباعة الفاتورة" icon={<Printer className="h-4 w-4" />} />
+                <SecondaryButton  text=" حفظ كمسودة" icon={<Save className="h-4 w-4" />} />
             </div>
         </form>
     );

@@ -1,45 +1,50 @@
 "use client";
 
 import * as React from "react";
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { ArrowUpDown, RefreshCw } from "lucide-react";
 
 import { getExpenseColumns } from "./ExpensesColumns";
-import { ExpenseRecord } from "@/types/types";
+import { ExpenseRecord } from "@/types/expense.types";
 import { DataTable } from "../DataTable";
 import { DataTablePagination } from "../Pagination";
-
-
-const PAGE_SIZE = 5;
 
 interface ExpensesTableSectionProps {
   title?: string;
   onRefresh?: () => void;
+  onSortToggle?: () => void;
+  onDeleteRow?: (row: ExpenseRecord) => void;
+  onEditRow?: (row: ExpenseRecord) => void;
   data: ExpenseRecord[];
-  totalRecords?: number;
+  page: number;
+  pageSize: number;
+  totalRecords: number;
+  isLoading?: boolean;
+  onPageChange: (page: number) => void;
   className?: string;
 }
 
 export function ExpensesTableSection({
   title = "سجل المصروفات",
   onRefresh,
+  onSortToggle,
+  onDeleteRow,
+  onEditRow,
   data,
+  page,
+  pageSize,
   totalRecords,
+  isLoading,
+  onPageChange,
   className,
 }: ExpensesTableSectionProps) {
-  const [page, setPage] = useState(1);
-
-  const pageRows = useMemo(() => {
-    const start = (page - 1) * PAGE_SIZE;
-    return data.slice(start, start + PAGE_SIZE);
-  }, [data, page]);
-
-  const columns = useMemo(() => getExpenseColumns(), []);
+  const columns = useMemo(
+    () => getExpenseColumns({ onDelete: onDeleteRow, onEdit: onEditRow }),
+    [onDeleteRow, onEditRow]
+  );
 
   return (
-    <section
-      className={`rounded-2xl bg-white ctm-shadow p-5 ${className ?? ""}`}
-    >
+    <section className={`rounded-2xl bg-white ctm-shadow p-5 ${className ?? ""}`}>
       <div className="flex items-center justify-between gap-4">
         <h2 className="text-[18px] font-semibold text-[#232323]">{title}</h2>
 
@@ -50,11 +55,12 @@ export function ExpensesTableSection({
             aria-label="تحديث"
             className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#E4E2E9]"
           >
-            <RefreshCw className="h-4 w-4 text-muted-foreground" />
+            <RefreshCw className={`h-4 w-4 text-muted-foreground ${isLoading ? "animate-spin" : ""}`} />
           </button>
 
           <button
             type="button"
+            onClick={onSortToggle}
             aria-label="ترتيب"
             className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#E4E2E9]"
           >
@@ -64,15 +70,15 @@ export function ExpensesTableSection({
       </div>
 
       <div className="mt-4 overflow-x-auto">
-        <DataTable columns={columns} data={pageRows} />
+        <DataTable columns={columns} data={data} />
       </div>
 
       <DataTablePagination
         className="mt-4"
         page={page}
-        pageSize={PAGE_SIZE}
-        totalRecords={totalRecords ?? data.length}
-        onPageChange={setPage}
+        pageSize={pageSize}
+        totalRecords={totalRecords}
+        onPageChange={onPageChange}
       />
     </section>
   );

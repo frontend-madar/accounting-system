@@ -53,29 +53,21 @@ export const InvoiceTextField = React.forwardRef<
                         "bg-white",
                         "px-4",
                         "text-[15px] text-[#232323]",
-
                         "placeholder:text-[#9CA3AF]",
-
                         "shadow-sm",
-
                         "transition-colors duration-200",
-
                         "hover:border-[#837CC9]",
-
                         "focus-visible:border-[#40369F]",
                         "focus-visible:ring-2",
                         "focus-visible:ring-[#40369F]/20",
-
                         disabled &&
-                            "cursor-not-allowed opacity-60",
-
+                        "cursor-not-allowed opacity-60",
                         error &&
-                            "border-red-500",
+                        "border-red-500",
                         error &&
-                            "focus-visible:border-red-500",
+                        "focus-visible:border-red-500",
                         error &&
-                            "focus-visible:ring-red-200",
-
+                        "focus-visible:ring-red-200",
                         className
                     )}
                     {...props}

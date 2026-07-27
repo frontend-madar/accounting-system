@@ -53,13 +53,20 @@ export function AmountField({
           error ? "border-red-500" : "border-[#C0C0C0]"
         )}
       >
-        <Select value={currency} onValueChange={onCurrencyChange}>
+        <Select
+          value={currency}
+          onValueChange={(value) => {
+            if (value !== null) {
+              onCurrencyChange(value);
+            }
+          }}
+        >
           <SelectTrigger
             className="w-auto text-[#000619]  text-[20px] border-0 bg-transparent px-0 shadow-none focus:ring-0 focus:ring-offset-0"
           >
             <SelectValue />
           </SelectTrigger>
-          
+
           <SelectContent align="start">
             {currencyOptions.map((option) => (
               <SelectItem key={option.value} value={option.value}>

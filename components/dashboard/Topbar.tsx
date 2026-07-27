@@ -1,15 +1,14 @@
 "use client";
 
-import * as React from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Bell, Check, ChevronDown, ChevronLeft, Search, LogOut, Menu } from "lucide-react";
+import { Check, ChevronDown, ChevronLeft, Search, LogOut, Menu, Home } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
     DropdownMenu,
     DropdownMenuContent,
-    DropdownMenuItem, 
+    DropdownMenuItem,
     DropdownMenuTrigger,
     DropdownMenuSeparator,
     DropdownMenuLabel,
@@ -35,7 +34,7 @@ const LANGUAGE_OPTIONS: LanguageOption[] = [
 ];
 
 interface TopbarProps {
-    title: string;
+    title?: string;
     avatarSrc?: string;
     searchPlaceholder?: string;
     onSearch?: (value: string) => void;
@@ -51,6 +50,7 @@ interface TopbarProps {
     defaultLanguage?: string;
     /** Called with the selected language's code whenever the user picks one. */
     onLanguageChange?: (code: string) => void;
+    isNested?: boolean
 }
 
 export function Topbar({
@@ -68,6 +68,7 @@ export function Topbar({
     middleNestedLinkPath,
     defaultLanguage = LANGUAGE_OPTIONS[0].code,
     onLanguageChange,
+    isNested
 }: TopbarProps) {
     const router = useRouter();
     const user = useAuthStore((s) => s.user);
@@ -79,7 +80,7 @@ export function Topbar({
 
     const [language, setLanguage] = useState<LanguageOption>(
         LANGUAGE_OPTIONS.find((option) => option.code === defaultLanguage) ??
-            LANGUAGE_OPTIONS[0]
+        LANGUAGE_OPTIONS[0]
     );
 
     function handleLanguageSelect(option: LanguageOption) {
@@ -99,57 +100,36 @@ export function Topbar({
                 className
             )}
         >
-            {!path && (
-                <div className="flex items-center gap-3" >
-                    <button
-                        type="button"
-                        onClick={toggleMobileSidebar}
-                        className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors"
-                    >
-                        <Menu className="h-6 w-6 text-[#0F1219]" />
-                    </button>
-                    <h1 className="shrink-0 hidden md:block text-[16px] md:text-[24px] font-semibold text-[#0F1219]">{title}</h1>
-                </div>
-            )}
 
-            {path && (
-                <div className="flex items-center md:gap-3 " >
-                    <button
-                        type="button"
-                        onClick={toggleMobileSidebar}
-                        className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors ml-2"
-                    >
-                        <Menu className="h-6 w-6 text-[#0F1219]" />
-                    </button>
-                    <div className="hidden md:flex items-center gap-1" >
-                         <TopbarHomeIcon />
-                         <Link href={'/dashboard'} className="text-[#B1B2B4] text-[12px] md:text-[18px]"> الرئيسية  </Link>
-                    </div>
+            {title && (<h1 className="shrink-0 hidden md:block text-[16px] md:text-[20px] font-semibold text-[#0F1219]">{title}</h1>)}
 
-                  
-                    <Link href={''} className="text-[#B1B2B4] text-[12px] md:text-[18px] flex items-center gap-1"> <ChevronLeft className="text-[#B1B2B4]" /> {path} </Link>
-                    {middleNestedLink && (
-                        <Link href={middleNestedLinkPath ?? '/dashboard'} className="text-[#B1B2B4] text-[12px] md:text-[18px] flex items-center gap-1"> <ChevronLeft className="text-[#B1B2B4]" /> {middleNestedLink} </Link>
-                    )}
-                    {nestedLink && (
-                        <Link href={nestedLinkPath ?? '/dashboard'} className="text-[#0F1219] text-[12px] md:text-[18px] flex items-center gap-1"> <ChevronLeft className="text-[#0F1219]" /> {nestedLink} </Link>
-                    )}
+            {isNested && (
+                <div className="md:flex items-center  hidden  " >
+
+                    <Link href={'/dashboard'} className="hidden md:flex items-center gap-1 text-[#B1B2B4] transition duration-300 cursor-pointer hover:text-[#463BAF]" >
+                        <Home />
+                        <div className=" text-[12px] md:text-[18px]"> الرئيسية  </div>
+                    </Link>
+
+                    {path && (<div>
+
+                        <div className="text-[#463BAF] text-[12px] md:text-[18px] flex items-center gap-1"> <ChevronLeft /> {path} </div>
+                    </div>)}
+
                 </div>
             )}
 
             <div className="flex items-center gap-3">
-                {search && (
-                    <div className="relative hidden md:block ">
-                        <Search className="pointer-events-none absolute right-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                        <Input
-                            type="search"
-                            placeholder={searchPlaceholder}
-                            onChange={(event) => onSearch?.(event.target.value)}
-                            className="h-10 w-[300px] rounded-xl border-border bg-muted/40 pr-9 text-right"
-                        />
-                    </div>
 
-                )}
+
+
+                <button
+                    type="button"
+                    onClick={toggleMobileSidebar}
+                    className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors  flex h-9 w-9 items-center justify-center rounded-full border border-border"
+                >
+                    <Menu className="rounded-full text-[#0F1219]" />
+                </button>
 
                 {/* Language */}
                 <DropdownMenu>
@@ -197,7 +177,7 @@ export function Topbar({
                     aria-label="الإشعارات"
                     className="relative flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border text-muted-foreground sm:h-10 sm:w-10"
                 >
-                   <TopbarNotificationIcon />
+                    <TopbarNotificationIcon />
 
                     {hasNotification && (
                         <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-rose-500 ring-2 ring-white sm:right-2.5 sm:top-2.5" />

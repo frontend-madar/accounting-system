@@ -94,18 +94,7 @@ export function DateField({
                                 : placeholder}
                         </span>
 
-                        <span
-                            className="
-                                flex
-                                h-8
-                                w-8
-                                items-center
-                                justify-center
-                                rounded-lg
-                                bg-[#F5F3FF]
-                                text-[#40369F]
-                            "
-                        >
+                        <span className=" flex h-8 w-8 items-center justify-center rounded-lg bg-[#F5F3FF] text-[#40369F] " >
                             <CalendarIcon className="h-4 w-4" />
                         </span>
                     </Button>
@@ -113,16 +102,7 @@ export function DateField({
 
                 <PopoverContent
                     align="start"
-                    className="
-                        w-auto
-                        rounded-xl
-                        border
-                        border-[#E4E2E9]
-                        bg-white
-                        p-2
-                        shadow-lg
-                    "
-                >
+                    className=" w-auto rounded-xl border border-[#E4E2E9] bg-white p-2 shadow-lg " >
                     <Calendar
                         mode="single"
                         selected={selectedDate}

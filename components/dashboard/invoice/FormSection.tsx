@@ -19,7 +19,7 @@ export function FormSection({
     return (
         <Card
             className={cn(
-                "group overflow-hidden rounded-3xl",
+                "group rounded-3xl",
                 "border border-slate-200/70",
                 "bg-gradient-to-br from-white via-white to-slate-50",
                 "shadow-sm transition-all duration-300",

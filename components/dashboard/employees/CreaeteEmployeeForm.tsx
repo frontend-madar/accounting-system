@@ -129,7 +129,7 @@ export function CreaeteEmployeeForm({
     return (
         <form
             onSubmit={handleSubmit(onSubmit)}
-            className="space-y-8 rounded-2xl  ctm-shadow bg-white p-6"
+            className="space-y-8 rounded-2xl  ctm-shadow bg-white p-2 md:p-6"
         >
 
             <FormSection title="بيانات الموظف" gridClassName="!grid-cols-1 md:!grid-cols-2 lg:!grid-cols-3">
@@ -311,7 +311,7 @@ export function CreaeteEmployeeForm({
                     )}
                 />
             </FormSection>
- 
+
 
             <FileUploadField
                 label=" المرفقات "

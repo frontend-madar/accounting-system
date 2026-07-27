@@ -66,7 +66,9 @@ export function InvoicesTableSection({
                 <h2 className="text-[18px] font-semibold text-foreground">{title}</h2>
                 <div className="flex flex-col md:flex-row md:items-center gap-2">
 
-                    <SearchInput query={query} setQuery={setQuery} setPage={setPage} />
+                    <div className="md:w-50" >
+                        <SearchInput query={query} setQuery={setQuery} setPage={setPage}  />
+                    </div>
 
                     <MainButton  text={addButtonLabel} icon={<Plus className="h-4 w-4" />} />
                 </div>
