@@ -1,12 +1,19 @@
 "use client";
 
 import * as React from "react";
-import { MoreVertical, Paperclip } from "lucide-react";
+import { MoreVertical, Paperclip, Pencil, Trash2 } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 
 import { Checkbox } from "@/components/ui/checkbox";
+import {
+    DropdownMenu,
+    DropdownMenuTrigger,
+    DropdownMenuContent,
+    DropdownMenuItem,
+} from "@/components/ui/dropdown-menu";
 import { ExpenseStatusBadge } from "./ExpenseStatusBadge";
 import { ExpenseRecord } from "@/types/expense.types";
+import Link from "next/link";
 
 interface GetExpenseColumnsOptions {
     onDelete?: (row: ExpenseRecord) => void;
@@ -65,7 +72,7 @@ export function getExpenseColumns({
             header: "المرفقات",
             cell: ({ row }) =>
                 row.original.documentUrl ? (
-                    <a
+                  <Link  
                         href={row.original.documentUrl}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -73,7 +80,7 @@ export function getExpenseColumns({
                     >
                         <Paperclip className="h-4 w-4" />
                         <span className="text-[14px]">عرض المرفق</span>
-                    </a>
+                    </Link>
                 ) : (
                     <span className="text-[14px] text-muted-foreground">لا يوجد</span>
                 ),
@@ -82,65 +89,25 @@ export function getExpenseColumns({
             id: "actions",
             header: "",
             cell: ({ row }) => (
-                <ExpenseRowActions row={row.original} onDelete={onDelete} onEdit={onEdit} />
+                <DropdownMenu>
+                    <DropdownMenuTrigger className="text-muted-foreground">
+                        <MoreVertical className="h-4 w-4" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => onEdit?.(row.original)}>
+                            <Pencil className="h-4 w-4" />
+                            تعديل
+                        </DropdownMenuItem>
+                        <DropdownMenuItem
+                            onClick={() => onDelete?.(row.original)}
+                            className="text-red-600 focus:text-red-600"
+                        >
+                            <Trash2 className="h-4 w-4" />
+                            حذف
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
             ),
         },
     ];
-}
-
-function ExpenseRowActions({
-    row,
-    onDelete,
-    onEdit,
-}: {
-    row: ExpenseRecord;
-    onDelete?: (row: ExpenseRecord) => void;
-    onEdit?: (row: ExpenseRecord) => void;
-}) {
-    const [open, setOpen] = React.useState(false);
-    const ref = React.useRef<HTMLDivElement>(null);
-
-    React.useEffect(() => {
-        if (!open) return;
-        function handleClickOutside(e: MouseEvent) {
-            if (ref.current && !ref.current.contains(e.target as Node)) {
-                setOpen(false);
-            }
-        }
-        document.addEventListener("mousedown", handleClickOutside);
-        return () => document.removeEventListener("mousedown", handleClickOutside);
-    }, [open]);
-
-    return (
-        <div ref={ref} className="relative">
-            <button type="button" onClick={() => setOpen((v) => !v)} className="text-muted-foreground">
-                <MoreVertical className="h-4 w-4" />
-            </button>
-
-            {open && (
-                <div className="absolute left-0 z-20 mt-2 w-32 rounded-lg border border-[#E4E2E9] bg-white p-1 shadow-md">
-                    <button
-                        type="button"
-                        onClick={() => {
-                            setOpen(false);
-                            onEdit?.(row);
-                        }}
-                        className="w-full rounded-md px-3 py-1.5 text-right text-sm hover:bg-slate-50"
-                    >
-                        تعديل
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => {
-                            setOpen(false);
-                            onDelete?.(row);
-                        }}
-                        className="w-full rounded-md px-3 py-1.5 text-right text-sm text-red-600 hover:bg-red-50"
-                    >
-                        حذف
-                    </button>
-                </div>
-            )}
-        </div>
-    );
 }

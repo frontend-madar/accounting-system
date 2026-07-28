@@ -52,53 +52,49 @@ export function DateField({
             </FieldLabel>
 
             <Popover>
-                <PopoverTrigger className="w-full">
-                    <Button
-                        id={fieldId}
-                        type="button"
-                        variant="outline"
-                        disabled={disabled}
-                        aria-invalid={!!error}
-                        className={cn(
-                            "flex h-[47px] w-full items-center justify-between",
-                            "rounded-xl",
-                            "border border-[#C8C2FC]",
-                            "bg-white",
-                            "px-4",
-                            "text-[15px] font-normal",
-                            "text-[#232323]",
-                            "shadow-sm",
-                            "transition-colors",
-
-                            "hover:bg-[#FAF9FF]",
-                            "hover:border-[#837CC9]",
-
-                            "focus-visible:border-[#40369F]",
-                            "focus-visible:ring-2",
-                            "focus-visible:ring-[#40369F]/20",
-
-                            !selectedDate && "text-[#9CA3AF]",
-
-                            error &&
+                <PopoverTrigger
+                    className="w-full"
+                    render={
+                        <Button
+                            id={fieldId}
+                            type="button"
+                            variant="outline"
+                            disabled={disabled}
+                            aria-invalid={!!error}
+                            className={cn(
+                                "flex h-[47px] w-full items-center justify-between",
+                                "rounded-xl",
+                                "border border-[#C8C2FC]",
+                                "bg-white",
+                                "px-4",
+                                "text-[15px] font-normal",
+                                "text-[#232323]",
+                                "shadow-sm",
+                                "transition-colors",
+                                "hover:bg-[#FAF9FF]",
+                                "hover:border-[#837CC9]",
+                                "focus-visible:border-[#40369F]",
+                                "focus-visible:ring-2",
+                                "focus-visible:ring-[#40369F]/20",
+                                !selectedDate && "text-[#9CA3AF]",
+                                error &&
                                 "border-red-500 focus-visible:border-red-500 focus-visible:ring-red-200",
+                                disabled && "cursor-not-allowed opacity-60",
+                                className
+                            )}
+                        >
+                            <span>
+                                {selectedDate
+                                    ? format(selectedDate, "dd/MM/yyyy")
+                                    : placeholder}
+                            </span>
 
-                            disabled &&
-                                "cursor-not-allowed opacity-60",
-
-                            className
-                        )}
-                    >
-                        <span>
-                            {selectedDate
-                                ? format(selectedDate, "dd/MM/yyyy")
-                                : placeholder}
-                        </span>
-
-                        <span className=" flex h-8 w-8 items-center justify-center rounded-lg bg-[#F5F3FF] text-[#40369F] " >
-                            <CalendarIcon className="h-4 w-4" />
-                        </span>
-                    </Button>
-                </PopoverTrigger>
+                            <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F5F3FF] text-[#40369F]">
+                                <CalendarIcon className="h-4 w-4" />
+                            </span>
+                        </Button>
+                    }
+                />
 
                 <PopoverContent
                     align="start"

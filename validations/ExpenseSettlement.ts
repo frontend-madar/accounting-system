@@ -9,12 +9,12 @@ export const expenseSettlementSchema = z.object({
 
 export type ExpenseSettlementValues = z.infer<typeof expenseSettlementSchema>;
 
- 
+
 export const STATUS_OPTIONS = [
   { value: "مدفوع", label: "مدفوع" },
   { value: "مسودة", label: "مسودة" },
 ];
- 
+
 
 export const expenseFormSchema = z.object({
   currency: z.string().min(1, "العملة مطلوبة"),
@@ -23,7 +23,6 @@ export const expenseFormSchema = z.object({
   category: z.string().min(1, "فئة المصروف مطلوبة"),
   paymentMethod: z.string().min(1, "طريقة الدفع مطلوبة"),
   account: z.string().min(1, "الحساب مطلوب"),
-  status: z.string().min(1, "الحالة مطلوبة"),   // <-- add this
   vendorName: z.string().optional(),
   vendorPhone: z.string().optional(),
   notes: z.string().optional(),

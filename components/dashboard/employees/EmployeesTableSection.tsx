@@ -127,10 +127,10 @@ export function EmployeesTableSection({
 
     
       <AlertDialog open={!!employeeToDelete} onOpenChange={(open) => !open && setEmployeeToDelete(null)}>
-        <AlertDialogContent>
+        <AlertDialogContent >
           <AlertDialogHeader>
             <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
-            <AlertDialogDescription>
+            <AlertDialogDescription  >
               هل أنت متأكد من حذف الموظف {employeeToDelete?.fullName}؟ لا يمكن التراجع عن هذا الإجراء.
             </AlertDialogDescription>
           </AlertDialogHeader>

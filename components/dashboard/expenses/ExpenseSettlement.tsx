@@ -21,6 +21,7 @@ interface ExpenseSettlementProps {
     initialValues?: Partial<ExpenseSettlementValues>;
     onApply?: (values: ExpenseSettlementValues) => void;
     onReset?: () => void;
+    isLoading?: boolean;
 }
 
 const EMPTY_VALUES: ExpenseSettlementValues = {
@@ -30,7 +31,32 @@ const EMPTY_VALUES: ExpenseSettlementValues = {
     status: "",
 };
 
-const ExpenseSettlement = ({ initialValues, onApply, onReset }: ExpenseSettlementProps) => {
+function ExpenseSettlementSkeleton() {
+    return (
+        <div className="rounded-2xl ctm-shadow bg-white p-5 space-y-5">
+            <div className="flex items-center gap-3">
+                <div className="h-6 w-6 animate-pulse rounded bg-slate-200" />
+                <div className="h-5 w-32 animate-pulse rounded bg-slate-200" />
+            </div>
+
+            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                {Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="space-y-2">
+                        <div className="h-3.5 w-16 animate-pulse rounded bg-slate-200" />
+                        <div className="h-11 w-full animate-pulse rounded-xl bg-slate-100" />
+                    </div>
+                ))}
+            </div>
+
+            <div className="flex gap-3 justify-end">
+                <div className="h-11 w-[150px] animate-pulse rounded-xl bg-slate-100" />
+                <div className="h-11 w-[130px] animate-pulse rounded-xl bg-slate-200" />
+            </div>
+        </div>
+    );
+}
+
+const ExpenseSettlement = ({ initialValues, onApply, onReset, isLoading }: ExpenseSettlementProps) => {
     const { control, register, handleSubmit, reset } = useForm<ExpenseSettlementValues>({
         resolver: zodResolver(expenseSettlementSchema),
         defaultValues: { ...EMPTY_VALUES, ...initialValues },
@@ -56,6 +82,10 @@ const ExpenseSettlement = ({ initialValues, onApply, onReset }: ExpenseSettlemen
     function handleReset() {
         reset(EMPTY_VALUES);
         onReset?.();
+    }
+
+    if (isLoading) {
+        return <ExpenseSettlementSkeleton />;
     }
 
     return (

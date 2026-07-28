@@ -17,7 +17,6 @@ import MainButton from "../shared/MainButton";
 import SecondaryButton from "../shared/SecondaryButton";
 
 import { AmountField } from "./AmountField";
-import { DateTimeField } from "./DateTimeField";
 import { SingleAttachmentDropzone } from "./SingleAttachmentDropzone";
 import { expenseFormSchema, ExpenseFormValues } from "@/validations/ExpenseSettlement";
 import {
@@ -97,6 +96,7 @@ export function CreateExpenseForm({ onSuccess }: CreateExpenseFormProps) {
     // Shared submit logic — `status` is supplied by whichever button
     // triggered it, not read from the form itself.
     function submitExpense(values: ExpenseFormValues, status: string) {
+        console.log(values)
         createExpense.mutate(
             {
                 amount: Number(values.amount),

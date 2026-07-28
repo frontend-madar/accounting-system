@@ -121,3 +121,36 @@ export function ExpenseStatCard({
     </div>
   );
 }
+
+export function ExpenseStatCardSkeleton({ className }: { className?: string }) {
+  return (
+    <div
+      className={cn(
+        "relative overflow-hidden rounded-3xl",
+        "border border-slate-100",
+        "bg-gradient-to-br from-white via-white to-slate-50",
+        "p-6 min-h-[170px]",
+        "shadow-sm",
+        className
+      )}
+    >
+      <div className="flex items-start justify-between">
+        <div className="flex items-center gap-4">
+          <div className="h-14 w-14 shrink-0 animate-pulse rounded-2xl bg-slate-200" />
+
+          <div className="space-y-2">
+            <div className="h-3.5 w-28 animate-pulse rounded bg-slate-200" />
+            <div className="h-3 w-20 animate-pulse rounded bg-slate-100" />
+          </div>
+        </div>
+
+        <div className="h-10 w-10 animate-pulse rounded-xl bg-slate-100" />
+      </div>
+
+      <div className="mt-8">
+        <div className="h-9 w-32 animate-pulse rounded bg-slate-200" />
+        <div className="mt-3 h-1.5 w-16 animate-pulse rounded-full bg-slate-200" />
+      </div>
+    </div>
+  );
+}

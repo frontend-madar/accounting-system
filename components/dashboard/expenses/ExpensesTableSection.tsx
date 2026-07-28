@@ -1,13 +1,14 @@
 "use client";
 
 import * as React from "react";
-import { useMemo } from "react";
+import { useMemo, useCallback } from "react";
 import { ArrowUpDown, RefreshCw } from "lucide-react";
 
 import { getExpenseColumns } from "./ExpensesColumns";
 import { ExpenseRecord } from "@/types/expense.types";
 import { DataTable } from "../DataTable";
 import { DataTablePagination } from "../Pagination";
+import { useDeleteExpense } from "@/hooks/useExpenses";
 
 interface ExpensesTableSectionProps {
   title?: string;
@@ -38,9 +39,22 @@ export function ExpensesTableSection({
   onPageChange,
   className,
 }: ExpensesTableSectionProps) {
+  const deleteExpense = useDeleteExpense();
+
+  const handleDelete = useCallback(
+    (row: ExpenseRecord) => {
+      deleteExpense.mutate(row.id, {
+        onSuccess: () => {
+          onDeleteRow?.(row);
+        },
+      });
+    },
+    [deleteExpense, onDeleteRow]
+  );
+
   const columns = useMemo(
-    () => getExpenseColumns({ onDelete: onDeleteRow, onEdit: onEditRow }),
-    [onDeleteRow, onEditRow]
+    () => getExpenseColumns({ onDelete: handleDelete, onEdit: onEditRow }),
+    [handleDelete, onEditRow]
   );
 
   return (

@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useState } from "react";
 
- 
+
 import { useExpenses, useExpenseDashboard, useDeleteExpense } from "@/hooks/useExpenses";
 import type { ExpenseSettlementValues } from "@/validations/ExpenseSettlement";
 import type { ExpenseStat } from "@/types/types";
@@ -12,6 +12,7 @@ import { Topbar } from "@/components/dashboard/Topbar";
 import { ExpenseStatsSection } from "@/components/dashboard/expenses/ExpenseStatsSection";
 import ExpenseSettlement from "@/components/dashboard/expenses/ExpenseSettlement";
 import { ExpensesTableSection } from "@/components/dashboard/expenses/ExpensesTableSection";
+import EmptyExpenses from "@/components/dashboard/expenses/EmptyExpenses";
 
 const PAGE_SIZE = 5;
 
@@ -39,7 +40,7 @@ export default function ExpensesPage() {
     };
 
     const { data: expensesRes, isLoading, refetch } = useExpenses(queryParams);
-    const { data: dashboardRes } = useExpenseDashboard();
+    const { data: dashboardRes, isLoading: isDashboardLoading } = useExpenseDashboard();
     const deleteExpense = useDeleteExpense();
 
     const stats: ExpenseStat[] = [
@@ -89,28 +90,39 @@ export default function ExpensesPage() {
         setSortOrder((prev) => (prev === "asc" ? "desc" : "asc"));
     }
 
+    const expenses = expensesRes?.data.data ?? [];
+    const hasNoExpenses = !isLoading && expenses.length === 0;
+
     return (
-        <div className="space-y-6">
-          <Topbar title='إضافة مصروف' />
-            <ExpenseStatsSection stats={stats} />
+        <div className="space-y-6 px-4">
+            <Topbar title='إضافة مصروف' />
 
-            <ExpenseSettlement
-                initialValues={filters}
-                onApply={handleApplyFilters}
-                onReset={handleResetFilters}
-            />
 
-            <ExpensesTableSection
-                data={expensesRes?.data.data ?? []}
-                page={expensesRes?.data.page ?? page}
-                pageSize={expensesRes?.data.limit ?? PAGE_SIZE}
-                totalRecords={expensesRes?.data.total ?? 0}
-                isLoading={isLoading}
-                onPageChange={setPage}
-                onRefresh={() => refetch()}
-                onSortToggle={toggleSort}
-                onDeleteRow={handleDeleteRow}
-            />
+            {hasNoExpenses ? (
+                <EmptyExpenses />
+            ) : (
+                <>
+                    <ExpenseStatsSection stats={stats} isLoading={isDashboardLoading} />
+
+                    <ExpenseSettlement
+                        initialValues={filters}
+                        onApply={handleApplyFilters}
+                        onReset={handleResetFilters}
+                        isLoading={isDashboardLoading}
+                    />
+                    <ExpensesTableSection
+                        data={expenses}
+                        page={expensesRes?.data.page ?? page}
+                        pageSize={expensesRes?.data.limit ?? PAGE_SIZE}
+                        totalRecords={expensesRes?.data.total ?? 0}
+                        isLoading={isLoading}
+                        onPageChange={setPage}
+                        onRefresh={() => refetch()}
+                        onSortToggle={toggleSort}
+                        onDeleteRow={handleDeleteRow}
+                    />
+                </>
+            )}
         </div>
     );
 }
