@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { FormSection } from "../invoice/FormSection";
 import { SelectField } from "../invoice/SelectField";
+import { DateField } from "../Datefield";
 
 interface MonthOption {
   value: string;
@@ -29,36 +30,11 @@ const YEAR_OPTIONS = ["2024", "2025", "2026", "2027"].map((y) => ({
   label: y,
 }));
 
-const BRANCH_OPTIONS = [
-  { value: "all", label: "جميع الفروع" },
-  { value: "main", label: "الفرع الرئيسي" },
-  { value: "east", label: "فرع الشرقية" },
-];
-
-const DEPARTMENT_OPTIONS = [
-  { value: "all", label: "جميع الاقسام" },
-  { value: "hr", label: "الموارد البشرية" },
-  { value: "finance", label: "المالية" },
-  { value: "sales", label: "المبيعات" },
-];
-
-const MONTH_LABELS: Record<string, string> = Object.fromEntries(
-  MONTH_OPTIONS.map((m) => [m.value, m.label]),
-);
-
-const DAYS_IN_MONTH: Record<string, number> = {
-  "1": 31, "2": 28, "3": 31, "4": 30, "5": 31, "6": 30,
-  "7": 31, "8": 31, "9": 30, "10": 31, "11": 30, "12": 31,
-};
-
-function buildPayrollPeriodLabel(month: string, year: string) {
-  const days = DAYS_IN_MONTH[month] ?? 30;
-  return `1 - ${days} ${MONTH_LABELS[month]} ${year}`;
-}
-
-interface PayrollInfoValues {
+export interface PayrollInfoValues {
   month: string;
   year: string;
+  startDate: string;
+  endDate: string;
   branch: string;
   department: string;
 }
@@ -73,8 +49,10 @@ export function PayrollInfo({
   onChange,
 }: PayrollInfoProps) {
   const [values, setValues] = useState<PayrollInfoValues>({
-    month: defaultValues?.month ?? "6",
+    month: defaultValues?.month ?? "7",
     year: defaultValues?.year ?? "2026",
+    startDate: defaultValues?.startDate ?? "2026-07-01",
+    endDate: defaultValues?.endDate ?? "2026-07-31",
     branch: defaultValues?.branch ?? "all",
     department: defaultValues?.department ?? "all",
   });
@@ -85,53 +63,36 @@ export function PayrollInfo({
     onChange?.(next);
   }
 
-  const payrollPeriodLabel = buildPayrollPeriodLabel(values.month, values.year);
-
   return (
     <form className="space-y-8 rounded-2xl ctm-shadow bg-white p-6">
       <FormSection title="معلومات المسير">
-          <SelectField
-            label="الشهر"
-            placeholder="اختر الشهر"
-            value={values.month}
-            onChange={(v) => update("month", v)}
-            options={MONTH_OPTIONS}
-          />
+        <SelectField
+          label="الشهر"
+          placeholder="اختر الشهر"
+          value={values.month}
+          onChange={(v) => update("month", v)}
+          options={MONTH_OPTIONS}
+        />
 
-          <SelectField
-            label="السنة"
-            placeholder="اختر السنة"
-            value={values.year}
-            onChange={(v) => update("year", v)}
-            options={YEAR_OPTIONS}
-          />
+        <SelectField
+          label="السنة"
+          placeholder="اختر السنة"
+          value={values.year}
+          onChange={(v) => update("year", v)}
+          options={YEAR_OPTIONS}
+        />
 
-          {/* Derived from month + year, so it's read-only rather than user-editable */}
-          <SelectField
-            label="فترة الرواتب"
-            placeholder="فترة الرواتب"
-            value={payrollPeriodLabel}
-            onChange={() => {}}
-            options={[{ value: payrollPeriodLabel, label: payrollPeriodLabel }]}
-            // disabled
-          />
-       
+        <DateField
+          label="فترة الرواتب (من)"
+          value={values.startDate}
+          onChange={(v) => update("startDate", v)}
+        />
 
-          <SelectField
-            label="الفرع"
-            placeholder="اختر الفرع"
-            value={values.branch}
-            onChange={(v) => update("branch", v)}
-            options={BRANCH_OPTIONS}
-          />
-
-          <SelectField
-            label="القسم"
-            placeholder="اختر القسم"
-            value={values.department}
-            onChange={(v) => update("department", v)}
-            options={DEPARTMENT_OPTIONS}
-          />
+        <DateField
+          label="فترة الرواتب (إلى)"
+          value={values.endDate}
+          onChange={(v) => update("endDate", v)}
+        />
       </FormSection>
     </form>
   );

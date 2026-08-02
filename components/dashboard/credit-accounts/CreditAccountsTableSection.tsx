@@ -1,92 +1,150 @@
 "use client";
 
-import * as React from "react";
 import { useMemo, useState } from "react";
 import { Plus } from "lucide-react";
 
-import {
-  getCreditAccountColumns,
-  CreditAccount,
-} from "./CreditAccountsColumns";
-
-import { CreditAccountStatus } from "./CreditAccountStatusBadge";
+import { CreditAccount, getCreditAccountColumns } from "./CreditAccountsColumns";
 import { DataTable } from "../DataTable";
 import { DataTablePagination } from "../Pagination";
 import MainButton from "../shared/MainButton";
-import SecondaryButton from "../shared/SecondaryButton";
 import FillterButton from "../FillterButton";
 import SearchInput from "../SearchInput";
+import EmptyState from "../shared/EmptyState";
+import { UpdateCreditAccountForm } from "./UpdateCreditAccountForm";
+import {
+  useDeferredAccounts,
+  useDeleteDeferredAccount,
+} from "@/hooks/use-deferred-account";
+import { useDebounce } from "@/hooks/use-debounce";
+import type { DeferredAccountItem } from "@/types/deferred-account.types";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { ConfirmDeleteDialog } from "../shared/ConfirmDeleteDialog";
 
-const PAGE_SIZE = 9;
+const PAGE_SIZE = 10;
+const STATUS_OPTIONS = ["الكل", "مكتملة", "كنسل", "باقي الدفع"];
 
 interface CreditAccountsTableSectionProps {
   addButtonLabel?: string;
   onAddClick?: () => void;
-  /** Full dataset — pagination below is client-side over this array. */
-  data: CreditAccount[];
-  /** Total record count, if it differs from `data.length` (server pagination). */
-  totalRecords?: number;
   className?: string;
 }
 
 export function CreditAccountsTableSection({
   addButtonLabel = "إضافة عميل",
   onAddClick,
-  data,
-  totalRecords,
   className,
 }: CreditAccountsTableSectionProps) {
   const [page, setPage] = useState(1);
   const [query, setQuery] = useState("");
-  const [rows, setRows] = useState(data);
+  const [statusFilter, setStatusFilter] = useState("الكل");
 
-  const filtered = useMemo(() => {
-    if (!query.trim()) return rows;
-    const q = query.trim();
-    return rows.filter(
-      (row) => row.client.includes(q) || row.employee.includes(q)
-    );
-  }, [rows, query]);
+  const debouncedQuery = useDebounce(query, 400);
 
-  const pageRows = useMemo(() => {
-    const start = (page - 1) * PAGE_SIZE;
-    return filtered.slice(start, start + PAGE_SIZE);
-  }, [filtered, page]);
+  const statusParam = statusFilter === "الكل" ? undefined : statusFilter;
 
-  function handleStatusChange(id: string, status: CreditAccountStatus) {
-    setRows((prev) =>
-      prev.map((row) => (row.id === id ? { ...row, status } : row))
-    );
-  }
+  const { data: apiResponse, isLoading } = useDeferredAccounts({
+    page,
+    limit: PAGE_SIZE,
+    search: debouncedQuery.trim() || undefined,
+    status: statusParam,
+  });
+
+  const tableData = apiResponse?.data?.data ?? [];
+  const totalCount = apiResponse?.data?.total ?? 0;
+
+  const hasActiveFilters = !!query.trim() || statusFilter !== "الكل";
+  const showEmptyState = !isLoading && totalCount === 0 && !hasActiveFilters;
+
+  const handleStatusFilterChange = (newStatus: string) => {
+    setStatusFilter(newStatus);
+    setPage(1);
+  };
+
+  const [editingAccount, setEditingAccount] = useState<DeferredAccountItem | null>(null);
+  const [deletingAccount, setDeletingAccount] = useState<DeferredAccountItem | null>(null);
+
+  const { mutate: deleteAccount, isPending: isDeleting } = useDeleteDeferredAccount();
 
   const columns = useMemo(
-    () => getCreditAccountColumns({ onStatusChange: handleStatusChange }),
+    () =>
+      getCreditAccountColumns({
+        onEdit: (account) => setEditingAccount(account as unknown as DeferredAccountItem),
+        onDelete: (account) => setDeletingAccount(account as unknown as DeferredAccountItem),
+      }),
     []
   );
 
   return (
     <section className={className}>
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+      {showEmptyState ? (
+        <EmptyState
+          title="لا يوجد حسابات آجلة حتى الآن"
+          description="إضافة بيانات عميل جديد لتسجيل معاملاته المالية ومتابعة أرصدته المستحقة."
+          buttonText={addButtonLabel}
+          href="/dashboard/credit-accounts/create"
+        />
+      ) : (
+        <>
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+            <div>
+              <SearchInput query={query} setQuery={setQuery} setPage={setPage} />
+            </div>
+            <div className="flex flex-col md:flex-row md:items-center gap-2">
+              <FillterButton
+                options={STATUS_OPTIONS}
+                selectedFilter={statusFilter}
+                onFilterChange={handleStatusFilterChange}
+              />
+              <MainButton
+                text={addButtonLabel}
+                href="/dashboard/credit-accounts/create"
+                icon={<Plus className="h-4 w-4" />}
+              />
+            </div>
+          </div>
 
-        <SearchInput query={query} setQuery={setQuery} setPage={setPage} />
-        <div className="flex flex-col md:flex-row md:items-center gap-2">
+          <div className="mt-4 overflow-hidden">
+            <DataTable columns={columns} data={tableData} isLoading={isLoading} />
+          </div>
 
-          <MainButton text={addButtonLabel} href="/dashboard/credit-accounts/create" icon={<Plus className="h-4 w-4" />} />
-          <FillterButton />
-        </div>
+          <DataTablePagination
+            className="mt-4"
+            page={page}
+            pageSize={PAGE_SIZE}
+            totalRecords={totalCount}
+            onPageChange={setPage}
+          />
+        </>
+      )}
 
-      </div>
+      <UpdateCreditAccountForm
+        account={editingAccount}
+        open={!!editingAccount}
+        onOpenChange={(open) => !open && setEditingAccount(null)}
+      />
 
-      <div className="mt-4 overflow-hidden">
-        <DataTable columns={columns} data={pageRows} />
-      </div>
-
-      <DataTablePagination
-        className="mt-4"
-        page={page}
-        pageSize={PAGE_SIZE}
-        totalRecords={totalRecords ?? filtered.length}
-        onPageChange={setPage}
+      <ConfirmDeleteDialog
+        open={!!deletingAccount}
+        onOpenChange={(open) => !open && setDeletingAccount(null)}
+        isLoading={isDeleting}
+        title="حذف الحساب الآجل"
+        description="هل أنت متأكد من حذف هذا الحساب؟ لا يمكن التراجع عن هذا الإجراء."
+        onConfirm={() => {
+          if (deletingAccount) {
+            deleteAccount(deletingAccount.id, {
+              onSuccess: () => setDeletingAccount(null),
+            });
+          }
+        }}
       />
     </section>
   );

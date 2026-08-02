@@ -3,11 +3,25 @@
 import { ChevronDown, Check } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 
-const filters = ["الكل", "الأحدث", "الأقدم"];
+const DEFAULT_FILTERS = ["الكل", "الأحدث", "الأقدم"];
 
-const FilterButton = () => {
+interface FilterButtonProps {
+  options?: string[];
+  selectedFilter?: string;
+  onFilterChange?: (value: string) => void;
+  className?: string;
+}
+
+const FilterButton = ({
+  options = DEFAULT_FILTERS,
+  selectedFilter: controlledSelected,
+  onFilterChange,
+  className = "",
+}: FilterButtonProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedFilter, setSelectedFilter] = useState("فلتر");
+  const [internalSelected, setInternalSelected] = useState(options[0] || "فلتر");
+
+  const selectedFilter = controlledSelected !== undefined ? controlledSelected : internalSelected;
 
   const menuRef = useRef<HTMLDivElement>(null);
 
@@ -31,14 +45,19 @@ const FilterButton = () => {
   }, []);
 
   const handleSelect = (value: string) => {
-    setSelectedFilter(value);
+    if (onFilterChange) {
+      onFilterChange(value);
+    } else {
+      setInternalSelected(value);
+    }
     setIsOpen(false);
   };
 
   return (
-    <div className="relative" ref={menuRef}>
+    <div className={`relative ${className}`} ref={menuRef}>
       <button
         onClick={() => setIsOpen((prev) => !prev)}
+        type="button"
         className="
         group
         flex
@@ -128,9 +147,10 @@ const FilterButton = () => {
         `}
       >
         <div className="p-2">
-          {filters.map((item) => (
+          {options.map((item) => (
             <button
               key={item}
+              type="button"
               onClick={() => handleSelect(item)}
               className={`
                 flex

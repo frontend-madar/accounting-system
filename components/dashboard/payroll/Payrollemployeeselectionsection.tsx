@@ -1,30 +1,34 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { PaginationState, RowSelectionState } from "@tanstack/react-table";
-import { Employee } from "@/types/types";
-import { getEmployeeSelectionColumns } from "./Employeecolumns";
+import { getEmployeeSelectionColumns, Employee } from "./Employeecolumns";
 import { SelectFilter } from "./Selectfilter";
 import SearchInput from "../SearchInput";
-import { EmployeeSelectionTable } from "./Employeeselectiontable";
+import { DataTable } from "../DataTable";
 import { DataTablePagination } from "../Pagination";
+import { useEmployees } from "@/hooks/use-employee";
+import { useDepartmentStore } from "@/store/department.store";
+import { EmployeeData } from "@/types/employee.types";
 
-
-const PAGE_SIZE = 9;
+const PAGE_SIZE = 10;
 const ALL_DEPARTMENTS = "all";
 
-interface DepartmentOption {
-    label: string;
-    value: string;
+/** Maps the API EmployeeData shape to the column-friendly Employee shape. */
+function toTableRow(e: EmployeeData): Employee {
+    return {
+        id: e.id,
+        jobNumber: e.nationalId,
+        name: e.fullName,
+        department: e.department,
+        baseSalary: parseFloat(e.basicSalary) || 0,
+    };
 }
 
 interface PayrollEmployeeSelectionSectionProps {
     title?: string;
     subtitle?: string;
-    /** Full employee dataset available for this payroll run. */
-    data: Employee[];
-    /** Department filter options (excluding the "all" option, added automatically). */
-    departments: DepartmentOption[];
+    initialSelectedIds?: string[];
     onSelectionChange?: (selectedIds: string[]) => void;
     className?: string;
 }
@@ -32,38 +36,49 @@ interface PayrollEmployeeSelectionSectionProps {
 export function PayrollEmployeeSelectionSection({
     title = "تشغيل مسير رواتب",
     subtitle = "اتبع الخطوات لاحتساب وإنشاء مسير رواتب جديد.",
-    data,
-    departments,
+    initialSelectedIds,
     onSelectionChange,
     className,
 }: PayrollEmployeeSelectionSectionProps) {
-    const [query, setQuery] = useState("");
+     const [query, setQuery] = useState("");
     const [department, setDepartment] = useState(ALL_DEPARTMENTS);
-    const [rowSelection, setRowSelection] = useState<RowSelectionState>({});
+    const [rowSelection, setRowSelection] = useState<RowSelectionState>(() => {
+        if (!initialSelectedIds) return {};
+        return Object.fromEntries(initialSelectedIds.map((id) => [id, true]));
+    });
     const [pagination, setPagination] = useState<PaginationState>({
         pageIndex: 0,
         pageSize: PAGE_SIZE,
     });
 
+    // ── Departments from store ──────────────────────────────────────────────
+    const { departments, fetchDepartments } = useDepartmentStore();
+
+    useEffect(() => {
+        fetchDepartments();
+    }, [fetchDepartments]);
+
     const departmentOptions = useMemo(
-        () => [{ label: "جميع الاقسام", value: ALL_DEPARTMENTS }, ...departments],
+        () => [
+            { label: "جميع الاقسام", value: ALL_DEPARTMENTS },
+            ...departments.map((d) => ({ label: d, value: d })),
+        ],
         [departments]
     );
 
-    const filtered = useMemo(() => {
-        const trimmedQuery = query.trim();
+    // ── Server-side data ────────────────────────────────────────────────────
+    const { data: employeesRes, isLoading } = useEmployees({
+        search: query || undefined,
+        department: department === ALL_DEPARTMENTS ? undefined : department,
+        page: pagination.pageIndex + 1,
+        limit: pagination.pageSize,
+    });
 
-        return data.filter((employee) => {
-            const matchesQuery = trimmedQuery
-                ? employee.name.includes(trimmedQuery) ||
-                employee.jobNumber.includes(trimmedQuery)
-                : true;
-            const matchesDepartment =
-                department === ALL_DEPARTMENTS || employee.department === department;
-
-            return matchesQuery && matchesDepartment;
-        });
-    }, [data, query, department]);
+    const rows = useMemo(
+        () => (employeesRes?.data.data ?? []).map(toTableRow),
+        [employeesRes]
+    );
+    const totalRecords = employeesRes?.data.total ?? 0;
 
     const columns = useMemo(() => getEmployeeSelectionColumns(), []);
 
@@ -75,14 +90,13 @@ export function PayrollEmployeeSelectionSection({
     function handleRowSelectionChange(
         updater: RowSelectionState | ((prev: RowSelectionState) => RowSelectionState)
     ) {
-        setRowSelection((prev) => {
-            const next = typeof updater === "function" ? updater(prev) : updater;
-            onSelectionChange?.(
-                Object.keys(next).filter((id) => next[id])
-            );
-            return next;
-        });
+        setRowSelection(updater);
     }
+
+    useEffect(() => {
+        const selectedIds = Object.keys(rowSelection).filter((id) => rowSelection[id]);
+        onSelectionChange?.(selectedIds);
+    }, [rowSelection, onSelectionChange]);
 
     function resetToFirstPage() {
         setPagination((prev) => ({ ...prev, pageIndex: 0 }));
@@ -118,20 +132,19 @@ export function PayrollEmployeeSelectionSection({
                     </div>
                 </div>
                 <div className=" text-center  md:text-[20px] text-[#676A6E]">
-                    تم تحديد {selectedCount} من {data.length}
+                    تم تحديد {selectedCount} من {totalRecords}
                 </div>
 
             </div>
 
-            <div className="mt-4 overflow-hidden">
-                <EmployeeSelectionTable
+            <div className="mt-4 overflow-x-auto">
+                <DataTable
                     columns={columns}
-                    data={filtered}
+                    data={rows}
+                    isLoading={isLoading}
                     getRowId={(row) => row.id}
                     rowSelection={rowSelection}
                     onRowSelectionChange={handleRowSelectionChange}
-                    pagination={pagination}
-                    onPaginationChange={setPagination}
                 />
             </div>
 
@@ -139,7 +152,7 @@ export function PayrollEmployeeSelectionSection({
                 className="mt-4"
                 page={pagination.pageIndex + 1}
                 pageSize={pagination.pageSize}
-                totalRecords={filtered.length}
+                totalRecords={totalRecords}
                 onPageChange={(page) =>
                     setPagination((prev) => ({ ...prev, pageIndex: page - 1 }))
                 }

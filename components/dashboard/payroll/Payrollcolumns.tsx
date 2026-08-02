@@ -1,58 +1,67 @@
 "use client";
 
 import { ColumnDef } from "@tanstack/react-table";
-import { Eye, MoreVertical } from "lucide-react";
-import { PayrollStatus, PayrollStatusBadge } from "./Payrollstatusbadge";
+import { Eye } from "lucide-react";
+import { PayrollStatusBadge } from "./Payrollstatusbadge";
+import { PayrollRunListItem } from "@/types/payroll.types";
+import { TableRowActions } from "../shared/TableRowActions";
 
- 
-export interface Payroll {
-    id: string;
-    runNumber: string;
-    month: string;
-    period: string;
-    employeesCount: number;
-    netSalary: number;
-    status: PayrollStatus;
-    createdAt: string;
-}
+// Re-export for backwards compat
+export type { PayrollRunListItem as Payroll };
 
 function currency(value: number) {
     return `EGP ${value.toLocaleString("en-US")}`;
 }
 
-interface GetPayrollColumnsOptions {
-    onView?: (payrollId: string) => void;
-    onOpenActions?: (payrollId: string) => void;
+function formatDate(iso: string) {
+    return new Date(iso).toLocaleDateString("ar-EG", {
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+    });
 }
 
-/**
- * Returns the column definitions for the payroll runs table.
- * Kept as a function (rather than a static array) so callbacks like
- * `onView` / `onOpenActions` can close over component state/handlers.
- */
+function monthName(month: number) {
+    return new Date(2000, month - 1, 1).toLocaleDateString("ar-EG", { month: "long" });
+}
+
+interface GetPayrollColumnsOptions {
+    onView?: (payrollId: string) => void;
+    onEdit?: (payroll: PayrollRunListItem) => void;
+    onDelete?: (payroll: PayrollRunListItem) => void;
+}
+
+
 export function getPayrollColumns({
     onView,
-    onOpenActions,
-}: GetPayrollColumnsOptions = {}): ColumnDef<Payroll>[] {
+    onEdit,
+    onDelete,
+}: GetPayrollColumnsOptions = {}): ColumnDef<PayrollRunListItem>[] {
     return [
         {
             accessorKey: "runNumber",
             header: "رقم المسير",
         },
         {
-            accessorKey: "month",
+            id: "month",
             header: "الشهر",
+            cell: ({ row }) => monthName(row.original.month),
         },
         {
-            accessorKey: "period",
+            id: "period",
             header: "فترة الرواتب",
+            cell: ({ row }) => {
+                const start = formatDate(row.original.startDate);
+                const end = formatDate(row.original.endDate);
+                return `${start} – ${end}`;
+            },
         },
         {
-            accessorKey: "employeesCount",
+            accessorKey: "employeeCount",
             header: "عدد الموظفين",
         },
         {
-            accessorKey: "netSalary",
+            accessorKey: "totalNetSalary",
             header: "صافي الرواتب",
             cell: ({ getValue }) => currency(getValue<number>()),
         },
@@ -64,6 +73,7 @@ export function getPayrollColumns({
         {
             accessorKey: "createdAt",
             header: "تاريخ الانشاء",
+            cell: ({ getValue }) => formatDate(getValue<string>()),
         },
         {
             id: "view",
@@ -83,14 +93,11 @@ export function getPayrollColumns({
             id: "actions",
             header: "",
             cell: ({ row }) => (
-                <button
-                    type="button"
-                    onClick={() => onOpenActions?.(row.original.id)}
-                    aria-label="خيارات إضافية"
-                    className="flex h-8 w-8 items-center justify-center rounded-full text-muted-foreground hover:bg-muted"
-                >
-                    <MoreVertical className="h-4 w-4" />
-                </button>
+                <TableRowActions
+                    row={row.original}
+                    onEdit={onEdit}
+                    onDelete={onDelete}
+                />
             ),
         },
     ];

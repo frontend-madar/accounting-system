@@ -2,16 +2,21 @@ import * as React from "react";
 import { UserRound } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-import { InvoiceListItem } from "@/data/data";
+import type { InvoiceItem } from "@/types/invoice.types";
 import { RowAction, RowActionsMenu } from "./RowActionsMenu";
 import { InitialsAvatar } from "./InitialsAvatar";
 import { InfoColumn } from "./InfoColumn";
 
 interface InvoiceCardProps {
-    invoice: InvoiceListItem;
+    invoice: InvoiceItem;
     actions?: RowAction[];
     onClick?: () => void;
     className?: string;
+}
+
+function formatDate(dateStr?: string): string {
+    if (!dateStr) return "-";
+    return dateStr.includes("T") ? dateStr.split("T")[0] : dateStr;
 }
 
 export function InvoiceCard({
@@ -30,46 +35,13 @@ export function InvoiceCard({
         >
             {/* Header */}
             <div
-                className="
-                    flex
-                    flex-col
-                    gap-3
-                    border-b
-                    border-[#ECEAF8]
-                    bg-[#F7F6FD]
-                    px-5
-                    py-4
-                    rounded-t-2xl
-                    sm:flex-row
-                    sm:items-center
-                    sm:justify-between
-                "
+                className=" flex flex-col gap-3 border-b border-[#ECEAF8] bg-[#F7F6FD] px-5 py-4 rounded-t-2xl sm:flex-row sm:items-center sm:justify-between "
             >
                 <div className="flex items-center gap-3">
                     <span
-                        className="
-                            flex
-                            h-10
-                            w-10
-                            items-center
-                            justify-center
-                            rounded-full
-                            border
-                            border-[#DDD8F5]
-                            bg-white
-                            text-[#40369F]
-                        "
+                        className=" flex h-10 w-10 items-center justify-center rounded-full border border-[#DDD8F5] bg-white text-[#40369F]"
                     >
-                        {invoice.employeeAvatarSrc ? (
-                            // eslint-disable-next-line @next/next/no-img-element
-                            <img
-                                src={invoice.employeeAvatarSrc}
-                                alt={invoice.employeeName}
-                                className="h-full w-full rounded-full object-cover"
-                            />
-                        ) : (
-                            <UserRound className="h-5 w-5" />
-                        )}
+                        <UserRound className="h-5 w-5" />
                     </span>
 
                     <div>
@@ -130,9 +102,9 @@ export function InvoiceCard({
                                 {invoice.clientName}
                             </p>
 
-                            <p className="mt-1 text-[14px] text-[#7B7E83]">
+                            {/* <p className="mt-1 text-[14px] text-[#7B7E83]">
                                 العميل #{invoice.clientId}
-                            </p>
+                            </p> */}
                         </div>
                     </div>
 
@@ -140,12 +112,12 @@ export function InvoiceCard({
                     <div className="grid flex-1 grid-cols-2 gap-6 lg:grid-cols-3 lg:px-8">
                         <InfoColumn
                             label="تاريخ الإنشاء"
-                            value={invoice.createdDate}
+                            value={formatDate(invoice.createdAt)}
                         />
 
                         <InfoColumn
                             label="المبلغ المتبقي"
-                            value={invoice.remaining}
+                            value={invoice.remainingAmount.toLocaleString()}
                         />
 
                         <InfoColumn

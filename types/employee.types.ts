@@ -14,9 +14,9 @@ export interface CreateEmployeePayload {
   jobTitle: string;
   hireDate: string;
   employmentType: EmploymentType;
-  basicSalary: string;
-  housingAllowance?: string;
-  transportationAllowance?: string;
+  basicSalary: number;
+  housingAllowance?: number;
+  transportationAllowance?: number;
   bankName: string;
   iban: string;
   attachments?: File | null;

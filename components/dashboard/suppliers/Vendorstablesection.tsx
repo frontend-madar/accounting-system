@@ -131,11 +131,13 @@ export function VendorsTableSection({
               {totalRecords} مورد
             </span>
           </div>
-          <SearchInput
-            query={query}
-            setQuery={handleSearchChange}
-            placeholder={searchPlaceholder}
-          />
+          <div>
+            <SearchInput
+              query={query}
+              setQuery={handleSearchChange}
+              placeholder={searchPlaceholder}
+            />
+          </div>
         </div>
 
         <div className="mt-4 overflow-x-auto">

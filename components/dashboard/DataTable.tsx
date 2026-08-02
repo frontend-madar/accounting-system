@@ -4,6 +4,8 @@ import { usePathname } from "next/navigation";
 
 import {
     ColumnDef,
+    OnChangeFn,
+    RowSelectionState,
     flexRender,
     getCoreRowModel,
     useReactTable,
@@ -30,6 +32,9 @@ interface DataTableProps<TData, TValue> {
     isLoading?: boolean;
     /** Number of skeleton rows to render while loading. Default 5. */
     skeletonRowCount?: number;
+    getRowId?: (row: TData) => string;
+    rowSelection?: RowSelectionState;
+    onRowSelectionChange?: OnChangeFn<RowSelectionState>;
 }
 
 export function DataTable<TData, TValue>({
@@ -40,10 +45,17 @@ export function DataTable<TData, TValue>({
     rowClassName,
     isLoading = false,
     skeletonRowCount = 5,
+    getRowId,
+    rowSelection,
+    onRowSelectionChange,
 }: DataTableProps<TData, TValue>) {
     const table = useReactTable({
         data,
         columns,
+        getRowId,
+        state: rowSelection ? { rowSelection } : undefined,
+        onRowSelectionChange,
+        enableRowSelection: !!onRowSelectionChange,
         getCoreRowModel: getCoreRowModel(),
     });
 

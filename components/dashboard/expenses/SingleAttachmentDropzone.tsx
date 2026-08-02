@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { useRef, useState } from "react";
 import { Upload, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -44,7 +43,7 @@ export function SingleAttachmentDropzone({
         if (file) handleFile(file);
       }}
       className={cn(
-        "group flex  h-full  w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#D8D2F6] bg-[#FCFCFE] px-6 py-8 text-center",
+        "group flex h-full w-full cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#D8D2F6] bg-[#FCFCFE] px-6 py-8 text-center col-span-full",
         "transition-colors duration-200",
         "hover:border-[#463BAF] hover:bg-[#FAF9FF]",
         className

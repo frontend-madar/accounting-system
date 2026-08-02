@@ -18,6 +18,9 @@ import { useCreateSupplier } from "@/hooks/use-supplier";
 import { useGetClients } from "@/hooks/use-client";
 import MainButton from "../shared/MainButton";
 import SecondaryButton from "../shared/SecondaryButton";
+import { useSyncCurrencies } from "@/hooks/useSyncCurrencies";
+import { useCurrencyStore } from "@/store/currency.store";
+import { DateField } from "../Datefield";
 
 const EMPTY_VALUES: SupplierFormValues = {
     supplierName: "",
@@ -55,6 +58,9 @@ export function CreateSupplierForm() {
         () => clients.map((client) => ({ label: client.name, value: client.name })),
         [clients]
     );
+
+    useSyncCurrencies();
+    const currencyOptions = useCurrencyStore((s) => s.currencyOptions);
 
     function onSubmit(values: SupplierFormValues) {
         createSupplier({
@@ -110,30 +116,42 @@ export function CreateSupplierForm() {
                                 isClientsLoading
                                     ? "جاري تحميل العملاء..."
                                     : isClientsError
-                                    ? "تعذر تحميل العملاء"
-                                    : "اختر اسم العميل"
+                                        ? "تعذر تحميل العملاء"
+                                        : "اختر اسم العميل"
                             }
                             value={field.value}
                             onChange={field.onChange}
                             options={clientOptions}
                             error={errors.clientName?.message}
-                         />
+                        />
                     )}
                 />
             </FormSection>
 
             <FormSection title="بيانات الخدمة" gridClassName="!grid-cols-1 md:!grid-cols-2 lg:!grid-cols-3">
-                <InvoiceTextField
-                    label="تاريخ السفر"
-                    type="date"
-                    error={errors.travelDate?.message}
-                    {...register("travelDate")}
+                <Controller
+                    control={control}
+                    name="travelDate"
+                    render={({ field }) => (
+                        <DateField
+                            label="تاريخ السفر"
+                            value={field.value}
+                            onChange={field.onChange}
+                            error={errors.travelDate?.message}
+                        />
+                    )}
                 />
-                <InvoiceTextField
-                    label="تاريخ العودة"
-                    type="date"
-                    error={errors.returnDate?.message}
-                    {...register("returnDate")}
+                <Controller
+                    control={control}
+                    name="returnDate"
+                    render={({ field }) => (
+                        <DateField
+                            label="تاريخ العودة"
+                            value={field.value}
+                            onChange={field.onChange}
+                            error={errors.returnDate?.message}
+                        />
+                    )}
                 />
                 <Controller
                     control={control}
@@ -161,7 +179,7 @@ export function CreateSupplierForm() {
                             placeholder="اختر العملة"
                             value={field.value}
                             onChange={field.onChange}
-                            options={SUPPLIER_CURRENCY_OPTIONS}
+                            options={currencyOptions}
                             error={errors.currency?.message}
                         />
                     )}

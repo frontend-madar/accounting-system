@@ -21,6 +21,7 @@ import Link from "next/link";
 import { TopbarHomeIcon, TopbarNotificationIcon } from "@/icons";
 import { useAuthStore } from "@/store/auth-store";
 import { useUiStore } from "@/store/ui-store";
+import { useUnreadNotificationsCount } from "@/hooks/use-notification";
 
 interface LanguageOption {
     code: string;
@@ -38,7 +39,6 @@ interface TopbarProps {
     avatarSrc?: string;
     searchPlaceholder?: string;
     onSearch?: (value: string) => void;
-    hasNotification?: boolean;
     className?: string;
     path?: string;
     search?: boolean
@@ -58,7 +58,6 @@ export function Topbar({
     avatarSrc = "/user.png",
     searchPlaceholder = "بحث",
     onSearch,
-    hasNotification = true,
     className,
     path,
     search,
@@ -74,6 +73,9 @@ export function Topbar({
     const user = useAuthStore((s) => s.user);
     const logout = useAuthStore((s) => s.logout);
     const toggleMobileSidebar = useUiStore((s) => s.toggleMobileSidebar);
+
+    const { data: unreadRes } = useUnreadNotificationsCount();
+    const unreadCount = unreadRes?.data?.count ?? 0;
 
     const userName = user?.businessName || user?.businessName || "المستخدم";
     const userEmail = user?.email || "user@example.com";
@@ -179,8 +181,10 @@ export function Topbar({
                 >
                     <TopbarNotificationIcon />
 
-                    {hasNotification && (
-                        <span className="absolute right-2 top-2 h-1.5 w-1.5 rounded-full bg-rose-500 ring-2 ring-white sm:right-2.5 sm:top-2.5" />
+                    {unreadCount > 0 && (
+                        <span className="absolute -right-1 -top-1 flex h-4.5 min-w-[18px] items-center justify-center rounded-full bg-red-700 px-1 text-[10px] font-semibold leading-none text-white ring-2 ring-white sm:-right-1.5 sm:-top-1.5">
+                            {unreadCount > 99 ? "99+" : unreadCount}
+                        </span>
                     )}
                 </Link>
 

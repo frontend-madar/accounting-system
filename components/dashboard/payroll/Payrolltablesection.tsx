@@ -2,14 +2,17 @@
 
 import { useMemo, useState } from "react";
 import { Plus } from "lucide-react";
-import { getPayrollColumns, Payroll } from "./Payrollcolumns";
+import { getPayrollColumns } from "./Payrollcolumns";
 import MainButton from "../shared/MainButton";
 import { SelectFilter } from "./Selectfilter";
 import SearchInput from "../SearchInput";
 import { DataTablePagination } from "../Pagination";
 import { DataTable } from "../DataTable";
-
-
+import { ConfirmDeleteDialog } from "../shared/ConfirmDeleteDialog";
+import { UpdatePayrollRunForm } from "./UpdatePayrollRunForm";
+import { usePayrollRuns, useDeletePayrollRun } from "@/hooks/use-payroll";
+import { useRouter } from "next/navigation";
+import type { PayrollRunListItem } from "@/types/payroll.types";
 
 const PAGE_SIZE = 9;
 
@@ -39,13 +42,6 @@ interface PayrollTableSectionProps {
     title?: string;
     subtitle?: string;
     addButtonLabel?: string;
-    onAddClick?: () => void;
-    onView?: (payrollId: string) => void;
-    onOpenActions?: (payrollId: string) => void;
-    /** Full dataset — pagination below is client-side over this array. */
-    data: Payroll[];
-    /** Total record count, if it differs from `data.length` (server pagination). */
-    totalRecords?: number;
     className?: string;
 }
 
@@ -53,41 +49,43 @@ export function PayrollTableSection({
     title = "قائمة المرتبات",
     subtitle = "إدارة مسيرات الرواتب ومتابعة عمليات الصرف والاعتماد.",
     addButtonLabel = "تشغيل مسير رواتب",
-    onAddClick,
-    onView,
-    onOpenActions,
-    data,
-    totalRecords,
     className,
 }: PayrollTableSectionProps) {
+    const router = useRouter();
     const [page, setPage] = useState(1);
     const [query, setQuery] = useState("");
     const [year, setYear] = useState(YEAR_OPTIONS[0].value);
     const [month, setMonth] = useState(MONTH_OPTIONS[0].value);
 
-    const filtered = useMemo(() => {
-        return data.filter((row) => {
-            const matchesQuery = query.trim()
-                ? row.runNumber.includes(query.trim())
-                : true;
-            const matchesYear = row.month.includes(year);
-            const matchesMonth =
-                month === "all" ||
-                row.month.startsWith(MONTH_OPTIONS.find((m) => m.value === month)?.label ?? "");
+    const [editingRunId, setEditingRunId] = useState<string | null>(null);
+    const [deletingRun, setDeletingRun] = useState<PayrollRunListItem | null>(null);
 
-            return matchesQuery && matchesYear && matchesMonth;
-        });
-    }, [data, query, year, month]);
+    const { data: runsRes, isLoading } = usePayrollRuns({
+        page,
+        limit: PAGE_SIZE,
+        search: query || undefined,
+        month: month === "all" ? undefined : Number(month),
+        year: Number(year),
+    });
 
-    const pageRows = useMemo(() => {
-        const start = (page - 1) * PAGE_SIZE;
-        return filtered.slice(start, start + PAGE_SIZE);
-    }, [filtered, page]);
+    const rows = runsRes?.data.data ?? [];
+    const totalRecords = runsRes?.data.total ?? 0;
+
+    const { mutate: deletePayrollRun, isPending: isDeleting } = useDeletePayrollRun();
 
     const columns = useMemo(
-        () => getPayrollColumns({ onView, onOpenActions }),
-        [onView, onOpenActions]
+        () =>
+            getPayrollColumns({
+                onView: (id) => router.push(`/dashboard/payroll/payroll-details?id=${id}`),
+                onEdit: (payroll) => setEditingRunId(payroll.id),
+                onDelete: (payroll) => setDeletingRun(payroll),
+            }),
+        [router]
     );
+
+    function resetToFirstPage() {
+        setPage(1);
+    }
 
     return (
         <section className={className}>
@@ -113,49 +111,79 @@ export function PayrollTableSection({
 
             <div className=" mt-10 min-h-[114px] flex flex-col md:flex-row md:items-center justify-between  gap-2 bg-white p-4 rounded-2xl ctm-shadow">
 
-                <SearchInput
-                    query={query}
-                    setQuery={setQuery}
-                    setPage={setPage}
-                    placeholder="بحث برقم المسير..."
-                />
+                <div className="w-75" >
+                    <SearchInput
+                        query={query}
+                        setQuery={setQuery}
+                        setPage={resetToFirstPage}
+                        placeholder="بحث برقم المسير..."
+                    />
+                </div>
                 <div className="flex items-center gap-4" >
-                    <span className="text-[14px] text-[#232323] shrink-0">
-                        الشهر
-                    </span>
-                    <SelectFilter
-                        value={month}
-                        onChange={(value) => {
-                            setMonth(value);
-                            setPage(1);
-                        }}
-                        options={MONTH_OPTIONS}
-                    />
-                    <span className="text-[14px] text-[#232323] shrink-0">
-                        السنة
-                    </span>
-                    <SelectFilter
-                        value={year}
-                        onChange={(value) => {
-                            setYear(value);
-                            setPage(1);
-                        }}
-                        options={YEAR_OPTIONS}
-                    />
+
+                    <div className="flex h-12 items-center gap-3 rounded-2xl border border-[#D8D2F6] bg-[#FCFCFE] px-4 shadow-sm transition-all duration-200 hover:border-[#B9B1EC] focus-within:border-[#40369F] focus-within:ring-2 focus-within:ring-[#40369F]/10">
+                        <span className="text-[15px] font-medium text-[#232323] whitespace-nowrap">
+                            الشهر
+                        </span>
+
+                        <SelectFilter
+                            value={month}
+                            onChange={(value) => {
+                                setMonth(value);
+                                resetToFirstPage();
+                            }}
+                            options={MONTH_OPTIONS}
+                        />
+                    </div>
+                    <div className="flex h-12 items-center gap-3 rounded-2xl border border-[#D8D2F6] bg-[#FCFCFE] px-4 shadow-sm transition-all duration-200 hover:border-[#B9B1EC] focus-within:border-[#40369F] focus-within:ring-2 focus-within:ring-[#40369F]/10">
+                        <span className="text-[15px] font-medium text-[#232323] whitespace-nowrap">
+                            السنة
+                        </span>
+
+                        <SelectFilter
+                            value={year}
+                            onChange={(value) => {
+                                setYear(value);
+                                resetToFirstPage();
+                            }}
+                            options={YEAR_OPTIONS}
+                            className="w-[130px]"
+                        />
+                    </div>
                 </div>
             </div>
 
             <div className="mt-10 overflow-hidden bg-white p-4 rounded-2xl ctm-shadow">
-                <DataTable columns={columns} data={pageRows} />
+                <DataTable columns={columns} data={rows} isLoading={isLoading} />
                 <DataTablePagination
                     className="mt-4"
                     page={page}
                     pageSize={PAGE_SIZE}
-                    totalRecords={totalRecords ?? filtered.length}
+                    totalRecords={totalRecords}
                     onPageChange={setPage}
                 />
             </div>
 
+            <UpdatePayrollRunForm
+                payrollRunId={editingRunId}
+                open={!!editingRunId}
+                onOpenChange={(open) => !open && setEditingRunId(null)}
+            />
+
+            <ConfirmDeleteDialog
+                open={!!deletingRun}
+                onOpenChange={(open) => !open && setDeletingRun(null)}
+                isLoading={isDeleting}
+                title="حذف مسير الرواتب"
+                description="هل أنت متأكد من حذف هذا المسير؟ لا يمكن التراجع عن هذا الإجراء."
+                onConfirm={() => {
+                    if (deletingRun) {
+                        deletePayrollRun(deletingRun.id, {
+                            onSuccess: () => setDeletingRun(null),
+                        });
+                    }
+                }}
+            />
         </section>
     );
 }

@@ -70,7 +70,7 @@ export function InvoicesTableSection({
                         <SearchInput query={query} setQuery={setQuery} setPage={setPage}  />
                     </div>
 
-                    <MainButton  text={addButtonLabel} icon={<Plus className="h-4 w-4" />} />
+                    <MainButton  text={addButtonLabel} icon={<Plus className="h-4 w-4" />} href="/dashboard/clients/create" />
                 </div>
 
             </div>

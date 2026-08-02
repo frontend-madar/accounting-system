@@ -2,95 +2,104 @@
 
 import * as React from "react";
 import { useMemo } from "react";
-import { Controller, useForm } from "react-hook-form";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Printer, Save } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
+import { Plus, Printer, X } from "lucide-react";
 
 import {
-    CLIENT_OPTIONS,
     INCLUDES_OPTIONS,
     invoiceFormSchema,
     InvoiceFormValues,
     NOTE_OPTIONS,
     SERVICE_OPTIONS,
+    STATUS_OPTIONS,
 } from "@/validations/Invoice";
 import { FormSection } from "./FormSection";
 import { InvoiceTextField } from "./TextField";
 import { SelectField } from "./SelectField";
 import { MultiSelectField } from "./MultiSelectField";
-import { QuantityStepper } from "./QuantityStepper";
-import { FieldLabel } from "./FieldLabel";
 import { DateField } from "../Datefield";
-import { cn } from "@/lib/utils";
 import MainButton from "../shared/MainButton";
-import SecondaryButton from "../shared/SecondaryButton";
 
-// Demo lookup — in a real app this would come from your clients API/table.
-const CLIENT_DETAILS: Record<string, { name: string; phone: string }> = {
-    "10242": { name: "محمد العنزي", phone: "966345276126" },
-    "10243": { name: "سارة القحطاني", phone: "966501112233" },
-    "10244": { name: "خالد الدوسري", phone: "966559998877" },
-};
+import { useClients } from "@/hooks/use-client";
+import { useEmployees } from "@/hooks/use-employee";
+import { useCreateInvoice } from "@/hooks/use-invoice";
+import type { CreateInvoicePayload } from "@/types/invoice.types";
+import { useSyncCurrencies } from "@/hooks/useSyncCurrencies";
+import { useCurrencyStore } from "@/store/currency.store";
 
 interface CreateInvoiceFormProps {
-    invoiceNumber?: string;
     onSaveDraft?: (values: Partial<InvoiceFormValues>) => void;
-    onSaveAndPrint?: (values: InvoiceFormValues) => void;
 }
 
 export function CreateInvoiceForm({
-    invoiceNumber = "676534",
     onSaveDraft,
-    onSaveAndPrint,
 }: CreateInvoiceFormProps) {
+    const { data: clientsRes } = useClients({ limit: 100 });
+    const { data: employeesRes } = useEmployees({ limit: 100 });
+    const { mutate: createInvoice, isPending } = useCreateInvoice();
+
+    const clientOptions = useMemo(() => {
+        const list = clientsRes?.data?.data || [];
+        return list.map((c) => ({ label: c.name, value: c.id }));
+    }, [clientsRes]);
+
+    const employeeOptions = useMemo(() => {
+        const list = employeesRes?.data?.data || [];
+        return list.map((e) => ({ label: e.fullName, value: e.id }));
+    }, [employeesRes]);
+
+    useSyncCurrencies();
+    const currencyOptions = useCurrencyStore((s) => s.currencyOptions);
+
     const {
         control,
         register,
         handleSubmit,
-        setValue,
-        watch,
-        getValues,
         formState: { errors },
     } = useForm<InvoiceFormValues>({
         resolver: zodResolver(invoiceFormSchema),
         defaultValues: {
             clientId: "",
-            clientName: "",
-            clientPhone: "",
-            invoiceNumber,
-            employeeName: "",
-            employeePhone: "",
+            invoiceNumber: "",
+            employeeId: "",
+            phoneNumber: "",
             service: "",
             includes: [],
-            quantity: 1,
-            paymentDate: "",
+            currency: "",
             totalPrice: 0,
-            paidAmount: 0,
+            status: "باقي الدفع",
             notes: "",
+            payments: [{ paidAmount: "", paymentDate: "" }],
         },
     });
 
-    const totalPrice = watch("totalPrice");
-    const paidAmount = watch("paidAmount");
-    const remaining = useMemo(
-        () => Math.max(0, (totalPrice || 0) - (paidAmount || 0)),
-        [totalPrice, paidAmount]
-    );
+    const { fields, append, remove } = useFieldArray({
+        control,
+        name: "payments",
+    });
 
-    function handleClientChange(clientId: string) {
-        setValue("clientId", clientId, { shouldValidate: true });
-        const details = CLIENT_DETAILS[clientId];
-        if (details) {
-            setValue("clientName", details.name, { shouldValidate: true });
-            setValue("clientPhone", details.phone, { shouldValidate: true });
-        }
-    }
-
-     
     function onSubmit(values: InvoiceFormValues) {
-        onSaveAndPrint?.(values);
+        const payments = (values.payments || [])
+            .filter((p) => p.paidAmount && p.paymentDate)
+            .map((p) => ({
+                paidAmount: parseFloat(p.paidAmount),
+                paymentDate: p.paymentDate,
+            }));
+
+        const payload: CreateInvoicePayload = {
+            invoiceNumber: values.invoiceNumber,
+            currency: values.currency,
+            clientId: values.clientId,
+            employeeId: values.employeeId,
+            service: values.service,
+            includes: values.includes,
+            totalPrice: values.totalPrice,
+            status: values.status,
+            payments: payments.length > 0 ? payments : undefined,
+        };
+
+        createInvoice(payload);
     }
 
     return (
@@ -98,57 +107,51 @@ export function CreateInvoiceForm({
             onSubmit={handleSubmit(onSubmit)}
             className="space-y-8 rounded-2xl  ctm-shadow bg-white p-2 md:p-6"
         >
-            <FormSection title="بيانات العميل">
-                <InvoiceTextField
-                    label="اسم العميل"
-                    placeholder="ادخل اسم العميل"
-                    error={errors.clientName?.message}
-                    {...register("clientName")}
-                />
-                <InvoiceTextField
-                    label="رقم الجوال"
-                    placeholder="ادخل رقم الجوال"
-                    inputMode="tel"
-                    error={errors.clientPhone?.message}
-                    {...register("clientPhone")}
-                />
-                <InvoiceTextField
-                    label="رقم الفاتورة"
-                    error={errors.invoiceNumber?.message}
-                    {...register("invoiceNumber")}
-                    readOnly
-                />
-                <Controller
-                    control={control}
-                    name="clientId"
-                    render={({ field }) => (
-                        <SelectField
-                            label="رقم العميل"
-                            placeholder="اختر العميل"
-                            value={field.value}
-                            onChange={handleClientChange}
-                            options={CLIENT_OPTIONS}
-                            error={errors.clientId?.message}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="col-span-2" >
+                    <FormSection title="بيانات العميل" gridClassName="md:!grid-cols-2">
+                        <Controller
+                            control={control}
+                            name="clientId"
+                            render={({ field }) => (
+                                <SelectField
+                                    label="اسم العميل"
+                                    placeholder="اختر العميل"
+                                    value={field.value}
+                                    onChange={field.onChange}
+                                    options={clientOptions}
+                                    error={errors.clientId?.message}
+                                />
+                            )}
                         />
-                    )}
-                />
-            </FormSection>
+                        <InvoiceTextField
+                            label="رقم الفاتورة"
+                            placeholder="ادخل رقم الفاتورة"
+                            error={errors.invoiceNumber?.message}
+                            {...register("invoiceNumber")}
+                        />
 
-            <FormSection title="بيانات الموظف">
-                <InvoiceTextField
-                    label="اسم الموظف"
-                    placeholder="ادخل اسم الموظف"
-                    error={errors.employeeName?.message}
-                    {...register("employeeName")}
-                />
-                <InvoiceTextField
-                    label="رقم الهاتف"
-                    placeholder="ادخل رقم الهاتف"
-                    inputMode="tel"
-                    error={errors.employeePhone?.message}
-                    {...register("employeePhone")}
-                />
-            </FormSection>
+                    </FormSection>
+                </div>
+
+                <FormSection title="بيانات الموظف" gridClassName="!grid-cols-1">
+                    <Controller
+                        control={control}
+                        name="employeeId"
+                        render={({ field }) => (
+                            <SelectField
+                                label="اسم الموظف "
+                                placeholder="اختر الموظف "
+                                value={field.value}
+                                onChange={field.onChange}
+                                options={employeeOptions}
+                                error={errors.employeeId?.message}
+                            />
+                        )}
+                    />
+
+                </FormSection>
+            </div>
 
             <FormSection title="تفاصيل الخدمة">
                 <Controller
@@ -179,33 +182,10 @@ export function CreateInvoiceForm({
                         />
                     )}
                 />
-                <Controller
-                    control={control}
-                    name="quantity"
-                    render={({ field }) => (
-                        <QuantityStepper
-                            label="العدد"
-                            value={field.value}
-                            onChange={field.onChange}
-                            error={errors.quantity?.message}
-                        />
-                    )}
-                />
-                <Controller
-                    control={control}
-                    name="paymentDate"
-                    render={({ field }) => (
-                        <DateField
-                            label="تاريخ الدفع"
-                            value={field.value}
-                            onChange={field.onChange}
-                            error={errors.paymentDate?.message}
-                        />
-                    )}
-                />
+
             </FormSection>
 
-            <FormSection title="تفاصيل السعر" className=" ">
+            <FormSection title="تفاصيل السعر">
                 <InvoiceTextField
                     label="السعر الاجمالي"
                     type="number"
@@ -213,44 +193,89 @@ export function CreateInvoiceForm({
                     error={errors.totalPrice?.message}
                     {...register("totalPrice", { valueAsNumber: true })}
                 />
-                <InvoiceTextField
-                    label="تم دفع"
-                    type="number"
-                    inputMode="decimal"
-                    error={errors.paidAmount?.message}
-                    {...register("paidAmount", { valueAsNumber: true })}
-                />
-                <div className="space-y-1.5">
-                    <FieldLabel htmlFor="remaining" dropdown={false}>
-                        <span className="text-[14px] font-semibold text-[#232323] md:text-[17px]">
-                            المتبقي
-                        </span>
-                    </FieldLabel>
-                    <div
-                        id="remaining"
-                        className={  "flex h-[47px] w-full select-none hover:border-[#837CC9] px-4 shadow-sm items-center rounded-xl border border-[#C8C2FC] transition-colors duration-200 bg-white text-[15px] font-medium text-[#232323]"}
-                    >
-                        {remaining.toLocaleString("ar-SA")}
-                    </div>
-                </div>
                 <Controller
                     control={control}
-                    name="notes"
+                    name="status"
                     render={({ field }) => (
                         <SelectField
-                            label="ملاحظات"
-                            placeholder="اختر السبب"
-                            value={field.value ?? ""}
+                            label="الحالة"
+                            placeholder="اختر الحالة"
+                            value={field.value}
                             onChange={field.onChange}
-                            options={NOTE_OPTIONS}
+                            options={STATUS_OPTIONS}
+                            error={errors.status?.message}
                         />
                     )}
+                />
+                <Controller
+                    control={control}
+                    name="currency"
+                    render={({ field }) => (
+                        <SelectField
+                            label="العملة"
+                            placeholder="اختر العملة"
+                            value={field.value}
+                            onChange={field.onChange}
+                            options={currencyOptions}
+                            error={errors.currency?.message}
+                        />
+                    )}
+                />
+
+                <div className="col-span-4 text-[#0F1219] text-[22px] font-bold"> الدفعات </div>
+
+                {fields.map((field, index) => (
+                    <div
+                        key={field.id}
+                        className="col-span-4 grid grid-cols-1 md:grid-cols-3 gap-4 shadow-md p-4 rounded-md bg-white mb-5 relative"
+                    >
+                        {fields.length > 1 && (
+                            <button
+                                type="button"
+                                onClick={() => remove(index)}
+                                className="absolute left-3 top-3 text-muted-foreground hover:text-red-600"
+                            >
+                                <X className="h-4 w-4" />
+                            </button>
+                        )}
+
+                        <InvoiceTextField
+                            label="تم دفع"
+                            type="number"
+                            inputMode="decimal"
+                            error={errors.payments?.[index]?.paidAmount?.message}
+                            {...register(`payments.${index}.paidAmount`)}
+                        />
+
+                        <Controller
+                            control={control}
+                            name={`payments.${index}.paymentDate`}
+                            render={({ field }) => (
+                                <DateField
+                                    label="تاريخ الدفع"
+                                    value={field.value || ""}
+                                    onChange={field.onChange}
+                                    error={errors.payments?.[index]?.paymentDate?.message}
+                                />
+                            )}
+                        />
+                    </div>
+                ))}
+
+                <MainButton
+                    type="button"
+                    text="اضافة دفعة جديدة"
+                    icon={<Plus className="h-4 w-4" />}
+                    onClick={() => append({ paidAmount: "", paymentDate: "" })}
                 />
             </FormSection>
 
             <div className="flex flex-col md:flex-row md:items-center gap-3 border-t border-border pt-5">
-                <MainButton  text=" حفظ وطباعة الفاتورة" icon={<Printer className="h-4 w-4" />} />
-                <SecondaryButton  text=" حفظ كمسودة" icon={<Save className="h-4 w-4" />} />
+                <MainButton
+                    text={isPending ? "جاري الحفظ..." : "حفظ وطباعة الفاتورة"}
+                    icon={<Printer className="h-4 w-4" />}
+                    disabled={isPending}
+                />
             </div>
         </form>
     );

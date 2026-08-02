@@ -2,27 +2,8 @@
 
 import * as React from "react";
 import { ColumnDef } from "@tanstack/react-table";
-// Adjust this path if CodeStepperInput lives elsewhere in your components tree
-// (it's used the same way in DailyEntriesTable.tsx for the "باكود العميل" column).
 import { CodeStepperInput } from "../CodeStepperInput";
-
-export interface PayrollDetailEmployee {
-    id: string;
-    name: string;
-    role: string;
-    avatarUrl?: string;
-}
-
-export interface PayrollDetail {
-    id: string;
-    employee: PayrollDetailEmployee;
-    basicSalary: number;
-    allowances: number;
-    bonuses: number;
-    overtime: number;
-    deductions: number;
-    netSalary: number;
-}
+import { PayrollDetailItem } from "@/types/payroll.types";
 
 const AVATAR_PALETTE = [
     { bg: "#FBE4EC", text: "#C24C74" },
@@ -37,7 +18,7 @@ function EmployeeAvatar({ name, index }: { name: string; index: number }) {
             className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full text-[14px] font-semibold"
             style={{ backgroundColor: bg, color: text }}
         >
-            {name.trim().charAt(0)}
+            {(name || "").trim().charAt(0)}
         </span>
     );
 }
@@ -48,7 +29,7 @@ function CurrencyCell({ value }: { value: number }) {
             <span className="ml-1 text-[12px] font-normal text-muted-foreground">
                 EGP
             </span>
-            {value.toLocaleString("en-US")}
+            {(value ?? 0).toLocaleString("en-US")}
         </span>
     );
 }
@@ -61,52 +42,59 @@ function DeductionInput({
     onChange?: (value: number) => void;
 }) {
     return (
-        <span className="inline-flex items-center gap-1 rounded-lg border border-[#463BAF] bg-white px-3 py-1.5">
-            <span className="text-[12px] text-muted-foreground">EGP</span>
+        <div className="group inline-flex h-11 items-center gap-3 rounded-2xl border border-[#D8D2F6] bg-[#FCFCFE] px-4 shadow-sm transition-all duration-200 hover:border-[#B9B1EC] focus-within:border-[#40369F] focus-within:ring-2 focus-within:ring-[#40369F]/10">
+            <span className="text-[13px] font-medium text-[#8B90A0]">
+                EGP
+            </span>
+
             <input
                 type="number"
                 value={value}
                 onChange={(event) => onChange?.(Number(event.target.value))}
-                className="w-16 bg-transparent text-[14px] font-medium tabular-nums text-[#232323] outline-none"
+                className="w-20 bg-transparent text-right text-[15px] font-semibold text-[#232323] outline-none [appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none"
             />
-        </span>
+        </div>
     );
 }
 
 interface GetPayrollDetailColumnsOptions {
-    onBonusChange?: (payrollId: string, value: number) => void;
-    onDeductionChange?: (payrollId: string, value: number) => void;
+    onBonusChange?: (payrollDetailId: string, value: number) => void;
+    onDeductionChange?: (payrollDetailId: string, value: number) => void;
+    loadingBonusId?: string | null;
+    loadingDeductionId?: string | null;
 }
 
 /**
  * Returns the column definitions for the detailed payroll table.
- * Kept as a function (rather than a static array) so callbacks like
- * `onBonusChange` / `onDeductionChange` can close over component state.
  */
 export function getPayrollDetailColumns({
     onBonusChange,
     onDeductionChange,
-}: GetPayrollDetailColumnsOptions = {}): ColumnDef<PayrollDetail>[] {
+    loadingBonusId,
+    loadingDeductionId,
+}: GetPayrollDetailColumnsOptions = {}): ColumnDef<PayrollDetailItem>[] {
     return [
         {
             accessorKey: "employee",
             header: "الموظف",
-            cell: ({ row }) => (
-                <div className="flex items-center gap-2">
-                    <EmployeeAvatar
-                        name={row.original.employee.name}
-                        index={row.index}
-                    />
-                    <div className="text-right">
-                        <p className="text-[14px] font-medium text-[#232323]">
-                            {row.original.employee.name}
-                        </p>
-                        <p className="text-[13px] text-muted-foreground">
-                            {row.original.employee.role}
-                        </p>
+            cell: ({ row }) => {
+                const emp = row.original.employee;
+                const name = emp?.fullName ?? "موظف";
+                const role = emp?.jobTitle ?? emp?.department ?? "";
+                return (
+                    <div className="flex items-center gap-2">
+                        <EmployeeAvatar name={name} index={row.index} />
+                        <div className="text-right">
+                            <p className="text-[14px] font-medium text-[#232323]">
+                                {name}
+                            </p>
+                            <p className="text-[13px] text-muted-foreground">
+                                {role}
+                            </p>
+                        </div>
                     </div>
-                </div>
-            ),
+                );
+            },
         },
         {
             accessorKey: "basicSalary",
@@ -125,6 +113,8 @@ export function getPayrollDetailColumns({
                 <CodeStepperInput
                     value={row.original.bonuses}
                     onChange={(value) => onBonusChange?.(row.original.id, value)}
+                    isLoading={loadingBonusId === row.original.id}
+                    currency="EGP"
                 />
             ),
         },
@@ -151,7 +141,7 @@ export function getPayrollDetailColumns({
                     <span className="ml-1 text-[12px] font-normal text-muted-foreground">
                         EGP
                     </span>
-                    {row.original.netSalary.toLocaleString("en-US")}
+                    {(row.original.netSalary ?? 0).toLocaleString("en-US")}
                 </span>
             ),
         },

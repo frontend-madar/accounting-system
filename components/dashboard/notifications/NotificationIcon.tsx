@@ -1,4 +1,4 @@
-import { Clock, Landmark, ReceiptText, type LucideIcon } from "lucide-react";
+import { Bell, Clock, Landmark, ReceiptText, type LucideIcon } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import { NotificationType } from "@/types/types";
@@ -31,14 +31,30 @@ const ICON_CONFIG: Record<NotificationType, IconConfig> = {
     },
 };
 
+const DEFAULT_ICON_CONFIG: IconConfig = {
+    icon: Bell,
+    iconClassName: "text-[#6B6B70]",
+    bgClassName: "bg-[#F2F2F5]",
+    borderClassName: "border-[#E1E1E6]",
+};
+
+/** Maps the raw API notification `type` string (e.g. "PAYROLL_DRAFT", "EXPENSE_CREATED")
+ * to the local NotificationType keys this component's icon config is keyed by. */
+const API_TYPE_MAP: Record<string, NotificationType> = {
+    PAYROLL_DRAFT: "salary_pending",
+    PAYROLL_PAID: "salary_paid",
+    EXPENSE_CREATED: "expense_created",
+};
+
 interface NotificationIconProps {
-    type: NotificationType;
+    type: string;
     className?: string;
 }
 
 export function NotificationIcon({ type, className }: NotificationIconProps) {
+    const mappedType = API_TYPE_MAP[type];
     const { icon: Icon, iconClassName, bgClassName, borderClassName } =
-        ICON_CONFIG[type];
+        (mappedType && ICON_CONFIG[mappedType]) || DEFAULT_ICON_CONFIG;
 
     return (
         <div

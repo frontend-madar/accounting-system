@@ -182,7 +182,7 @@ export function Sidebar({
         <aside
             ref={sidebarRef}
             className={cn(
-                "flex flex-col rounded-2xl text-white bg-[#695BE1] bg-[linear-gradient(180deg,_#25198A_0%,_rgba(37,25,138,0.35)_104.8%,_rgba(37,25,138,0)_169.64%)] transition-all duration-300 ease-in-out shrink-0 z-[100]",
+                "flex flex-col rounded-2xl text-white bg-[#695BE1] bg-[linear-gradient(180deg,_#25198A_0%,_rgba(37,25,138,0.35)_104.8%,_rgba(37,25,138,0)_169.64%)] transition-all duration-300 ease-in-out shrink-0 z-[1]",
                 "fixed top-4 bottom-4 right-4 lg:relative lg:top-0 lg:bottom-0 lg:right-0 lg:h-full",
                 isMobileScreen
                     ? (isMobileSidebarOpen ? "translate-x-0 w-[283px]" : "translate-x-[120%]")

@@ -22,6 +22,7 @@ export const InvoiceTextField = React.forwardRef<
             id,
             className,
             disabled,
+            type = "text",
             ...props
         },
         ref
@@ -44,6 +45,7 @@ export const InvoiceTextField = React.forwardRef<
                 <Input
                     id={fieldId}
                     ref={ref}
+                     type={type}
                     disabled={disabled}
                     aria-invalid={!!error}
                     className={cn(

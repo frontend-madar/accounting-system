@@ -31,9 +31,9 @@ export const employeeFormSchema = z.object({
   jobTitle: z.string().min(1, "المسمى الوظيفي مطلوب"),
   hireDate: z.string().min(1, "تاريخ التعيين مطلوب"),
   employmentType: z.enum(["full_time", "part_time"]),
-  basicSalary: z.string().min(1, "الراتب الأساسي مطلوب"),
-  housingAllowance: z.string().optional(),
-  transportAllowance: z.string().optional(),
+  basicSalary: z.number().min(1, "الراتب الأساسي مطلوب"),
+  housingAllowance: z.number().optional(),
+  transportAllowance: z.number().optional(),
   iban: z.string().min(1, "رقم الحساب البنكي مطلوب"),
   bank: z.string().min(1, "البنك مطلوب"),
 });

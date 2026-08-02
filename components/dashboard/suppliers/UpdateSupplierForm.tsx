@@ -4,14 +4,14 @@
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useMemo } from "react";
-import { Loader2 } from "lucide-react";
 
 import { FormSection } from "../invoice/FormSection";
 import { InvoiceTextField } from "../invoice/TextField";
 import { SelectField } from "../invoice/SelectField";
-import { MultiSelectField } from "../invoice/MultiSelectField"; // same component referenced earlier for serviceTypes
+import { MultiSelectField } from "../invoice/MultiSelectField"; 
 import MainButton from "../shared/MainButton";
 import SecondaryButton from "../shared/SecondaryButton";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
     Dialog,
     DialogContent,
@@ -27,6 +27,8 @@ import {
     SUPPLIER_SERVICE_TYPE_OPTIONS,
 } from "@/validations/supplier-schema";
 import type { UpdateSupplierPayload } from "@/types/supplier.types";
+import { useSyncCurrencies } from "@/hooks/useSyncCurrencies";
+import { useCurrencyStore } from "@/store/currency.store";
 
 interface UpdateSupplierFormProps {
     supplierId: string | null;
@@ -37,6 +39,53 @@ interface UpdateSupplierFormProps {
 /** Converts an ISO date string to the yyyy-MM-dd shape <input type="date"> expects. */
 function toDateInputValue(iso: string): string {
     return iso ? iso.slice(0, 10) : "";
+}
+
+function UpdateSupplierFormSkeleton() {
+    return (
+        <div className="space-y-8 pt-2">
+            <div>
+                <Skeleton className="h-5 w-40 mb-4" />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                        <div key={i} className="space-y-2">
+                            <Skeleton className="h-4 w-24" />
+                            <Skeleton className="h-11 w-full rounded-xl" />
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <div>
+                <Skeleton className="h-5 w-32 mb-4" />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                        <div key={i} className="space-y-2">
+                            <Skeleton className="h-4 w-24" />
+                            <Skeleton className="h-11 w-full rounded-xl" />
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <div>
+                <Skeleton className="h-5 w-28 mb-4" />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                        <div key={i} className="space-y-2">
+                            <Skeleton className="h-4 w-24" />
+                            <Skeleton className="h-11 w-full rounded-xl" />
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 border-t border-border pt-5">
+                <Skeleton className="h-11 w-[130px] rounded-xl" />
+                <Skeleton className="h-11 w-[150px] rounded-xl" />
+            </div>
+        </div>
+    );
 }
 
 export function UpdateSupplierForm({ supplierId, open, onOpenChange }: UpdateSupplierFormProps) {
@@ -56,6 +105,9 @@ export function UpdateSupplierForm({ supplierId, open, onOpenChange }: UpdateSup
         [clients]
     );
 
+    useSyncCurrencies();
+    const currencyOptions = useCurrencyStore((s) => s.currencyOptions);
+
     const {
         control,
         register,
@@ -65,16 +117,16 @@ export function UpdateSupplierForm({ supplierId, open, onOpenChange }: UpdateSup
         resolver: zodResolver(supplierFormSchema),
         values: supplier
             ? {
-                  supplierName: supplier.supplierName,
-                  supplierPhone: supplier.supplierPhone,
-                  clientName: supplier.clientName,
-                  serviceTypes: supplier.serviceTypes,
-                  travelDate: toDateInputValue(supplier.travelDate),
-                  returnDate: toDateInputValue(supplier.returnDate),
-                  currency: supplier.currency,
-                  servicePrice: String(supplier.servicePrice),
-                  amountPaid: String(supplier.amountPaid),
-              }
+                supplierName: supplier.supplierName,
+                supplierPhone: supplier.supplierPhone,
+                clientName: supplier.clientName,
+                serviceTypes: supplier.serviceTypes,
+                travelDate: toDateInputValue(supplier.travelDate),
+                returnDate: toDateInputValue(supplier.returnDate),
+                currency: supplier.currency,
+                servicePrice: String(supplier.servicePrice),
+                amountPaid: String(supplier.amountPaid),
+            }
             : undefined,
     });
 
@@ -115,10 +167,7 @@ export function UpdateSupplierForm({ supplierId, open, onOpenChange }: UpdateSup
                 </DialogHeader>
 
                 {isSupplierLoading ? (
-                    <div className="flex items-center justify-center py-16 gap-2 text-muted-foreground">
-                        <Loader2 className="h-5 w-5 animate-spin" />
-                        جاري تحميل بيانات المورد...
-                    </div>
+                    <UpdateSupplierFormSkeleton />
                 ) : (
                     <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 pt-2">
                         <FormSection title="بيانات المورد والعميل" gridClassName="!grid-cols-3">
@@ -145,8 +194,8 @@ export function UpdateSupplierForm({ supplierId, open, onOpenChange }: UpdateSup
                                             isClientsLoading
                                                 ? "جاري تحميل العملاء..."
                                                 : isClientsError
-                                                ? "تعذر تحميل العملاء"
-                                                : "اختر اسم العميل"
+                                                    ? "تعذر تحميل العملاء"
+                                                    : "اختر اسم العميل"
                                         }
                                         value={field.value}
                                         onChange={field.onChange}
@@ -196,7 +245,7 @@ export function UpdateSupplierForm({ supplierId, open, onOpenChange }: UpdateSup
                                         placeholder="اختر العملة"
                                         value={field.value}
                                         onChange={field.onChange}
-                                        options={SUPPLIER_CURRENCY_OPTIONS}
+                                        options={currencyOptions}
                                         error={errors.currency?.message}
                                     />
                                 )}

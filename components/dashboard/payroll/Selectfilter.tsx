@@ -36,7 +36,7 @@ export function SelectFilter({
             }}
         >
             <SelectTrigger
-                className={`h-11 min-w-[110px] rounded-lg border-border bg-white text-[14px] ${className ?? ""}`}
+                className={`!h-full w-full rounded-lg !border-none   bg-white text-[14px] ${className ?? ""}`}
             >
                 <SelectValue />
             </SelectTrigger>

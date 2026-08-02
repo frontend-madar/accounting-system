@@ -11,7 +11,6 @@ import {
     employeeFormSchema,
     EmployeeFormValues,
     EMPLOYEE_CURRENCY,
-    BANK_OPTIONS,
 } from "@/validations/employee-schema";
 import { FormSection } from "../invoice/FormSection";
 import { InvoiceTextField } from "../invoice/TextField";
@@ -31,6 +30,8 @@ import {
     DialogHeader,
     DialogTitle,
 } from "@/components/ui/dialog";
+import { useSyncExpenseOptions } from "@/hooks/useSyncExpenseOptions";
+import { useExpenseOptionsStore } from "@/store/expense.store";
 
 interface UpdateEmployeeFormProps {
     employee: EmployeeData | null;
@@ -84,14 +85,17 @@ export function UpdateEmployeeForm({ employee, open, onOpenChange }: UpdateEmplo
                 jobTitle: employee.jobTitle,
                 hireDate: toDateInputValue(employee.hireDate),
                 employmentType: employee.employmentType,
-                basicSalary: employee.basicSalary,
-                housingAllowance: employee.housingAllowance ?? "",
-                transportAllowance: employee.transportationAllowance ?? "",
+                basicSalary: Number(employee.basicSalary),
+                housingAllowance: employee.housingAllowance ? Number(employee.housingAllowance) : undefined,
+                transportAllowance: employee.transportationAllowance ? Number(employee.transportationAllowance) : undefined,
                 iban: employee.iban,
                 bank: employee.bankName,
             }
             : undefined,
     });
+
+    useSyncExpenseOptions();
+    const accountOptions = useExpenseOptionsStore((s) => s.accountOptions);
 
     const handleFileSelect = (file: File) => {
         if (file.type !== "application/pdf") {
@@ -147,7 +151,7 @@ export function UpdateEmployeeForm({ employee, open, onOpenChange }: UpdateEmplo
 
     return (
         <Dialog open={open} onOpenChange={onOpenChange}>
-            <DialogContent className="w-[90vw] max-w-[90vw] !max-h-[90vh] overflow-y-auto">
+            <DialogContent className="w-[90vw] max-w-[90vw] z-q0 !max-h-[90vh] overflow-y-auto">
                 <DialogHeader className="mt-8" >
                     <DialogTitle>تعديل بيانات الموظف</DialogTitle>
                 </DialogHeader>
@@ -270,6 +274,7 @@ export function UpdateEmployeeForm({ employee, open, onOpenChange }: UpdateEmplo
                     <FormSection title="البيانات المالية" gridClassName="!grid-cols-3">
                         <InvoiceTextField
                             label={`الراتب الأساسي (${EMPLOYEE_CURRENCY})`}
+                            type="number"
                             placeholder="0.00"
                             inputMode="decimal"
                             error={errors.basicSalary?.message}
@@ -277,6 +282,7 @@ export function UpdateEmployeeForm({ employee, open, onOpenChange }: UpdateEmplo
                         />
                         <InvoiceTextField
                             label="بدل السكن"
+                            type="number"
                             placeholder="0.00"
                             inputMode="decimal"
                             error={errors.housingAllowance?.message}
@@ -284,6 +290,7 @@ export function UpdateEmployeeForm({ employee, open, onOpenChange }: UpdateEmplo
                         />
                         <InvoiceTextField
                             label="بدل الانتقال"
+                            type="number"
                             placeholder="0.00"
                             inputMode="decimal"
                             error={errors.transportAllowance?.message}
@@ -306,7 +313,7 @@ export function UpdateEmployeeForm({ employee, open, onOpenChange }: UpdateEmplo
                                     placeholder="اختر البنك"
                                     value={field.value}
                                     onChange={field.onChange}
-                                    options={BANK_OPTIONS}
+                                    options={accountOptions}
                                     error={errors.bank?.message}
                                 />
                             )}

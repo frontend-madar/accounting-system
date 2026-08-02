@@ -2,17 +2,14 @@
 
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { FileText, Plus } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import {  Plus } from "lucide-react";
+import { useMemo, useState } from "react";
 import { useCreateEmployee } from "@/hooks/use-employee";
-import { Button } from "@/components/ui/button";
 
 import {
     employeeFormSchema,
     EmployeeFormValues,
     EMPLOYEE_CURRENCY,
-    DEPARTMENT_OPTIONS,
-    BANK_OPTIONS,
 } from "@/validations/employee-schema";
 import { FormSection } from "../invoice/FormSection";
 import { InvoiceTextField } from "../invoice/TextField";
@@ -21,11 +18,13 @@ import { FieldLabel } from "../invoice/FieldLabel";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { DateField } from "../Datefield";
 import { toIsoDate } from "@/utils/toIsoDate";
-import { toast } from "sonner";
 import { useGetDepartments } from "@/hooks/use-department";
 import FileUploadField from "../shared/FileUploadField";
 import MainButton from "../shared/MainButton";
 import SecondaryButton from "../shared/SecondaryButton";
+import { useExpenseAccounts } from "@/hooks/useExpenses";
+import { useExpenseOptionsStore } from "@/store/expense.store";
+import { useSyncExpenseOptions } from "@/hooks/useSyncExpenseOptions";
 
 interface CreateEmployeeFormProps {
     onSaveEmployee?: (values: EmployeeFormValues) => void;
@@ -33,15 +32,13 @@ interface CreateEmployeeFormProps {
 }
 
 export function CreaeteEmployeeForm({
-    onSaveEmployee,
-    onSaveAndAddAnother,
+
 }: CreateEmployeeFormProps) {
 
     const {
         control,
         register,
         handleSubmit,
-        getValues,
         formState: { errors },
     } = useForm<EmployeeFormValues>({
         resolver: zodResolver(employeeFormSchema),
@@ -56,15 +53,15 @@ export function CreaeteEmployeeForm({
             jobTitle: "",
             hireDate: "",
             employmentType: "full_time",
-            basicSalary: "",
-            housingAllowance: "",
-            transportAllowance: "",
+            basicSalary: undefined,
+            housingAllowance: undefined,
+            transportAllowance: undefined,
             iban: "",
             bank: "",
         },
     });
 
-    const fileInputRef = useRef<HTMLInputElement>(null);
+     const { data: accountsRes } = useExpenseAccounts();
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const { mutate: createEmployee, isPending } = useCreateEmployee();
 
@@ -83,28 +80,11 @@ export function CreaeteEmployeeForm({
         [departments]
     );
 
-    const handleFileSelect = (file: File) => {
-        if (file.type !== "application/pdf") {
-            toast.error("الملف يجب أن يكون بصيغة PDF فقط");
-            return;
-        }
-        if (file.size > 10 * 1024 * 1024) {
-            toast.error("حجم الملف يجب ألا يتجاوز 10 ميجابايت");
-            return;
-        }
-        setSelectedFile(file);
-    };
-
-    function handleSaveAndAddAnother() {
-        // Saved as-is, without requiring full validation.
-        onSaveAndAddAnother?.(getValues());
-    }
+    useSyncExpenseOptions();
+   const accountOptions = useExpenseOptionsStore((s) => s.accountOptions);
 
     function onSubmit(values: EmployeeFormValues) {
-        if (!selectedFile) {
-            toast.error("الرجاء إرفاق ملف PDF");
-            return;
-        }
+         
         createEmployee({
             fullName: values.fullName,
             email: values.email,
@@ -271,25 +251,28 @@ export function CreaeteEmployeeForm({
                     placeholder="0.00"
                     inputMode="numeric"
                     error={errors.basicSalary?.message}
-                    {...register("basicSalary")}
+                    {...register("basicSalary", { valueAsNumber: true })}
                 />
                 <InvoiceTextField
                     label="بدل السكن"
+                    type="number"
                     placeholder="0.00"
                     inputMode="numeric"
                     error={errors.housingAllowance?.message}
-                    {...register("housingAllowance")}
+                    {...register("housingAllowance", { valueAsNumber: true })}
                 />
                 <InvoiceTextField
                     label="بدل الانتقال"
+                    type="number"
                     placeholder="0.00"
                     inputMode="numeric"
                     error={errors.transportAllowance?.message}
-                    {...register("transportAllowance")}
+                    {...register("transportAllowance", { valueAsNumber: true })}
                 />
 
                 <div className="lg:col-span-2">
                     <InvoiceTextField
+                        type="number"
                         label="رقم الحساب البنكي (IBAN)"
                         placeholder="ادخل رقم الحساب البنكي"
                         error={errors.iban?.message}
@@ -305,7 +288,7 @@ export function CreaeteEmployeeForm({
                             placeholder="اختر البنك"
                             value={field.value}
                             onChange={field.onChange}
-                            options={BANK_OPTIONS}
+                            options={accountOptions}
                             error={errors.bank?.message}
                         />
                     )}
@@ -318,6 +301,7 @@ export function CreaeteEmployeeForm({
                 selectedFile={selectedFile}
                 setSelectedFile={setSelectedFile}
             />
+            
 
             <div className="flex flex-col md:flex-row items-center  gap-3 border-t border-border pt-5">
                 <MainButton icon={<Plus />} text="حفظ الموظف" className="md:!w-[150px]" disabled={isPending} />

@@ -65,12 +65,15 @@ export function getEmployeeColumns({
     {
       id: "attachments",
       header: "المرفقات",
-      cell: ({ row }) => (
-        <div className="flex items-center gap-1">
-          <span>{row.original.attachments.length}</span>
-          <Paperclip className="h-4 w-4 text-muted-foreground" />
-        </div>
-      ),
+      cell: ({ row }) =>
+        row.original.attachments.length === 0 ? (
+          <span className="text-muted-foreground">لا يوجد</span>
+        ) : (
+          <div className="flex items-center gap-1">
+            <span>{row.original.attachments.length}</span>
+            <Paperclip className="h-4 w-4 text-muted-foreground" />
+          </div>
+        ),
     },
     {
       id: "actions",

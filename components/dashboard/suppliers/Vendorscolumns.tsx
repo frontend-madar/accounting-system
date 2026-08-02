@@ -1,15 +1,9 @@
 "use client";
 
 import * as React from "react";
-import { MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 import type { SupplierData, SupplierCurrency } from "@/types/supplier.types";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
+import { TableRowActions } from "../shared/TableRowActions";
 
 const SERVICE_TYPE_STYLES: Record<string, string> = {
     "انتقالات": "bg-[#E8EEFD] text-[#3D6BEA]",
@@ -119,24 +113,11 @@ export function getVendorColumns({
             id: "actions",
             header: "",
             cell: ({ row }) => (
-                <DropdownMenu>
-                    <DropdownMenuTrigger className="text-muted-foreground">
-                        <MoreVertical className="h-4 w-4" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => onEdit?.(row.original)}>
-                            <Pencil className="h-4 w-4" />
-                            تعديل
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                            onClick={() => onDelete?.(row.original)}
-                            className="text-red-600 focus:text-red-600"
-                        >
-                            <Trash2 className="h-4 w-4" />
-                            حذف
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <TableRowActions
+                    row={row.original}
+                    onEdit={onEdit}
+                    onDelete={onDelete}
+                />
             ),
         },
     ];

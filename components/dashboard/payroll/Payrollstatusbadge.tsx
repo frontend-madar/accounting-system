@@ -1,6 +1,6 @@
 "use client";
 
-export type PayrollStatus = "مدفوع" | "معتمد" | "مسودة";
+export type PayrollStatus = "مدفوع" | "معتمدة" | "مسودة" | "لم يتم الاختيار";
 
 const STATUS_CONFIG: Record<
     PayrollStatus,
@@ -11,8 +11,8 @@ const STATUS_CONFIG: Record<
         badgeClass: "bg-[#E6F6F4] text-[#1BA915]",
         dotClass: "bg-[#1F9254]",
     },
-    معتمد: {
-        label: "معتمد",
+    معتمدة: {
+        label: "معتمدة",
         badgeClass: "bg-[#E7F7EF] text-[#1F9254]",
         dotClass: "bg-[#1F9254]",
     },
@@ -21,6 +21,11 @@ const STATUS_CONFIG: Record<
         badgeClass: "bg-[#EBEBEC] text-[#0F1219]",
         dotClass: "bg-[#9CA3AF]",
     },
+    "لم يتم الاختيار": {
+        label: "لم يتم الاختيار",
+        badgeClass: "bg-[#FFF4E5] text-[#B76E00]",
+        dotClass: "bg-[#F59E0B]",
+    },
 };
 
 interface PayrollStatusBadgeProps {
@@ -28,7 +33,11 @@ interface PayrollStatusBadgeProps {
 }
 
 export function PayrollStatusBadge({ value }: PayrollStatusBadgeProps) {
-    const config = STATUS_CONFIG[value];
+    const config = STATUS_CONFIG[value] ?? {
+        label: value,
+        badgeClass: "bg-[#EBEBEC] text-[#0F1219]",
+        dotClass: "bg-[#9CA3AF]",
+    };
 
     return (
         <span

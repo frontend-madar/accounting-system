@@ -19,14 +19,12 @@ import SecondaryButton from "../shared/SecondaryButton";
 import { AmountField } from "./AmountField";
 import { SingleAttachmentDropzone } from "./SingleAttachmentDropzone";
 import { expenseFormSchema, ExpenseFormValues } from "@/validations/ExpenseSettlement";
-import {
-    useExpenseAccounts,
-    useExpenseCategories,
-    useExpensePaymentMethods,
-    useCreateExpense,
-} from "@/hooks/useExpenses";
+import { useCreateExpense } from "@/hooks/useExpenses";
+import { useSyncExpenseOptions } from "@/hooks/useSyncExpenseOptions";
 import type { ExpenseCurrency } from "@/types/expense.types";
 import { DateField } from "../Datefield";
+import { useExpenseOptionsStore } from "@/store/expense.store";
+import { NotesCard } from "../shared/NotesCard";
 
 // Fixed currency list from the API contract.
 const CURRENCY_OPTIONS = [
@@ -71,30 +69,21 @@ export function CreateExpenseForm({ onSuccess }: CreateExpenseFormProps) {
 
     const attachmentRef = useRef<File | null>(null);
 
-    const { data: categoriesRes } = useExpenseCategories();
-    const { data: paymentMethodsRes } = useExpensePaymentMethods();
-    const { data: accountsRes } = useExpenseAccounts();
     const createExpense = useCreateExpense();
 
-    const categoryOptions = React.useMemo(
-        () => (categoriesRes?.data ?? []).map((c) => ({ label: c, value: c })),
-        [categoriesRes]
-    );
-    const paymentMethodOptions = React.useMemo(
-        () => (paymentMethodsRes?.data ?? []).map((p) => ({ label: p.name, value: p.id })),
-        [paymentMethodsRes]
-    );
-    const accountOptions = React.useMemo(
-        () => (accountsRes?.data ?? []).map((a) => ({ label: a.name, value: a.id })),
-        [accountsRes]
-    );
+    // Keeps the shared Zustand store in sync with the latest fetched data.
+    // Safe to call from multiple mounted components — react-query dedupes
+    // the underlying network requests by query key.
+    useSyncExpenseOptions();
+
+    const categoryOptions = useExpenseOptionsStore((s) => s.categoryOptions);
+    const paymentMethodOptions = useExpenseOptionsStore((s) => s.paymentMethodOptions);
+    const accountOptions = useExpenseOptionsStore((s) => s.accountOptions);
 
     function handleAttachmentSelect(file: File) {
         attachmentRef.current = file;
     }
 
-    // Shared submit logic — `status` is supplied by whichever button
-    // triggered it, not read from the form itself.
     function submitExpense(values: ExpenseFormValues, status: string) {
         console.log(values)
         createExpense.mutate(
@@ -141,7 +130,7 @@ export function CreateExpenseForm({ onSuccess }: CreateExpenseFormProps) {
             </div>
 
             <div className="grid lg:grid-cols-3 items-center gap-4">
-                <FormSection title="معلومات المصروف" className="col-span-2" gridClassName="md:!grid-cols-2">
+                <FormSection title="معلومات المصروف" className="lg:col-span-2" gridClassName="md:!grid-cols-2">
                     <Controller
                         control={control}
                         name="currency"
@@ -219,7 +208,9 @@ export function CreateExpenseForm({ onSuccess }: CreateExpenseFormProps) {
                     />
                 </FormSection>
 
-                <SingleAttachmentDropzone onFileSelect={handleAttachmentSelect} />
+                <div className="h-full w-full col" >
+                    <SingleAttachmentDropzone onFileSelect={handleAttachmentSelect}  />
+                </div>
             </div>
 
             <FormSection title="بيانات المورد" className="border-t border-b py-10">
@@ -238,29 +229,13 @@ export function CreateExpenseForm({ onSuccess }: CreateExpenseFormProps) {
                 />
             </FormSection>
 
-            <Card className="overflow-hidden rounded-3xl border border-slate-200/70 bg-gradient-to-br from-white via-white to-slate-50 shadow-sm transition-all duration-300 hover:shadow-md">
-                <div className="border-slate-100 px-6">
-                    <div className="flex items-center gap-3">
-                        <div className="h-10 w-1.5 rounded-full bg-gradient-to-b from-[#463BAF] to-[#0e065e]" />
-                        <div>
-                            <FieldLabel htmlFor="notes" dropdown={false}>
-                                <span className="text-xl font-bold text-slate-900">ملاحظات</span>
-                            </FieldLabel>
-                            <p className="mt-1 text-sm text-slate-500">
-                                يمكنك إضافة أي ملاحظات أو تفاصيل إضافية هنا.
-                            </p>
-                        </div>
-                    </div>
-                </div>
-                <div className="p-6">
-                    <Textarea
-                        id="notes"
-                        placeholder="اكتب ملاحظاتك هنا..."
-                        className="min-h-[180px] resize-none rounded-2xl border-slate-200 bg-slate-50/50 px-4 py-3 text-base leading-7 placeholder:text-slate-400 transition-all duration-200 focus:border-[#102e4f] focus:bg-white focus:ring-4 focus:ring-[#102e4f]/10"
-                        {...register("notes")}
-                    />
-                </div>
-            </Card>
+            <NotesCard
+                title="ملاحظات"
+                description="يمكنك إضافة أي ملاحظات أو تفاصيل إضافية هنا."
+                placeholder="اكتب ملاحظاتك هنا..."
+                error={errors.notes?.message}
+                {...register("notes")}
+            />
 
             <div className="flex flex-col md:flex-row items-center justify-end gap-3 pt-5">
                 <MainButton

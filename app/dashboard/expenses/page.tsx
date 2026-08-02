@@ -12,9 +12,9 @@ import { Topbar } from "@/components/dashboard/Topbar";
 import { ExpenseStatsSection } from "@/components/dashboard/expenses/ExpenseStatsSection";
 import ExpenseSettlement from "@/components/dashboard/expenses/ExpenseSettlement";
 import { ExpensesTableSection } from "@/components/dashboard/expenses/ExpensesTableSection";
-import EmptyExpenses from "@/components/dashboard/expenses/EmptyExpenses";
+import EmptyState from "@/components/dashboard/shared/EmptyState";
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 10;
 
 const EMPTY_FILTERS: ExpenseSettlementValues = {
     expenseCode: "",
@@ -99,7 +99,12 @@ export default function ExpensesPage() {
 
 
             {hasNoExpenses ? (
-                <EmptyExpenses />
+                <EmptyState
+                    title="لا توجد فواتير حتى الآن"
+                    description="ابدأ بإضافة أول فاتورة لإدارة مبيعات شركتك."
+                    buttonText="إضافة فاتورة"
+                    href="/dashboard/expenses/add-expense"
+                />
             ) : (
                 <>
                     <ExpenseStatsSection stats={stats} isLoading={isDashboardLoading} />

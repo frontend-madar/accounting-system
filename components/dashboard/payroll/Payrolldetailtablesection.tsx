@@ -5,73 +5,86 @@ import { useMemo, useState } from "react";
 import SearchInput from "../SearchInput";
 import { DataTablePagination } from "../Pagination";
 import { DataTable } from "../DataTable";
-import { getPayrollDetailColumns, PayrollDetail } from "./Payrolldetailcolumns";
+import { getPayrollDetailColumns } from "./Payrolldetailcolumns";
+import { usePayrollDetails, useUpdatePayrollDetail } from "@/hooks/use-payroll";
 
 const PAGE_SIZE = 9;
 
 interface PayrollDetailTableSectionProps {
+    payrollRunId?: string;
     title?: string;
     searchPlaceholder?: string;
-    onBonusChange?: (payrollId: string, value: number) => void;
-    onDeductionChange?: (payrollId: string, value: number) => void;
-    /** Full dataset — pagination below is client-side over this array. */
-    data: PayrollDetail[];
-    /** Total record count, if it differs from `data.length` (server pagination). */
-    totalRecords?: number;
     className?: string;
 }
 
 export function PayrollDetailTableSection({
+    payrollRunId,
     title = "جدول الرواتب التفصيلي",
     searchPlaceholder = "بحث عن موظف...",
-    onBonusChange,
-    onDeductionChange,
-    data,
-    totalRecords,
     className,
 }: PayrollDetailTableSectionProps) {
     const [page, setPage] = useState(1);
     const [query, setQuery] = useState("");
 
-    const filtered = useMemo(() => {
-        if (!query.trim()) return data;
-        const q = query.trim().toLowerCase();
-        return data.filter((row) => row.employee.name.toLowerCase().includes(q));
-    }, [data, query]);
+    const { data: detailsRes, isLoading } = usePayrollDetails({
+        payrollRunId,
+        search: query || undefined,
+        page,
+        limit: PAGE_SIZE,
+    });
 
-    const pageRows = useMemo(() => {
-        const start = (page - 1) * PAGE_SIZE;
-        return filtered.slice(start, start + PAGE_SIZE);
-    }, [filtered, page]);
+    const { mutate: updateDetail } = useUpdatePayrollDetail();
+
+    const rows = detailsRes?.data.data ?? [];
+    const totalRecords = detailsRes?.data.total ?? 0;
+
+    const handleBonusChange = (id: string, value: number) => {
+        updateDetail({ id, payload: { bonuses: value } });
+    };
+
+    const handleDeductionChange = (id: string, value: number) => {
+        updateDetail({ id, payload: { deductions: value } });
+    };
+
+    
 
     const columns = useMemo(
-        () => getPayrollDetailColumns({ onBonusChange, onDeductionChange }),
-        [onBonusChange, onDeductionChange]
+        () =>
+            getPayrollDetailColumns({
+                onBonusChange: handleBonusChange,
+                onDeductionChange: handleDeductionChange,
+            }),
+        []
     );
+
+    function resetToFirstPage() {
+        setPage(1);
+    }
 
     return (
         <section className={`bg-white p-4 rounded-2xl ctm-shadow ${className ?? ""}`}>
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <h2 className="text-[20px] font-bold text-[#0F1219]">{title}</h2>
 
-                <SearchInput
-                    query={query}
-                    setQuery={setQuery}
-                    setPage={setPage}
-                    placeholder={searchPlaceholder}
-                    // className="md:w-[280px]"
-                />
+                <div>
+                    <SearchInput
+                        query={query}
+                        setQuery={setQuery}
+                        setPage={resetToFirstPage}
+                        placeholder={searchPlaceholder}
+                    />
+                </div>
             </div>
 
             <div className="mt-6 overflow-x-auto">
-                <DataTable columns={columns} data={pageRows} />
+                <DataTable columns={columns} data={rows} isLoading={isLoading} />
             </div>
 
             <DataTablePagination
                 className="mt-4"
                 page={page}
                 pageSize={PAGE_SIZE}
-                totalRecords={totalRecords ?? filtered.length}
+                totalRecords={totalRecords}
                 onPageChange={setPage}
             />
         </section>
