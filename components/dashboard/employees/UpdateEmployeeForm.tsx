@@ -4,7 +4,7 @@
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { FileText } from "lucide-react";
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import {
@@ -69,6 +69,7 @@ export function UpdateEmployeeForm({ employee, open, onOpenChange }: UpdateEmplo
         register,
         handleSubmit,
         reset,
+        setValue,
         formState: { errors, dirtyFields },
     } = useForm<EmployeeFormValues>({
         resolver: zodResolver(employeeFormSchema),
@@ -96,6 +97,22 @@ export function UpdateEmployeeForm({ employee, open, onOpenChange }: UpdateEmplo
 
     useSyncExpenseOptions();
     const accountOptions = useExpenseOptionsStore((s) => s.accountOptions);
+
+    // `employee.bankName` is a display name (e.g. "الأهلي"), but accountOptions'
+    // `value` is the account id — so the raw name never matches any option's
+    // value and the select renders empty. Resolve it to the matching option's
+    // id once the options list has loaded.
+    useEffect(() => {
+        if (!employee || accountOptions.length === 0) return;
+
+        const matchedOption = accountOptions.find(
+            (opt) => opt.label === employee.bankName
+        );
+
+        if (matchedOption) {
+            setValue("bank", matchedOption.value, { shouldDirty: false });
+        }
+    }, [employee, accountOptions, setValue]);
 
     const handleFileSelect = (file: File) => {
         if (file.type !== "application/pdf") {
@@ -130,7 +147,13 @@ export function UpdateEmployeeForm({ employee, open, onOpenChange }: UpdateEmplo
         if (dirtyFields.housingAllowance) payload.housingAllowance = values.housingAllowance;
         if (dirtyFields.transportAllowance) payload.transportationAllowance = values.transportAllowance;
         if (dirtyFields.iban) payload.iban = values.iban;
-        if (dirtyFields.bank) payload.bankName = values.bank;
+        if (dirtyFields.bank) {
+            // values.bank now holds the account id (from the resolved select
+            // value) — map back to the bank's display name for the payload,
+            // same as the API originally returned it.
+            const selectedOption = accountOptions.find((opt) => opt.value === values.bank);
+            payload.bankName = selectedOption?.label ?? values.bank;
+        }
         if (selectedFile) payload.attachments = selectedFile;
 
         if (Object.keys(payload).length === 0) {

@@ -7,6 +7,7 @@ import type {
   GetSupplierResponse,
   GetSuppliersParams,
   GetSuppliersResponse,
+  ExportSuppliersEmailParams,
 } from "@/types/supplier.types";
 
 export const supplierService = {
@@ -27,9 +28,25 @@ export const supplierService = {
 
   exportSuppliersPdf: (params: GetSuppliersParams = {}) =>
     api
-      .get("/suppliers/export/pdf", {
+      .get("/export/suppliers/pdf", {
         params,
         responseType: "blob",
       })
       .then((res) => res.data as Blob),
+
+  exportSuppliersExcel: (params: GetSuppliersParams = {}) =>
+    api
+      .get("/export/suppliers/excel", {
+        params,
+        responseType: "blob",
+      })
+      .then((res) => res.data as Blob),
+
+  exportSuppliersEmail: ({ to }: ExportSuppliersEmailParams) =>
+    api
+      .post<{ success: boolean; message: string }>
+      ("/export/suppliers/email", {},
+        { params: { to } }
+      )
+      .then((res) => res.data),
 };

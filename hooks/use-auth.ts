@@ -82,9 +82,10 @@ export function useForgotPassword() {
   const router = useRouter();
 
   return useMutation({
-    mutationFn: (payload: ForgotPasswordPayload) => authService.forgotPassword(payload),
-    onSuccess: (res, variables) => {
-      toast.success(res.data.message);
+    mutationFn: (payload: any) => authService.forgotPassword(payload),
+    onSuccess: (res: any, variables: any) => {
+      toast.success(res.message);
+      console.log(res)
       router.push(`/reset-password?email=${encodeURIComponent(variables.email)}`);
     },
     onError: (error) => {
@@ -120,7 +121,7 @@ export function useInviteAccountant() {
   });
 }
 
- 
+
 export function useAcceptInvitation() {
   const router = useRouter();
   const setSession = useAuthStore((s) => s.setSession);
@@ -134,6 +135,26 @@ export function useAcceptInvitation() {
     },
     onError: (error) => {
       toast.error(getErrorMessage(error, "تعذر تفعيل الدعوة"));
+    },
+  });
+}
+
+export function useLogout() {
+  const router = useRouter();
+  const clearSession = useAuthStore((s) => s.clearSession);
+
+  return useMutation({
+    mutationFn: () => authService.logout(),
+    onSuccess: () => {
+      clearSession();
+      toast.success("تم تسجيل الخروج بنجاح");
+      router.push("/login");
+    },
+    onError: (error) => {
+      // Clear locally even if the server call fails — don't strand the user logged-in-looking.
+      clearSession();
+      router.push("/login");
+      toast.error(getErrorMessage(error, "حدث خطأ أثناء تسجيل الخروج"));
     },
   });
 }

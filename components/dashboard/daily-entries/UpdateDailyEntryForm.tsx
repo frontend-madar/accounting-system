@@ -34,6 +34,77 @@ function formatDateInput(dateStr?: string): string {
   return dateStr.includes("T") ? dateStr.split("T")[0] : dateStr;
 }
 
+function DailyEntryFormSkeleton() {
+  return (
+    <div className="space-y-8 rounded-2xl ctm-shadow bg-white p-2 md:p-6 animate-pulse">
+      {/* Title */}
+      <div className="flex flex-col items-center md:items-end gap-2">
+        <div className="h-6 md:h-9 w-64 md:w-96 rounded-md bg-[#E4E5E7]" />
+        <div className="h-4 md:h-5 w-72 md:w-[420px] rounded-md bg-[#EEEFF1]" />
+      </div>
+
+      {/* بيانات العميل والموظف */}
+      <SkeletonSection gridClassName="md:!grid-cols-3" fieldCount={3} />
+
+      {/* تفاصيل الإقامة */}
+      <SkeletonSection gridClassName="md:!grid-cols-3" fieldCount={3} />
+
+      {/* الحجوزات */}
+      <div>
+        <div className="h-6 w-32 rounded-md bg-[#E4E5E7] mb-4" />
+        {[0, 1].map((i) => (
+          <div
+            key={i}
+            className="grid grid-cols-1 md:grid-cols-3 gap-4 shadow-md p-4 rounded-md bg-white mb-5"
+          >
+            <SkeletonField />
+            <SkeletonField />
+            <SkeletonField />
+          </div>
+        ))}
+        <div className="h-11 w-40 rounded-xl bg-[#E4E5E7]" />
+      </div>
+
+      {/* تفاصيل الدفع */}
+      <SkeletonSection fieldCount={5} />
+
+      {/* Buttons */}
+      <div className="flex items-center gap-3 pt-5">
+        <div className="h-11 w-36 rounded-xl bg-[#E4E5E7]" />
+        <div className="h-11 w-24 rounded-xl bg-[#EEEFF1]" />
+      </div>
+    </div>
+  );
+}
+
+function SkeletonSection({
+  fieldCount,
+  gridClassName,
+}: {
+  fieldCount: number;
+  gridClassName?: string;
+}) {
+  return (
+    <div>
+      <div className="h-5 w-40 rounded-md bg-[#E4E5E7] mb-4" />
+      <div className={`grid grid-cols-1 md:grid-cols-2 gap-4 ${gridClassName ?? ""}`}>
+        {Array.from({ length: fieldCount }).map((_, i) => (
+          <SkeletonField key={i} />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function SkeletonField() {
+  return (
+    <div className="space-y-1.5">
+      <div className="h-4 w-24 rounded bg-[#E4E5E7]" />
+      <div className="h-[47px] w-full rounded-xl border border-[#EDEEFF] bg-[#FAFBFC]" />
+    </div>
+  );
+}
+
 export function UpdateDailyEntryForm({ entryId }: UpdateDailyEntryFormProps) {
   useSyncCurrencies();
   const currencyOptions = useCurrencyStore((s) => s.currencyOptions);
@@ -109,10 +180,10 @@ export function UpdateDailyEntryForm({ entryId }: UpdateDailyEntryFormProps) {
       paymentMethod: entry.paymentMethod,
       bookingLines: entry.bookingLines.length
         ? entry.bookingLines.map((line) => ({
-            bookingPlace: line.bookingPlace,
-            serviceType: line.serviceType,
-            bookingPrice: String(line.bookingPrice),
-          }))
+          bookingPlace: line.bookingPlace,
+          serviceType: line.serviceType,
+          bookingPrice: String(line.bookingPrice),
+        }))
         : [{ bookingPlace: "", serviceType: "", bookingPrice: "" }],
     });
   }, [entry, clientList, employeeList, reset]);
@@ -174,9 +245,7 @@ export function UpdateDailyEntryForm({ entryId }: UpdateDailyEntryFormProps) {
 
   if (isEntryLoading || !entry) {
     return (
-      <div className="flex h-40 items-center justify-center rounded-2xl bg-white ctm-shadow text-muted-foreground">
-        جاري التحميل...
-      </div>
+      <DailyEntryFormSkeleton />
     );
   }
 

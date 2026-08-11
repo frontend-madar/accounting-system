@@ -58,7 +58,7 @@ export type GetClientsResponse = ApiResponse<ClientListData>;
 
 export interface GetClientsParams {
   clientType?: "individual" | "business";
-  name?: string;
+  search?: string;
   mobile?: string;
   email?: string;
   country?: string;

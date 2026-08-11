@@ -146,36 +146,35 @@ export function SelectField({
                         "
                     >
                         <div className="max-h-60 overflow-y-auto">
-                            {options.map((option) => (
-                                <button
-                                    key={option.value}
-                                    type="button"
-                                    onClick={() => {
-                                        onChange(option.value);
-                                        setOpen(false);
-                                    }}
-                                    className={cn(
-                                        "flex w-full items-center justify-between",
-
-                                        "rounded-lg",
-
-                                        "px-3 py-2.5",
-
-                                        "text-right",
-
-                                        "text-sm",
-
-                                        "transition-colors",
-
-                                        "hover:bg-[#F5F3FF]",
-
-                                        option.value === value &&
-                                        "bg-[#F5F3FF] text-[#40369F] font-medium"
-                                    )}
-                                >
-                                    {option.label}
-                                </button>
-                            ))}
+                            {options.length === 0 ? (
+                                <div className="px-3 py-4 text-center text-sm text-[#9CA3AF]">
+                                    لايوجد
+                                </div>
+                            ) : (
+                                options.map((option) => (
+                                    <button
+                                        key={option.value}
+                                        type="button"
+                                        onClick={() => {
+                                            onChange(option.value);
+                                            setOpen(false);
+                                        }}
+                                        className={cn(
+                                            "flex w-full items-center justify-between",
+                                            "rounded-lg",
+                                            "px-3 py-2.5",
+                                            "text-right",
+                                            "text-sm",
+                                            "transition-colors",
+                                            "hover:bg-[#F5F3FF]",
+                                            option.value === value &&
+                                            "bg-[#F5F3FF] text-[#40369F] font-medium"
+                                        )}
+                                    >
+                                        {option.label}
+                                    </button>
+                                ))
+                            )}
                         </div>
                     </div>
                 )}

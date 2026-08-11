@@ -23,11 +23,11 @@ function buildEmployeeFormData(payload: CreateEmployeePayload): FormData {
   formData.append("jobTitle", payload.jobTitle);
   formData.append("hireDate", payload.hireDate);
   formData.append("employmentType", payload.employmentType);
-  formData.append("basicSalary", payload.basicSalary);
+  formData.append("basicSalary", String(payload.basicSalary));
   formData.append("bankName", payload.bankName);
   formData.append("iban", payload.iban);
-  if (payload.housingAllowance) formData.append("housingAllowance", payload.housingAllowance);
-  if (payload.transportationAllowance) formData.append("transportationAllowance", payload.transportationAllowance);
+  if (payload.housingAllowance != null) formData.append("housingAllowance", String(payload.housingAllowance));
+  if (payload.transportationAllowance != null) formData.append("transportationAllowance", String(payload.transportationAllowance));
   if (payload.attachments) formData.append("attachments", payload.attachments);
   return formData;
 }

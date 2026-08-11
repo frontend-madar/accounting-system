@@ -2,7 +2,7 @@
 
 import { ColumnDef } from "@tanstack/react-table";
 import { Eye } from "lucide-react";
-import { PayrollStatusBadge } from "./Payrollstatusbadge";
+import { PayrollStatusDropdown } from "./PayrollStatusDropdown";
 import { PayrollRunListItem } from "@/types/payroll.types";
 import { TableRowActions } from "../shared/TableRowActions";
 
@@ -68,7 +68,12 @@ export function getPayrollColumns({
         {
             accessorKey: "status",
             header: "الحالة",
-            cell: ({ row }) => <PayrollStatusBadge value={row.original.status} />,
+            cell: ({ row }) => (
+                <PayrollStatusDropdown
+                    payrollId={row.original.id}
+                    status={row.original.status}
+                />
+            ),
         },
         {
             accessorKey: "createdAt",

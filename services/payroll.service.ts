@@ -1,5 +1,3 @@
-// services/payroll.service.ts
-
 import { api } from "@/lib/axios";
 import type {
   CreatePayrollRunPayload,
@@ -15,6 +13,7 @@ import type {
   GetPayrollDetailByIdResponse,
   UpdatePayrollDetailPayload,
   UpdatePayrollDetailResponse,
+  ExportPayrollRunsEmailParams,
 } from "@/types/payroll.types";
 
 export const payrollService = {
@@ -83,5 +82,32 @@ export const payrollService = {
   deletePayrollDetail: (id: string) =>
     api
       .delete<{ success: boolean }>(`/payroll-details/${id}`)
+      .then((res) => res.data),
+
+  // ── Export Functions ────────────────────────────────────────────────────
+
+  
+  exportPayrollRunPdf: () =>
+    api
+      .get(`/export/payroll-runs/pdf`, {
+        responseType: "blob",
+      })
+      .then((res) => res.data as Blob),
+
+  
+  exportPayrollRunExcel: () =>
+    api
+      .get(`/export/payroll-runs/excel`, {
+        responseType: "blob",
+      })
+      .then((res) => res.data as Blob),
+
+  
+  exportPayrollRunEmail: ({ to }: { to: string }) =>
+    api
+      .post<{ success: boolean; message: string }>(
+        `/export/payroll-runs/email`,
+        { to }
+      )
       .then((res) => res.data),
 };

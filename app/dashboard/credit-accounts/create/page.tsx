@@ -5,7 +5,7 @@ import React from 'react'
 const page = () => {
   return (
     <div  className='space-y-4 px-4' >
-         <Topbar path='الحسابات الآجلة / إضافة حساب جديد' title="" />
+         <Topbar  title="الحسابات الآجلة" />
 
          <CreateCreditAccountForm />
     </div>

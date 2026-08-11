@@ -13,16 +13,7 @@ import StaffDownsizing from "./StaffDownsizing";
 import EmptyState from "../shared/EmptyState"; // adjust path to wherever you put it
 import { useEmployees, useDeleteEmployee } from "@/hooks/use-employee";
 import { EmployeeData } from "@/types/employee.types";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { ConfirmDeleteDialog } from "../shared/ConfirmDeleteDialog";
 import { UpdateEmployeeForm } from "./UpdateEmployeeForm";
 
 const PAGE_SIZE = 5;
@@ -145,22 +136,14 @@ export function EmployeesTableSection({
         </>
       )}
 
-      <AlertDialog open={!!employeeToDelete} onOpenChange={(open) => !open && setEmployeeToDelete(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
-            <AlertDialogDescription>
-              هل أنت متأكد من حذف الموظف {employeeToDelete?.fullName}؟ لا يمكن التراجع عن هذا الإجراء.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>إلغاء</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} disabled={isDeleting}>
-              حذف
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmDeleteDialog
+        open={!!employeeToDelete}
+        onOpenChange={(open) => !open && setEmployeeToDelete(null)}
+        isLoading={isDeleting}
+        title="تأكيد الحذف"
+        description={`هل أنت متأكد من حذف الموظف ${employeeToDelete?.fullName}؟ لا يمكن التراجع عن هذا الإجراء.`}
+        onConfirm={confirmDelete}
+      />
 
       <UpdateEmployeeForm
         employee={employeeToEdit}

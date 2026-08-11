@@ -1,35 +1,30 @@
 "use client";
 
-export type PayrollStatus = "مدفوع" | "معتمدة" | "مسودة" | "لم يتم الاختيار";
+import type { PayrollRunStatus } from "@/types/payroll.types";
 
 const STATUS_CONFIG: Record<
-    PayrollStatus,
+    any,
     { label: string; badgeClass: string; dotClass: string }
 > = {
-    مدفوع: {
-        label: "مدفوع",
-        badgeClass: "bg-[#E6F6F4] text-[#1BA915]",
-        dotClass: "bg-[#1F9254]",
-    },
-    معتمدة: {
+    APPROVED: {
         label: "معتمدة",
         badgeClass: "bg-[#E7F7EF] text-[#1F9254]",
         dotClass: "bg-[#1F9254]",
     },
-    مسودة: {
+    DRAFT: {
         label: "مسودة",
         badgeClass: "bg-[#EBEBEC] text-[#0F1219]",
         dotClass: "bg-[#9CA3AF]",
     },
-    "لم يتم الاختيار": {
-        label: "لم يتم الاختيار",
-        badgeClass: "bg-[#FFF4E5] text-[#B76E00]",
-        dotClass: "bg-[#F59E0B]",
+    CANCELLED: {
+        label: "كانسل",
+        badgeClass: "bg-[#FDEDEA] text-[#E0472C]",
+        dotClass: "bg-[#E0472C]",
     },
 };
 
 interface PayrollStatusBadgeProps {
-    value: PayrollStatus;
+    value: PayrollRunStatus;
 }
 
 export function PayrollStatusBadge({ value }: PayrollStatusBadgeProps) {

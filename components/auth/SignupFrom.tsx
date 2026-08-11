@@ -8,12 +8,11 @@ import { Label } from "@/components/ui/label";
 import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import { signupSchema, DEPARTMENT_OPTIONS } from "@/validations/auth";
+import { signupSchema } from "@/validations/auth";
 import { z } from "zod";
 import IntlTelInput, { IntlTelInputRef } from "@intl-tel-input/react";
 import "intl-tel-input/styles";
 import { useSignup } from "@/hooks/use-auth";
-import { FacebookIcon, GoogleIcon } from "@/icons";
 import SocialLoginButtons from "./SocialLoginButtons";
 import FooterTerm from "./FooterTerm";
 
@@ -28,15 +27,10 @@ export function SignupForm() {
     const [phone, setPhone] = useState("");
     const [countryCode, setCountryCode] = useState("+20");
     const [departments, setDepartments] = useState<string[]>([]);
-    const [isDeptOpen, setIsDeptOpen] = useState(false);
 
     const signupMutation = useSignup();
 
-    function toggleDepartment(dept: string) {
-        setDepartments((prev) =>
-            prev.includes(dept) ? prev.filter((d) => d !== dept) : [...prev, dept]
-        );
-    }
+
 
     function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
         event.preventDefault();
@@ -44,6 +38,7 @@ export function SignupForm() {
         const formData = new FormData(event.currentTarget);
         const raw = {
             businessName: String(formData.get("businessName") ?? ""),
+            name: String(formData.get("name") ?? ""),
             email: String(formData.get("email") ?? ""),
             countryCode,
             phone,
@@ -95,46 +90,93 @@ export function SignupForm() {
                 </div>
 
                 <form onSubmit={handleSubmit} noValidate className="mt-8 space-y-6">
-                    {/* Business Name Field */}
-                    <div className="space-y-1.5">
-                        <Label htmlFor="businessName" className="text-sm font-medium text-[#171A1F] flex items-center gap-2">
-                            الاسم التجاري
-                        </Label>
-                        <div className={cn(
-                            "relative rounded-xl transition-all duration-200",
-                            focusedField === "businessName" && "ring-2 ring-[#40369F]/20 shadow-lg shadow-[#40369F]/5"
-                        )}>
-                            <Input
-                                id="businessName"
-                                name="businessName"
-                                type="text"
-                                placeholder="مثال: شركة التقنية المتطورة"
-                                autoComplete="organization"
-                                aria-invalid={!!fieldErrors.businessName}
-                                onFocus={() => setFocusedField("businessName")}
-                                onBlur={() => setFocusedField(null)}
-                                className={cn(
-                                    "ctm-inp pr-11 h-[54px] text-[15px] rounded-xl border-[#E4E5E7] bg-[#FAFBFC] transition-all duration-200",
-                                    "placeholder:text-[#9A9DA2] placeholder:text-sm",
-                                    "focus:bg-white focus:border-[#40369F]",
-                                    fieldErrors.businessName &&
-                                    "border-red-500 focus-visible:ring-red-500 bg-red-50/40",
-                                    !fieldErrors.businessName && focusedField === "businessName" && "border-[#40369F]"
+                    {/* Business Name + Name Fields */}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        
+
+                        {/* Name Field */}
+                        <div className="space-y-1.5">
+                            <Label htmlFor="name" className="text-sm font-medium text-[#171A1F] flex items-center gap-2">
+                                الاسم
+                            </Label>
+                            <div className={cn(
+                                "relative rounded-xl transition-all duration-200",
+                                focusedField === "name" && "ring-2 ring-[#40369F]/20 shadow-lg shadow-[#40369F]/5"
+                            )}>
+                                <Input
+                                    id="name"
+                                    name="name"
+                                    type="text"
+                                    placeholder="مثال: أحمد محمد"
+                                    autoComplete="name"
+                                    aria-invalid={!!fieldErrors.name}
+                                    onFocus={() => setFocusedField("name")}
+                                    onBlur={() => setFocusedField(null)}
+                                    className={cn(
+                                        "ctm-inp pr-11 h-[54px] text-[15px] rounded-xl border-[#E4E5E7] bg-[#FAFBFC] transition-all duration-200",
+                                        "placeholder:text-[#9A9DA2] placeholder:text-sm",
+                                        "focus:bg-white focus:border-[#40369F]",
+                                        fieldErrors.name &&
+                                        "border-red-500 focus-visible:ring-red-500 bg-red-50/40",
+                                        !fieldErrors.name && focusedField === "name" && "border-[#40369F]"
+                                    )}
+                                />
+                                <Building2 className="absolute right-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-[#9A9DA2] pointer-events-none transition-colors duration-200" />
+                                {fieldErrors.name && (
+                                    <div className="absolute left-3 top-1/2 -translate-y-1/2">
+                                        <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse"></div>
+                                    </div>
                                 )}
-                            />
-                            <Building2 className="absolute right-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-[#9A9DA2] pointer-events-none transition-colors duration-200" />
-                            {fieldErrors.businessName && (
-                                <div className="absolute left-3 top-1/2 -translate-y-1/2">
-                                    <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse"></div>
-                                </div>
+                            </div>
+                            {fieldErrors.name && (
+                                <p className="text-sm text-red-600 flex items-center gap-2 animate-in fade-in slide-in-from-top-1 duration-200">
+                                    <span className="inline-block w-1 h-1 rounded-full bg-red-500"></span>
+                                    {fieldErrors.name}
+                                </p>
                             )}
                         </div>
-                        {fieldErrors.businessName && (
-                            <p className="text-sm text-red-600 flex items-center gap-2 animate-in fade-in slide-in-from-top-1 duration-200">
-                                <span className="inline-block w-1 h-1 rounded-full bg-red-500"></span>
-                                {fieldErrors.businessName}
-                            </p>
-                        )}
+
+                        {/* Business Name Field */}
+                        <div className="space-y-1.5">
+                            <Label htmlFor="businessName" className="text-sm font-medium text-[#171A1F] flex items-center gap-2">
+                                الاسم التجاري
+                            </Label>
+                            <div className={cn(
+                                "relative rounded-xl transition-all duration-200",
+                                focusedField === "businessName" && "ring-2 ring-[#40369F]/20 shadow-lg shadow-[#40369F]/5"
+                            )}>
+                                <Input
+                                    id="businessName"
+                                    name="businessName"
+                                    type="text"
+                                    placeholder="مثال: شركة التقنية المتطورة"
+                                    autoComplete="organization"
+                                    aria-invalid={!!fieldErrors.businessName}
+                                    onFocus={() => setFocusedField("businessName")}
+                                    onBlur={() => setFocusedField(null)}
+                                    className={cn(
+                                        "ctm-inp pr-11 h-[54px] text-[15px] rounded-xl border-[#E4E5E7] bg-[#FAFBFC] transition-all duration-200",
+                                        "placeholder:text-[#9A9DA2] placeholder:text-sm",
+                                        "focus:bg-white focus:border-[#40369F]",
+                                        fieldErrors.businessName &&
+                                        "border-red-500 focus-visible:ring-red-500 bg-red-50/40",
+                                        !fieldErrors.businessName && focusedField === "businessName" && "border-[#40369F]"
+                                    )}
+                                />
+                                <Building2 className="absolute right-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-[#9A9DA2] pointer-events-none transition-colors duration-200" />
+                                {fieldErrors.businessName && (
+                                    <div className="absolute left-3 top-1/2 -translate-y-1/2">
+                                        <div className="h-2 w-2 rounded-full bg-red-500 animate-pulse"></div>
+                                    </div>
+                                )}
+                            </div>
+                            {fieldErrors.businessName && (
+                                <p className="text-sm text-red-600 flex items-center gap-2 animate-in fade-in slide-in-from-top-1 duration-200">
+                                    <span className="inline-block w-1 h-1 rounded-full bg-red-500"></span>
+                                    {fieldErrors.businessName}
+                                </p>
+                            )}
+                        </div>
                     </div>
 
                     {/* Email Field */}

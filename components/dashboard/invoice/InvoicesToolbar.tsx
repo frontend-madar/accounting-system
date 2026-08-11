@@ -1,13 +1,18 @@
 "use client";
 
 import * as React from "react";
-import { FileEdit, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import SearchInput from "../SearchInput";
 import FillterButton from "../FillterButton";
 import MainButton from "../shared/MainButton";
-import SecondaryButton from "../shared/SecondaryButton";
+import { ExportDropdown } from "../shared/ExportDropdown";
+import {
+    useExportInvoicesPdf,
+    useExportInvoicesExcel,
+    useExportInvoicesEmail,
+} from "@/hooks/use-invoice";
 
 const STATUS_OPTIONS = ["الكل", "مكتملة", "كنسل", "باقي الدفع"];
 
@@ -32,15 +37,43 @@ export function InvoicesToolbar({
     onOpenDrafts,
     className,
 }: InvoicesToolbarProps) {
-    return (
-        <div className={cn("flex flex-wrap items-center justify-between gap-3", className)}>
-            <div><SearchInput query={query} setQuery={setQuery} setPage={setPage} /></div>
+    const { mutate: exportPdf, isPending: isExportingPdf } = useExportInvoicesPdf();
+    const { mutate: exportExcel, isPending: isExportingExcel } = useExportInvoicesExcel();
+    const { mutate: exportEmail, isPending: isExportingEmail } = useExportInvoicesEmail();
 
-            <div className="flex items-center gap-2">
+    function handleExportPdf() {
+        exportPdf({});
+    }
+
+    function handleExportExcel() {
+        exportExcel({});
+    }
+
+    function handleExportEmail(email: string) {
+        exportEmail({ to: email });
+    }
+
+    return (
+        <div className={cn("flex flex-col md:flex-row bg-red  items-center justify-between gap-3", className)}>
+            <div className="w-full md:w-auto"><SearchInput query={query} setQuery={setQuery} setPage={setPage} /></div>
+
+            <div className="flex flex-col md:flex-row justify-end  w-full gap-2">
                 <FillterButton
                     options={STATUS_OPTIONS}
                     selectedFilter={statusFilter}
                     onFilterChange={onFilterChange}
+                    className="md:w-auto w-full"
+                />
+
+                <ExportDropdown
+                    label="تصدير"
+                    className="md:w-auto w-full"
+                    isExportingPdf={isExportingPdf}
+                    isExportingExcel={isExportingExcel}
+                    isExportingEmail={isExportingEmail}
+                    onExportPdf={handleExportPdf}
+                    onExportExcel={handleExportExcel}
+                    onExportEmail={handleExportEmail}
                 />
 
                 <MainButton
@@ -48,6 +81,7 @@ export function InvoicesToolbar({
                     icon={<Plus className="h-4 w-4" />}
                     href="/dashboard/invoices/create"
                     onClick={onCreateInvoice}
+                    className="md:w-auto w-full "
                 />
             </div>
         </div>

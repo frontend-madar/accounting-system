@@ -49,7 +49,7 @@ export default function DashboardOverviewPage() {
                 />
 
                 <NavCard
-                    href="/dashboard/invoices"
+                    href="/dashboard/clients"
                     title="العملاء"
                     subtitle="عرض جميع العملاء"
                     icon={<ChevronLeft className="h-5 w-5 text-[#161616]" />}

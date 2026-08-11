@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { ExpenseIconKey, ExpenseStat } from "@/types/types";
 import { cn } from "@/lib/utils";
+import { Button } from "@/components/ui/button";
 
 const ICON_MAP: Record<
   ExpenseIconKey,
@@ -84,14 +85,13 @@ export function ExpenseStatCard({
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={() => onMenuClick?.(id)}
-          className="flex h-10 w-10 items-center justify-center rounded-xl text-slate-500 transition-all hover:bg-slate-100 hover:text-slate-700"
+        <Button
+           onClick={() => onMenuClick?.(id)}
+          className="flex h-10 w-10 items-center bg-transparent justify-center rounded-xl text-slate-500 transition-all hover:bg-slate-100 hover:text-slate-700"
           aria-label="Options"
         >
           <MoreVertical className="h-5 w-5" />
-        </button>
+        </Button>
       </div>
 
       {/* Value */}

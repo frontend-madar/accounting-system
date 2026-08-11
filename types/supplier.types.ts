@@ -1,4 +1,7 @@
 export const SUPPLIER_CURRENCIES = ["SAR", "EGP", "AED", "USD", "EUR", "GBP"] as const;
+export const SUPPLIER_STATUS_OPTIONS = ["مكتمل", "غير مكتمل"] as const;
+export type SupplierStatus = (typeof SUPPLIER_STATUS_OPTIONS)[number];
+
 export type SupplierCurrency = (typeof SUPPLIER_CURRENCIES)[number];
 
 export interface CreateSupplierPayload {
@@ -13,7 +16,6 @@ export interface CreateSupplierPayload {
   amountPaid: number;
 }
 
-export type UpdateSupplierPayload = Partial<CreateSupplierPayload>;
 
 export interface SupplierData {
   id: string;
@@ -29,6 +31,7 @@ export interface SupplierData {
   servicePrice: number;
   amountPaid: number;
   remainingAmount: number;
+  status: SupplierStatus;
   createdAt: string;
   updatedAt: string;
 }
@@ -68,3 +71,11 @@ export interface GetSuppliersResponse {
   };
   message: string;
 }
+
+export interface ExportSuppliersEmailParams {
+  to: string;
+}
+
+export type UpdateSupplierPayload = Partial<CreateSupplierPayload> & {
+  status?: SupplierStatus;
+};

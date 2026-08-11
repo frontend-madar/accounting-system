@@ -54,47 +54,15 @@ const FilterButton = ({
   };
 
   return (
-    <div className={`relative ${className}`} ref={menuRef}>
+    <div className={`relative   ${className}`} ref={menuRef}>
       <button
         onClick={() => setIsOpen((prev) => !prev)}
         type="button"
-        className="
-        group
-        flex
-        items-center
-        gap-3
-        h-12
-        rounded-2xl
-        px-5
-        border
-        border-[#DCD5FF]
-        bg-gradient-to-br
-        from-white
-        to-[#FAF8FF]
-        shadow-[0_6px_18px_rgba(0,0,0,.06)]
-        transition-all
-        duration-300
-        hover:-translate-y-0.5
-        hover:border-[#7B61FF]
-        hover:shadow-[0_14px_32px_rgba(123,97,255,.15)]
-      "
+        className=" group flex items-center gap-3 w-full h-12 rounded-2xl px-5 border border-[#DCD5FF] bg-gradient-to-br from-white to-[#FAF8FF] shadow-[0_6px_18px_rgba(0,0,0,.06)] transition-all duration-300 hover:-translate-y-0.5 hover:border-[#7B61FF] hover:shadow-[0_14px_32px_rgba(123,97,255,.15)]"
       >
         {/* Icon */}
         <div
-          className="
-          flex
-          h-9
-          w-9
-          items-center
-          justify-center
-          rounded-xl
-          bg-gradient-to-br
-          from-[#F3EFFF]
-          to-[#E9E1FF]
-          transition-all
-          duration-300
-          group-hover:scale-105
-          group-hover:rotate-6
+          className=" flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#F3EFFF] to-[#E9E1FF] transition-all duration-300 group-hover:scale-105 group-hover:rotate-6
         "
         >
           <svg
@@ -123,28 +91,8 @@ const FilterButton = ({
       </button>
 
       <div
-        className={`
-          absolute
-          left-0
-          top-full
-          z-50
-          mt-3
-          w-56
-          origin-top-right
-          rounded-2xl
-          border
-          border-[#ECE8FF]
-          bg-white/95
-          backdrop-blur-xl
-          shadow-[0_20px_45px_rgba(0,0,0,.12)]
-          transition-all
-          duration-300
-          ${
-            isOpen
-              ? "opacity-100 scale-100 translate-y-0 visible"
-              : "opacity-0 scale-95 -translate-y-2 invisible"
-          }
-        `}
+        className={` absolute left-0 top-full z-50 mt-3 w-56 origin-top-right rounded-2xl border border-[#ECE8FF] bg-white/95 backdrop-blur-xl shadow-[0_20px_45px_rgba(0,0,0,.12)] transition-all duration-300
+          ${isOpen? "opacity-100 scale-100 translate-y-0 visible": "opacity-0 scale-95 -translate-y-2 invisible"}`}
       >
         <div className="p-2">
           {options.map((item) => (
@@ -152,24 +100,10 @@ const FilterButton = ({
               key={item}
               type="button"
               onClick={() => handleSelect(item)}
-              className={`
-                flex
-                w-full
-                items-center
-                justify-between
-                rounded-xl
-                px-4
-                py-3
-                text-right
-                transition-all
-                duration-200
-
-                ${
-                  selectedFilter === item
+              className={` flex w-full items-center justify-between rounded-xl px-4 py-3 text-right transition-all duration-200 ${selectedFilter === item
                     ? "bg-gradient-to-r from-[#6D5DF6] to-[#8B7BFF] text-white shadow-md"
                     : "hover:bg-[#F6F4FF] text-[#444]"
-                }
-              `}
+                }`}
             >
               <span className="font-medium">{item}</span>
 

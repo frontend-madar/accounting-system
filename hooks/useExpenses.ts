@@ -6,6 +6,7 @@ import type {
   CreateExpensePayload,
   UpdateExpensePayload,
   GetExpensesParams,
+  ExportExpensesEmailParams,
 } from "@/types/expense.types";
 
 export const EXPENSES_QUERY_KEY = "expenses";
@@ -22,7 +23,6 @@ export function useExpenses(params: GetExpensesParams = {}) {
   });
 }
 
-/** Fetches a single expense by id — used to populate the update form. Disabled until an id is provided. */
 export function useExpense(id: string | null) {
   return useQuery({
     queryKey: [EXPENSES_QUERY_KEY, id],
@@ -117,6 +117,55 @@ export function useDeleteExpense() {
     },
     onError: (error) => {
       toast.error(getErrorMessage(error, "حدث خطأ أثناء حذف المصروف"));
+    },
+  });
+}
+
+function downloadBlob(blob: Blob, filename: string) {
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(url);
+}
+
+export function useExportExpensesPdf() {
+  return useMutation({
+    mutationFn: (params: GetExpensesParams = {}) => expenseService.exportExpensesPdf(params),
+    onSuccess: (blob) => {
+      downloadBlob(blob, `expenses-${new Date().toISOString().slice(0, 10)}.pdf`);
+      toast.success("تم تنزيل الملف بنجاح");
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error, "تعذر تصدير الملف"));
+    },
+  });
+}
+
+export function useExportExpensesExcel() {
+  return useMutation({
+    mutationFn: (params: GetExpensesParams = {}) => expenseService.exportExpensesExcel(params),
+    onSuccess: (blob) => {
+      downloadBlob(blob, `expenses-${new Date().toISOString().slice(0, 10)}.xlsx`);
+      toast.success("تم تنزيل الملف بنجاح");
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error, "تعذر تصدير الملف"));
+    },
+  });
+}
+
+export function useExportExpensesEmail() {
+  return useMutation({
+    mutationFn: (params: ExportExpensesEmailParams) => expenseService.exportExpensesEmail(params),
+    onSuccess: (res) => {
+      toast.success(res.message || "تم إرسال الملف بالبريد الإلكتروني بنجاح");
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error, "تعذر إرسال الملف بالبريد الإلكتروني"));
     },
   });
 }

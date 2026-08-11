@@ -1,28 +1,49 @@
 "use client";
 
+import * as React from "react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 
-interface SecondaryButtonProps {
+interface SecondaryButtonBaseProps {
     text: string;
     icon?: React.ReactNode;
-    href?: string;
     className?: string;
-    onClick?: () => void;
-    type?: "button" | "submit" | "reset";
     disabled?: boolean;
 }
 
-const SecondaryButton = ({
-    text,
-    icon,
-    href,
-    className,
-    onClick,
-    type = "button",
-    disabled = false,
-}: SecondaryButtonProps) => {
+interface SecondaryButtonAsLink
+    extends SecondaryButtonBaseProps,
+    Omit<React.ComponentPropsWithoutRef<"a">, keyof SecondaryButtonBaseProps | "type"> {
+    href: string;
+    onClick?: () => void;
+    type?: never;
+}
+
+interface SecondaryButtonAsButton
+    extends SecondaryButtonBaseProps,
+    Omit<React.ComponentPropsWithoutRef<"button">, keyof SecondaryButtonBaseProps | "type"> {
+    href?: undefined;
+    onClick?: () => void;
+    type?: "button" | "submit" | "reset";
+}
+
+type SecondaryButtonProps = SecondaryButtonAsLink | SecondaryButtonAsButton;
+
+const SecondaryButton = React.forwardRef<
+    HTMLButtonElement | HTMLAnchorElement,
+    SecondaryButtonProps
+>((props, ref) => {
+    const {
+        text,
+        icon,
+        href,
+        className,
+        onClick,
+        disabled = false,
+        ...rest
+    } = props;
+
     const buttonClass = cn(
         "inline-flex items-center justify-center gap-2",
         "w-full md:w-[246px]",
@@ -47,7 +68,13 @@ const SecondaryButton = ({
 
     if (href) {
         return (
-            <Link href={href} className={buttonClass} onClick={onClick}>
+            <Link
+                href={href}
+                className={buttonClass}
+                onClick={onClick}
+                ref={ref as React.Ref<HTMLAnchorElement>}
+                {...(rest as Omit<React.ComponentPropsWithoutRef<"a">, "href" | "className" | "onClick">)}
+            >
                 {icon && (
                     <span className="flex h-5 w-5 items-center justify-center">
                         {icon}
@@ -58,21 +85,27 @@ const SecondaryButton = ({
         );
     }
 
+    const { type = "button" } = props as SecondaryButtonAsButton;
+
     return (
         <Button
             type={type}
             disabled={disabled}
             onClick={onClick}
             className={buttonClass}
+            ref={ref as React.Ref<HTMLButtonElement>}
+            {...(rest as Omit<React.ComponentPropsWithoutRef<"button">, "type" | "disabled" | "className" | "onClick">)}
         >
             {icon && (
                 <span className="flex h-5 w-5 items-center justify-center">
                     {icon}
                 </span>
             )}
-            <span>{text}</span>
+            {text && <span>{text}</span>}
         </Button>
     );
-};
+});
+
+SecondaryButton.displayName = "SecondaryButton";
 
 export default SecondaryButton;

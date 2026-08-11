@@ -8,11 +8,12 @@ interface AuthState {
   isAuthenticated: boolean;
   setSession: (user: AuthUser, token: string, expiresInSeconds: number) => void;
   logout: () => void;
+  clearSession: () => void;
 }
 
 export const useAuthStore = create<AuthState>()(
   persist(
-    (set) => ({
+    (set, get) => ({
       user: null,
       isAuthenticated: false,
       setSession: (user, token, expiresInSeconds) => {
@@ -23,11 +24,12 @@ export const useAuthStore = create<AuthState>()(
         tokenStorage.clear();
         set({ user: null, isAuthenticated: false });
       },
+      
+      clearSession: () => get().logout(),
     }),
     {
-      name: "auth-storage", // key under which this is stored
+      name: "auth-storage",
       storage: createJSONStorage(() => localStorage),
-      // Only persist these two fields — don't persist functions.
       partialize: (state) => ({
         user: state.user,
         isAuthenticated: state.isAuthenticated,
@@ -35,4 +37,3 @@ export const useAuthStore = create<AuthState>()(
     }
   )
 );
-

@@ -11,9 +11,13 @@ import FillterButton from "../FillterButton";
 import SearchInput from "../SearchInput";
 import EmptyState from "../shared/EmptyState";
 import { UpdateCreditAccountForm } from "./UpdateCreditAccountForm";
+import { ExportDropdown } from "../shared/ExportDropdown";
 import {
   useDeferredAccounts,
   useDeleteDeferredAccount,
+  useExportDeferredAccountsPdf,
+  useExportDeferredAccountsExcel,
+  useExportDeferredAccountsEmail,
 } from "@/hooks/use-deferred-account";
 import { useDebounce } from "@/hooks/use-debounce";
 import type { DeferredAccountItem } from "@/types/deferred-account.types";
@@ -74,6 +78,11 @@ export function CreditAccountsTableSection({
 
   const { mutate: deleteAccount, isPending: isDeleting } = useDeleteDeferredAccount();
 
+  // NEW: Export hooks
+  const { mutate: exportPdf, isPending: isExportingPdf } = useExportDeferredAccountsPdf();
+  const { mutate: exportExcel, isPending: isExportingExcel } = useExportDeferredAccountsExcel();
+  const { mutate: exportEmail, isPending: isExportingEmail } = useExportDeferredAccountsEmail();
+
   const columns = useMemo(
     () =>
       getCreditAccountColumns({
@@ -82,6 +91,25 @@ export function CreditAccountsTableSection({
       }),
     []
   );
+
+  // NEW: Export handlers
+  function handleExportPdf() {
+    exportPdf({
+      status: statusParam,
+      search: debouncedQuery.trim() || undefined,
+    });
+  }
+
+  function handleExportExcel() {
+    exportExcel({
+      status: statusParam,
+      search: debouncedQuery.trim() || undefined,
+    });
+  }
+
+  function handleExportEmail(email: string) {
+    exportEmail({ to: email });
+  }
 
   return (
     <section className={className}>
@@ -95,19 +123,34 @@ export function CreditAccountsTableSection({
       ) : (
         <>
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
+            <div className="w-full md:w-auto">
               <SearchInput query={query} setQuery={setQuery} setPage={setPage} />
             </div>
-            <div className="flex flex-col md:flex-row md:items-center gap-2">
+            <div className="flex flex-col md:flex-row md:items-center gap-2 w-full md:w-auto">
               <FillterButton
                 options={STATUS_OPTIONS}
                 selectedFilter={statusFilter}
                 onFilterChange={handleStatusFilterChange}
+                className="md:w-auto w-full"
               />
+              
+              {/* NEW: Export Dropdown */}
+              <ExportDropdown
+                label="تصدير"
+                className="md:w-auto w-full"
+                isExportingPdf={isExportingPdf}
+                isExportingExcel={isExportingExcel}
+                isExportingEmail={isExportingEmail}
+                onExportPdf={handleExportPdf}
+                onExportExcel={handleExportExcel}
+                onExportEmail={handleExportEmail}
+              />
+
               <MainButton
                 text={addButtonLabel}
                 href="/dashboard/credit-accounts/create"
                 icon={<Plus className="h-4 w-4" />}
+                className="md:w-auto w-full"
               />
             </div>
           </div>

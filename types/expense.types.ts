@@ -124,3 +124,7 @@ export interface GetExpenseDashboardResponse {
   message: string;
   data: ExpenseDashboardStats;
 }
+
+export interface ExportExpensesEmailParams {
+  to: string;
+}

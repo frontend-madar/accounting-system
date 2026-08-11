@@ -16,8 +16,9 @@ type InviteAccountantFormValues = z.infer<typeof inviteAccountantSchema>;
 type FieldErrors = Partial<Record<keyof InviteAccountantFormValues, string>>;
 
 interface InviteFromProps {
-    onClose?: () => void;
+    onClose?: () => void;  
 }
+ 
 
 export function InviteFrom({ onClose }: InviteFromProps) {
     const [fieldErrors, setFieldErrors] = useState<FieldErrors>({});
@@ -66,15 +67,15 @@ export function InviteFrom({ onClose }: InviteFromProps) {
     }
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-            {/* Backdrop */}
+        <div className="fixed inset-0 w-screen z-50 flex items-center justify-center">
+            {/* Backdrop - full screen */}
             <div
                 className="absolute inset-0 bg-black/50 backdrop-blur-md animate-in fade-in duration-300"
                 onClick={onClose}
             />
 
-            {/* Modal */}
-            <div className="relative w-full max-w-lg animate-in fade-in zoom-in-95 slide-in-from-bottom-4 duration-300">
+            {/* Modal - centered with max width */}
+            <div className="relative w-full max-w-lg mx-4 animate-in fade-in zoom-in-95 slide-in-from-bottom-4 duration-300">
                 <div className="bg-white rounded-3xl shadow-2xl shadow-[#40369F]/10 p-6 md:p-8 relative border border-[#F0F0F2]">
                     {/* Close Button */}
                     <button

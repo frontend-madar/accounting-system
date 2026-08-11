@@ -8,6 +8,7 @@ import type {
   UpdateDailyEntryPayload,
   UpdateDailyEntryResponse,
   DeleteDailyEntryResponse,
+  ExportDailyEntriesEmailParams,
 } from "@/types/daily-entry.types";
 
 export const dailyEntryService = {
@@ -34,5 +35,27 @@ export const dailyEntryService = {
   deleteDailyEntry: (id: string) =>
     api
       .delete<DeleteDailyEntryResponse>(`/daily-entries/${id}`)
+      .then((res) => res.data),
+   
+  exportDailyEntriesPdf: () =>
+    api
+      .get("/export/daily-entries/pdf", {
+         responseType: "blob"
+      })
+      .then((res) => res.data as Blob),
+
+  exportDailyEntriesExcel: () =>
+    api
+      .get("/export/daily-entries/excel", {
+        responseType: "blob",
+      })
+      .then((res) => res.data as Blob),
+
+  exportDailyEntriesEmail: ({ to }: ExportDailyEntriesEmailParams) =>
+    api
+      .post<{ success: boolean; message: string }>(
+        "/export/daily-entries/email",
+        { to }
+      )
       .then((res) => res.data),
 };

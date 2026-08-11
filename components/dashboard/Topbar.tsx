@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, ChevronDown, ChevronLeft, Search, LogOut, Menu, Home } from "lucide-react";
+import { Check, ChevronDown, ChevronLeft, Search, LogOut, Menu, Home, Loader2 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -14,7 +14,7 @@ import {
     DropdownMenuLabel,
     DropdownMenuGroup,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
+import { useLogout } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
@@ -22,6 +22,8 @@ import { TopbarHomeIcon, TopbarNotificationIcon } from "@/icons";
 import { useAuthStore } from "@/store/auth-store";
 import { useUiStore } from "@/store/ui-store";
 import { useUnreadNotificationsCount } from "@/hooks/use-notification";
+import { useGetProfile } from "@/hooks/use-profile";
+import { useProfileStore } from "@/store/profile.store";
 
 interface LanguageOption {
     code: string;
@@ -71,14 +73,19 @@ export function Topbar({
 }: TopbarProps) {
     const router = useRouter();
     const user = useAuthStore((s) => s.user);
-    const logout = useAuthStore((s) => s.logout);
+    const { data: profileResponse } = useGetProfile();
+    const profile = useProfileStore((s) => s.profile) || profileResponse?.data;
+
+    const { mutate: logout, isPending: isLoggingOut } = useLogout();
     const toggleMobileSidebar = useUiStore((s) => s.toggleMobileSidebar);
+
 
     const { data: unreadRes } = useUnreadNotificationsCount();
     const unreadCount = unreadRes?.data?.count ?? 0;
 
-    const userName = user?.businessName || user?.businessName || "المستخدم";
-    const userEmail = user?.email || "user@example.com";
+    const userName = profile?.name || user?.businessName || "المستخدم";
+    const userEmail = profile?.email || user?.email || "user@example.com";
+    const userAvatar = profile?.avatar || avatarSrc || "/user.png";
 
     const [language, setLanguage] = useState<LanguageOption>(
         LANGUAGE_OPTIONS.find((option) => option.code === defaultLanguage) ??
@@ -92,7 +99,6 @@ export function Topbar({
 
     function handleLogout() {
         logout();
-        router.push("/login");
     }
 
     return (
@@ -134,7 +140,7 @@ export function Topbar({
                 </button>
 
                 {/* Language */}
-                <DropdownMenu>
+                {/* <DropdownMenu>
                     <DropdownMenuTrigger
                         aria-label="اللغة / الدولة"
                         className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-border sm:h-10 sm:w-10"
@@ -171,7 +177,7 @@ export function Topbar({
                             </DropdownMenuItem>
                         ))}
                     </DropdownMenuContent>
-                </DropdownMenu>
+                </DropdownMenu> */}
 
                 {/* Notifications */}
                 <Link
@@ -197,13 +203,15 @@ export function Topbar({
                         <ChevronDown className="h-3.5 w-3.5 text-muted-foreground sm:h-4 sm:w-4" />
 
                         <Avatar className="h-9 w-9 sm:h-10 sm:w-10">
-                            <AvatarImage src={avatarSrc} alt={userName} />
+                            <AvatarImage src={userAvatar} alt={userName} />
                             <AvatarFallback>{userName.slice(0, 1)}</AvatarFallback>
                         </Avatar>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-56" sideOffset={8}>
                         <DropdownMenuGroup>
-                            <DropdownMenuLabel className="font-normal flex flex-col gap-1.5 p-2">
+                            <DropdownMenuLabel onClick={() => {
+                                router.push('/dashboard/profile')
+                            }} className="font-normal flex flex-col gap-1.5 p-2 cursor-pointer">
                                 <p className="text-sm font-medium leading-none text-[#0F1219]">{userName}</p>
                                 <p className="text-xs leading-none text-muted-foreground">
                                     {userEmail}
@@ -212,16 +220,24 @@ export function Topbar({
                         </DropdownMenuGroup>
                         <DropdownMenuSeparator />
                         <DropdownMenuItem
-                            onClick={handleLogout}
-                            className="text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer flex items-center gap-2 p-2"
+                            onClick={(e) => {
+                                e.preventDefault(); // keep menu mounted until the mutation finishes
+                                handleLogout();
+                            }}
+                            disabled={isLoggingOut}
+                            className="text-red-600 focus:bg-red-50 focus:text-red-600 cursor-pointer flex items-center gap-2 p-2 disabled:opacity-60 disabled:cursor-not-allowed"
                         >
-                            <LogOut className="h-4 w-4" />
-                            <span className="font-medium">تسجيل الخروج</span>
+                            {isLoggingOut ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                                <LogOut className="h-4 w-4" />
+                            )}
+                            <span className="font-medium">
+                                {isLoggingOut ? "جاري تسجيل الخروج..." : "تسجيل الخروج"}
+                            </span>
                         </DropdownMenuItem>
                     </DropdownMenuContent>
                 </DropdownMenu>
-
-
             </div>
         </header>
     );

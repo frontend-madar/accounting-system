@@ -7,6 +7,7 @@ interface SearchInputProps {
   setQuery?: (query: string) => void;
   setPage?: (page: number) => void;
   placeholder?: string;
+  className?: string;
 }
 
 const SearchInput = ({
@@ -14,12 +15,14 @@ const SearchInput = ({
   setQuery,
   setPage,
   placeholder,
+  className,
 }: SearchInputProps) => {
   return (
-    <div className="relative w-full ">
+    <div className={cn("relative w-full", className)}>
       {/* Search Icon */}
       <Search
-        className=" pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#8B90A0] " />
+        className="pointer-events-none absolute right-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#9CA3AF] transition-colors duration-200 group-focus-within:text-[#40369F]"
+      />
 
       <Input
         type="search"
@@ -29,7 +32,23 @@ const SearchInput = ({
           setQuery?.(e.target.value);
           setPage?.(1);
         }}
-        className={cn( "h-12", "rounded-2xl", "border border-[#D8D2F6]", "bg-[#FCFCFE]", "pr-12 pl-4", "text-right text-[15px]", "placeholder:text-[#A0A4AE]", "shadow-sm", "transition-colors duration-200", "focus:border-[#40369F]", "focus:ring-2 focus:ring-[#40369F]/10", "focus:bg-white")}
+        className={cn(
+          "h-[47px] w-full",
+          "rounded-xl",
+          "border border-[#C8C2FC]",
+          "bg-white",
+          "pr-12 pl-4",
+          "text-right text-[15px] text-[#232323]",
+          "placeholder:text-[#9CA3AF]",
+          "shadow-sm",
+          "transition-colors duration-200",
+          "hover:border-[#837CC9]",
+          "focus-visible:border-[#40369F]",
+          "focus-visible:ring-2",
+          "focus-visible:ring-[#40369F]/20",
+          "focus-visible:outline-none",
+          "placeholder:text-right",
+        )}
       />
     </div>
   );

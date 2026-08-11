@@ -17,7 +17,8 @@ import type {
   InviteAccountantPayload,
   InviteAccountantResponse,
   AcceptInvitationPayload,
-  AcceptInvitationResponse,
+  RefreshTokenResponse,
+  LogoutResponse,
 } from "@/types/auth.types";
 
 export const authService = {
@@ -43,5 +44,11 @@ export const authService = {
     api.post<InviteAccountantResponse>("/auth/invite-accountant", payload).then((res) => res.data),
 
   acceptInvitation: (payload: AcceptInvitationPayload) =>
-    api.post<AcceptInvitationResponse>("/auth/accept-invitation", payload).then((res) => res.data),
+    api.post<any>("/auth/accept-invitation", payload).then((res) => res.data),
+
+  refreshToken: () =>
+    api.post<RefreshTokenResponse>("/auth/refresh").then((res) => res.data),
+
+  logout: () =>
+    api.post<LogoutResponse>("/auth/logout").then((res) => res.data),
 };

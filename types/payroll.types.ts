@@ -18,7 +18,7 @@ export interface PaginatedList<T> {
 
 // ── Payroll Run ──────────────────────────────────────────────────────────────
 
-export type PayrollRunStatus = "مسودة" | "معتمدة" | "لم يتم الاختيار";
+export type PayrollRunStatus = "مسودة" | "معتمدة" | "كانسل";
 
 export interface PayrollDetailEmployee {
   id: string;
@@ -82,7 +82,7 @@ export interface CreatePayrollRunPayload {
 export type UpdatePayrollRunPayload = Partial<CreatePayrollRunPayload>;
 
 export interface UpdatePayrollRunStatusPayload {
-  status: "مسودة" | "معتمدة";
+  status: PayrollRunStatus;
 }
 
 // ── Payroll Run API Response Types ───────────────────────────────────────────
@@ -121,4 +121,15 @@ export interface GetPayrollRunsParams {
   search?: string;
   month?: number;
   year?: number;
+}
+
+ 
+export interface ExportPayrollRunsEmailParams {
+  to: string;
+}
+
+export interface ExportPayrollRunsResponse {
+  success: boolean;
+  message: string;
+  data?: Blob | any;
 }

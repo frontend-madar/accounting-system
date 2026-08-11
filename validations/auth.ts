@@ -23,6 +23,7 @@ export const DEPARTMENT_OPTIONS = [
 
 export const signupSchema = z.object({
   businessName: z.string().min(2, "الاسم التجاري مطلوب"),
+  name: z.string().min(2, "الاسم مطلوب"),
   email: z.string().email("بريد إلكتروني غير صالح"),
   countryCode: z.string().min(1, "كود الدولة مطلوب"),
   phone: z.string().min(6, "رقم الهاتف غير صالح"),

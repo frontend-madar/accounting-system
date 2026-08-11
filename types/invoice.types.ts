@@ -108,3 +108,7 @@ export interface DeleteInvoiceIncludeResponse {
   message: string;
   data?: InvoiceItem;
 }
+
+export interface ExportInvoicesEmailParams {
+  to: string;
+}

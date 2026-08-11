@@ -13,6 +13,11 @@ const SERVICE_TYPE_STYLES: Record<string, string> = {
     "فنادق": "bg-[#EFE7FB] text-[#7A4FCF]",
 };
 
+const STATUS_STYLES: Record<string, string> = {
+    "مكتمل": "bg-[#E6F6F4] text-[#1BA915]",
+    "غير مكتمل": "bg-[#FCEADF] text-[#E0673A]",
+};
+
 function formatDate(iso: string): string {
     return iso ? new Date(iso).toLocaleDateString("ar-EG") : "-";
 }
@@ -40,6 +45,18 @@ function ServiceTypeBadges({ types }: { types: string[] }) {
                 </span>
             ))}
         </div>
+    );
+}
+
+function StatusBadge({ status }: { status: string }) {
+    return (
+        <span
+            className={`inline-flex items-center rounded-full px-3 py-1 text-[13px] font-medium ${
+                STATUS_STYLES[status] ?? "bg-[#F1F1F3] text-[#5C5F63]"
+            }`}
+        >
+            {status}
+        </span>
     );
 }
 
@@ -108,6 +125,11 @@ export function getVendorColumns({
             cell: ({ row }) => (
                 <CurrencyCell amount={row.original.remainingAmount} currency={row.original.currency} />
             ),
+        },
+        {
+            accessorKey: "status",
+            header: "الحالة",
+            cell: ({ row }) => <StatusBadge status={row.original.status} />,
         },
         {
             id: "actions",

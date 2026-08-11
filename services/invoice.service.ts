@@ -10,6 +10,7 @@ import type {
   DeleteInvoiceResponse,
   DeleteInvoicePaymentResponse,
   DeleteInvoiceIncludeResponse,
+  ExportInvoicesEmailParams,
 } from "@/types/invoice.types";
 
 export const invoiceService = {
@@ -48,4 +49,29 @@ export const invoiceService = {
     api
       .get(`/invoices/${invoiceId}/pdf`, { responseType: "blob" })
       .then((res) => res.data as Blob),
+
+  exportInvoicesPdf: (params: GetInvoicesParams = {}) =>
+    api
+      .get("/export/invoices/pdf", {
+        params,
+        responseType: "blob",
+      })
+      .then((res) => res.data as Blob),
+
+  exportInvoicesExcel: (params: GetInvoicesParams = {}) =>
+    api
+      .get("/export/invoices/excel", {
+        params,
+        responseType: "blob",
+      })
+      .then((res) => res.data as Blob),
+
+  exportInvoicesEmail: ({ to }: ExportInvoicesEmailParams) =>
+    api
+      .post<{ success: boolean; message: string }>(
+        "/export/invoices/email",
+        {}, // empty JSON body — avoids "null is not valid JSON" on strict body parsers
+        { params: { to } }
+      )
+      .then((res) => res.data),
 };

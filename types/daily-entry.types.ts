@@ -105,3 +105,13 @@ export interface DeleteDailyEntryResponse {
     success: boolean;
     message: string;
 }
+
+export interface ExportDailyEntriesEmailParams {
+  to: string;
+}
+
+export interface ExportDailyEntriesResponse {
+  success: boolean;
+  message: string;
+  data?: Blob | any;
+}

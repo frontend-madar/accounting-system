@@ -20,7 +20,7 @@ export const clientFormSchema = z.object({
 
 export const clientFilterSchema = z.object({
     clientType: z.enum(["individual", "business", ""]).optional(),
-    name: z.string().optional(),
+    search: z.string().optional(),
     mobile: z.string().optional(),
     email: z.string().optional(),
     country: z.string().optional(),

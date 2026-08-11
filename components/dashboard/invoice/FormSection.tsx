@@ -29,14 +29,14 @@ export function FormSection({
         >
             <CardContent className="p-6 md:p-8 ">
                 {/* Header */}
-                <div className="mb-8 flex items-center gap-4">
+                {title && <div className="mb-8 flex items-center gap-4">
                     <div className="h-10 w-1.5 rounded-full bg-gradient-to-b from-[#463BAF] to-[#0e065e]" />
 
                     <h2 className="text-xl font-bold   text-slate-900 md:text-2xl">
                         {title}
                     </h2>
 
-                </div>
+                </div>}
 
                 {/* Fields */}
                 <div

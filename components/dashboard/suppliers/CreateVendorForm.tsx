@@ -195,6 +195,7 @@ export function CreateSupplierForm() {
                     label="المدفوع"
                     placeholder="ادخل المبلغ المدفوع"
                     inputMode="numeric"
+                    type="number"
                     error={errors.amountPaid?.message}
                     {...register("amountPaid")}
                 />

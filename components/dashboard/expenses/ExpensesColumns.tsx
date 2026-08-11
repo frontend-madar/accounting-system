@@ -1,20 +1,15 @@
 "use client";
 
 import * as React from "react";
-import { MoreVertical, Paperclip, Pencil, Trash2 } from "lucide-react";
+import { Paperclip } from "lucide-react";
 import { ColumnDef } from "@tanstack/react-table";
 
 import { Checkbox } from "@/components/ui/checkbox";
-import {
-    DropdownMenu,
-    DropdownMenuTrigger,
-    DropdownMenuContent,
-    DropdownMenuItem,
-} from "@/components/ui/dropdown-menu";
 import { ExpenseStatusBadge } from "./ExpenseStatusBadge";
 import { ExpenseRecord } from "@/types/expense.types";
 import Link from "next/link";
-
+import { TableRowActions } from "../shared/TableRowActions";
+ 
 interface GetExpenseColumnsOptions {
     onDelete?: (row: ExpenseRecord) => void;
     onEdit?: (row: ExpenseRecord) => void;
@@ -72,7 +67,7 @@ export function getExpenseColumns({
             header: "المرفقات",
             cell: ({ row }) =>
                 row.original.documentUrl ? (
-                  <Link  
+                    <Link
                         href={row.original.documentUrl}
                         target="_blank"
                         rel="noopener noreferrer"
@@ -89,24 +84,13 @@ export function getExpenseColumns({
             id: "actions",
             header: "",
             cell: ({ row }) => (
-                <DropdownMenu>
-                    <DropdownMenuTrigger className="text-muted-foreground">
-                        <MoreVertical className="h-4 w-4" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem onClick={() => onEdit?.(row.original)}>
-                            <Pencil className="h-4 w-4" />
-                            تعديل
-                        </DropdownMenuItem>
-                        <DropdownMenuItem
-                            onClick={() => onDelete?.(row.original)}
-                            className="text-red-600 focus:text-red-600"
-                        >
-                            <Trash2 className="h-4 w-4" />
-                            حذف
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                <TableRowActions
+                    row={row.original}
+                    onEdit={onEdit}
+                    onDelete={onDelete}
+                    editLabel="تعديل"
+                    deleteLabel="حذف"
+                />
             ),
         },
     ];

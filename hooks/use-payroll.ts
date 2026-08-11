@@ -1,5 +1,3 @@
-// hooks/use-payroll.ts
-
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
 import { payrollService } from "@/services/payroll.service";
@@ -11,6 +9,7 @@ import type {
   GetPayrollRunsParams,
   GetPayrollDetailsParams,
   UpdatePayrollDetailPayload,
+  ExportPayrollRunsEmailParams,
 } from "@/types/payroll.types";
 
 // ── Query Keys ───────────────────────────────────────────────────────────────
@@ -156,6 +155,68 @@ export function useDeletePayrollDetail() {
     },
     onError: (error) => {
       toast.error(getErrorMessage(error, "حدث خطأ أثناء حذف سجل الراتب"));
+    },
+  });
+}
+
+// ── Export Functions ─────────────────────────────────────────────────────────
+
+/** Download helper */
+function downloadBlob(blob: Blob, filename: string) {
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(url);
+}
+
+/** Export single payroll run as PDF */
+export function useExportPayrollRunPdf() {
+  return useMutation({
+    mutationFn: (id: string) => payrollService.exportPayrollRunPdf(),
+    onSuccess: (blob, id) => {
+      downloadBlob(
+        blob, 
+        `payroll-run-${id}-${new Date().toISOString().slice(0, 10)}.pdf`
+      );
+      toast.success("تم تنزيل الملف بنجاح");
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error, "تعذر تصدير الملف"));
+    },
+  });
+}
+
+/** Export single payroll run as Excel */
+export function useExportPayrollRunExcel() {
+  return useMutation({
+    mutationFn: (id: string) => payrollService.exportPayrollRunExcel(),
+    onSuccess: (blob, id) => {
+      downloadBlob(
+        blob, 
+        `payroll-run-${id}-${new Date().toISOString().slice(0, 10)}.xlsx`
+      );
+      toast.success("تم تنزيل الملف بنجاح");
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error, "تعذر تصدير الملف"));
+    },
+  });
+}
+
+/** Export single payroll run via email */
+export function useExportPayrollRunEmail() {
+  return useMutation({
+    mutationFn: ({ id, to }: { id: string; to: string }) =>
+      payrollService.exportPayrollRunEmail({  to }),
+    onSuccess: (res) => {
+      toast.success(res.message || "تم إرسال الملف بالبريد الإلكتروني بنجاح");
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error, "تعذر إرسال الملف بالبريد الإلكتروني"));
     },
   });
 }

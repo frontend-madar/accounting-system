@@ -34,7 +34,11 @@ export default function RootLayout({
         <Providers>
           {/* <DevToolsBlocker />  */}
           {children}
-          <Toaster position="top-right" richColors />
+          <Toaster
+            position="top-right"
+            richColors
+            dir="rtl"
+          />
         </Providers>
       </body>
     </html>

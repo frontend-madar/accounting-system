@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { SUPPLIER_CURRENCIES } from "@/types/supplier.types";
+import { SUPPLIER_STATUS_OPTIONS } from "@/types/supplier.types";
 
 export const SUPPLIER_CURRENCY_OPTIONS = [
     { label: "ريال سعودي (SAR)", value: "SAR" },
@@ -17,6 +18,11 @@ export const SUPPLIER_SERVICE_TYPE_OPTIONS = [
     { label: "استقبال", value: "استقبال" },
     { label: "فنادق", value: "فنادق" },
 ];
+
+export const SUPPLIER_STATUS_SELECT_OPTIONS = SUPPLIER_STATUS_OPTIONS.map((status) => ({
+    label: status,
+    value: status,
+}));
 
 const PHONE_REGEX = /^\+?\d{8,15}$/;
 
@@ -49,6 +55,9 @@ export const supplierFormSchema = z
             .min(1, "المبلغ المدفوع مطلوب")
             .regex(/^\d+(\.\d+)?$/, "المبلغ المدفوع يجب أن يكون رقمًا")
             .refine((val) => Number(val) >= 0, "المبلغ المدفوع يجب ألا يكون سالبًا"),
+        status: z.enum(SUPPLIER_STATUS_OPTIONS, {
+            message: "الحالة مطلوبة",
+        }),
     })
     .refine((data) => new Date(data.returnDate) >= new Date(data.travelDate), {
         message: "تاريخ العودة يجب أن يكون بعد تاريخ السفر",

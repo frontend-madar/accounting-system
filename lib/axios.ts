@@ -1,11 +1,12 @@
 // axios.ts
-
-import axios, { AxiosError } from "axios";
+import axios, { AxiosError, InternalAxiosRequestConfig } from "axios";
 import { tokenStorage } from "./token-storage";
+import { useAuthStore } from "@/store/auth-store";
 
 export const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
   headers: { "Content-Type": "application/json" },
+  withCredentials: true, // required so the httpOnly refreshToken cookie is sent
 });
 
 api.interceptors.request.use((config) => {
@@ -16,16 +17,94 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
+interface RetriableConfig extends InternalAxiosRequestConfig {
+  _retry?: boolean;
+}
+
+let isRefreshing = false;
+let pendingQueue: Array<{
+  resolve: (token: string) => void;
+  reject: (error: unknown) => void;
+}> = [];
+
+function processQueue(error: unknown, token: string | null) {
+  pendingQueue.forEach(({ resolve, reject }) => {
+    if (error || !token) reject(error);
+    else resolve(token);
+  });
+  pendingQueue = [];
+}
+
+function redirectToLogin() {
+  if (typeof window !== "undefined" && window.location.pathname !== "/login") {
+    window.location.href = "/login";
+  }
+}
+
+function forceLogout() {
+  tokenStorage.clear();
+  useAuthStore.getState().clearSession();
+  redirectToLogin();
+}
+
 api.interceptors.response.use(
   (response) => response,
-  (error: AxiosError) => {
-    if (error.response?.status === 401) {
-      tokenStorage.clear();
-      if (typeof window !== "undefined" && window.location.pathname !== "/login") {
-        window.location.href = "/login";
-      }
+  async (error: AxiosError) => {
+    const originalRequest = error.config as RetriableConfig | undefined;
+
+    if (!originalRequest || error.response?.status !== 401) {
+      return Promise.reject(error);
     }
-    return Promise.reject(error);
+
+    // The refresh call itself (or login) failing 401 means the session is dead — stop here.
+    if (originalRequest.url?.includes("/auth/refresh")) {
+      forceLogout();
+      return Promise.reject(error);
+    }
+
+    // Already retried once after a refresh — don't loop forever.
+    if (originalRequest._retry) {
+      forceLogout();
+      return Promise.reject(error);
+    }
+
+    if (isRefreshing) {
+      // A refresh is already in flight — queue this request until it resolves.
+      return new Promise((resolve, reject) => {
+        pendingQueue.push({
+          resolve: (token) => {
+            originalRequest.headers.Authorization = `Bearer ${token}`;
+            resolve(api(originalRequest));
+          },
+          reject,
+        });
+      });
+    }
+
+    originalRequest._retry = true;
+    isRefreshing = true;
+
+    try {
+      const { data } = await api.post<{
+        data: { accessToken: string; expiresIn: number; user: any };
+      }>("/auth/refresh");
+
+      const { accessToken, expiresIn, user } = data.data;
+
+      tokenStorage.set(accessToken, expiresIn);
+      useAuthStore.getState().setSession(user, accessToken, expiresIn);
+
+      processQueue(null, accessToken);
+
+      originalRequest.headers.Authorization = `Bearer ${accessToken}`;
+      return api(originalRequest);
+    } catch (refreshError) {
+      processQueue(refreshError, null);
+      forceLogout();
+      return Promise.reject(refreshError);
+    } finally {
+      isRefreshing = false;
+    }
   }
 );
 

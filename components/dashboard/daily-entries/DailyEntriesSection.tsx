@@ -6,7 +6,6 @@ import { Plus } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { DailyEntriesTable } from "./DailyEntriesTable";
- 
 import { useDailyEntries, useDeleteDailyEntry } from "@/hooks/use-daily-entry";
 import { useDebounce } from "@/hooks/use-debounce";
 import type { DailyEntryItem } from "@/types/daily-entry.types";
@@ -15,6 +14,12 @@ import SearchInput from "../SearchInput";
 import MainButton from "../shared/MainButton";
 import { DataTablePagination } from "../Pagination";
 import { ConfirmDeleteDialog } from "../shared/ConfirmDeleteDialog";
+import { ExportDropdown } from "../shared/ExportDropdown";
+import {
+  useExportDailyEntriesPdf,
+  useExportDailyEntriesExcel,
+  useExportDailyEntriesEmail,
+} from "@/hooks/use-daily-entry";
 
 const PAGE_SIZE = 6;
 
@@ -42,17 +47,56 @@ export function DailyEntriesSection({ className }: DailyEntriesSectionProps) {
 
   const { mutate: deleteEntry, isPending: isDeleting } = useDeleteDailyEntry();
 
+  // Export hooks
+  const { mutate: exportPdf, isPending: isExportingPdf } = useExportDailyEntriesPdf();
+  const { mutate: exportExcel, isPending: isExportingExcel } = useExportDailyEntriesExcel();
+  const { mutate: exportEmail, isPending: isExportingEmail } = useExportDailyEntriesEmail();
+
+  // Export handlers
+  const handleExportPdf = () => {
+    exportPdf({
+      search: debouncedQuery.trim() || undefined,
+      page,
+      limit: PAGE_SIZE,
+    });
+  };
+
+  const handleExportExcel = () => {
+    exportExcel({
+      search: debouncedQuery.trim() || undefined,
+      page,
+      limit: PAGE_SIZE,
+    });
+  };
+
+  const handleExportEmail = (email: string) => {
+    exportEmail({ to: email });
+  };
+
   return (
     <section className={className}>
-      <div className="flex items-center justify-between gap-4">
-        <div>
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div className="w-full md:w-auto">
           <SearchInput query={query} setQuery={setQuery} setPage={setPage} />
         </div>
-        <div className="flex items-center gap-4">
+        <div className="flex flex-col md:flex-row md:items-center gap-2 w-full md:w-auto">
+          {/* Export Dropdown */}
+          <ExportDropdown
+            label="تصدير"
+            className="md:w-auto w-full"
+            isExportingPdf={isExportingPdf}
+            isExportingExcel={isExportingExcel}
+            isExportingEmail={isExportingEmail}
+            onExportPdf={handleExportPdf}
+            onExportExcel={handleExportExcel}
+            onExportEmail={handleExportEmail}
+          />
+
           <MainButton
             text="إضافة عميل"
             icon={<Plus className="h-4 w-4" />}
             onClick={() => router.push("/dashboard/daily-entries/create")}
+            className="md:w-auto w-full"
           />
         </div>
       </div>

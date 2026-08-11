@@ -12,6 +12,7 @@ import type {
   GetExpenseAccountsResponse,
   GetExpensePeriodsResponse,
   GetExpenseDashboardResponse,
+  ExportExpensesEmailParams,
 } from "@/types/expense.types";
 
 // `document` is a file upload, so create/update go out as multipart form-data.
@@ -70,4 +71,29 @@ export const expenseService = {
 
   getDashboardStats: () =>
     api.get<GetExpenseDashboardResponse>("/expenses/dashboard").then((res) => res.data),
+
+  exportExpensesPdf: (params: GetExpensesParams = {}) =>
+    api
+      .get("/export/expenses/pdf", {
+        params,
+        responseType: "blob",
+      })
+      .then((res) => res.data as Blob),
+
+  exportExpensesExcel: (params: GetExpensesParams = {}) =>
+    api
+      .get("/export/expenses/excel", {
+        params,
+        responseType: "blob",
+      })
+      .then((res) => res.data as Blob),
+
+  exportExpensesEmail: ({ to }: ExportExpensesEmailParams) =>
+    api
+      .post<{ success: boolean; message: string }>(
+        "/export/expenses/email",
+        {}, // empty JSON body — avoids "null is not valid JSON" on strict body parsers
+        { params: { to } }
+      )
+      .then((res) => res.data),
 };

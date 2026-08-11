@@ -3,7 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { PaginationState, RowSelectionState } from "@tanstack/react-table";
 import { getEmployeeSelectionColumns, Employee } from "./Employeecolumns";
-import { SelectFilter } from "./Selectfilter";
+import FillterButton from "../FillterButton";
 import SearchInput from "../SearchInput";
 import { DataTable } from "../DataTable";
 import { DataTablePagination } from "../Pagination";
@@ -12,7 +12,7 @@ import { useDepartmentStore } from "@/store/department.store";
 import { EmployeeData } from "@/types/employee.types";
 
 const PAGE_SIZE = 10;
-const ALL_DEPARTMENTS = "all";
+const ALL_DEPARTMENTS_LABEL = "جميع الاقسام";
 
 /** Maps the API EmployeeData shape to the column-friendly Employee shape. */
 function toTableRow(e: EmployeeData): Employee {
@@ -41,7 +41,7 @@ export function PayrollEmployeeSelectionSection({
     className,
 }: PayrollEmployeeSelectionSectionProps) {
      const [query, setQuery] = useState("");
-    const [department, setDepartment] = useState(ALL_DEPARTMENTS);
+    const [department, setDepartment] = useState(ALL_DEPARTMENTS_LABEL);
     const [rowSelection, setRowSelection] = useState<RowSelectionState>(() => {
         if (!initialSelectedIds) return {};
         return Object.fromEntries(initialSelectedIds.map((id) => [id, true]));
@@ -59,17 +59,14 @@ export function PayrollEmployeeSelectionSection({
     }, [fetchDepartments]);
 
     const departmentOptions = useMemo(
-        () => [
-            { label: "جميع الاقسام", value: ALL_DEPARTMENTS },
-            ...departments.map((d) => ({ label: d, value: d })),
-        ],
+        () => [ALL_DEPARTMENTS_LABEL, ...departments],
         [departments]
     );
 
     // ── Server-side data ────────────────────────────────────────────────────
     const { data: employeesRes, isLoading } = useEmployees({
         search: query || undefined,
-        department: department === ALL_DEPARTMENTS ? undefined : department,
+        department: department === ALL_DEPARTMENTS_LABEL ? undefined : department,
         page: pagination.pageIndex + 1,
         limit: pagination.pageSize,
     });
@@ -102,6 +99,11 @@ export function PayrollEmployeeSelectionSection({
         setPagination((prev) => ({ ...prev, pageIndex: 0 }));
     }
 
+    function handleDepartmentFilterChange(value: string) {
+        setDepartment(value);
+        resetToFirstPage();
+    }
+
     return (
         <section className={`${className}  bg-white p-4 rounded-2xl ctm-shadow`} >
             <div>
@@ -118,20 +120,13 @@ export function PayrollEmployeeSelectionSection({
                         placeholder="بحث عن موظف..."
                     />
 
-                    <div className="flex items-center  gap-2 w-[250px] h-[50px] px-4  rounded-lg border border-border">
-                        <span className="text-[14px] text-[#0F1219] font-medium">القسم:</span>
-                        <SelectFilter
-                            value={department}
-                            className="border-none text-[#0F1219] font-medium"
-                            onChange={(value) => {
-                                setDepartment(value);
-                                resetToFirstPage();
-                            }}
-                            options={departmentOptions}
-                        />
-                    </div>
+                    <FillterButton
+                        options={departmentOptions}
+                        selectedFilter={department}
+                        onFilterChange={handleDepartmentFilterChange}
+                    />
                 </div>
-                <div className=" text-center  md:text-[20px] text-[#676A6E]">
+                <div className=" text-center  md:text-[18px] text-[#676A6E]">
                     تم تحديد {selectedCount} من {totalRecords}
                 </div>
 

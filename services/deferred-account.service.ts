@@ -7,6 +7,7 @@ import type {
   UpdateDeferredAccountPayload,
   UpdateDeferredAccountResponse,
   DeleteDeferredAccountResponse,
+  ExportDeferredAccountsEmailParams,
 } from "@/types/deferred-account.types";
 
 export const deferredAccountService = {
@@ -34,5 +35,30 @@ export const deferredAccountService = {
   deleteDeferredAccount: (accountId: string) =>
     api
       .delete<DeleteDeferredAccountResponse>(`/deferred-accounts/${accountId}`)
+      .then((res) => res.data),
+
+  exportDeferredAccountsPdf: (params: GetDeferredAccountsParams = {}) =>
+    api
+      .get("/export/deferred-accounts/pdf", {
+        params,
+        responseType: "blob",
+      })
+      .then((res) => res.data as Blob),
+
+  exportDeferredAccountsExcel: (params: GetDeferredAccountsParams = {}) =>
+    api
+      .get("/export/deferred-accounts/excel", {
+        params,
+        responseType: "blob",
+      })
+      .then((res) => res.data as Blob),
+
+  exportDeferredAccountsEmail: ({ to }: ExportDeferredAccountsEmailParams) =>
+    api
+      .post<{ success: boolean; message: string }>(
+        "/export/deferred-accounts/email",
+        {}, // empty JSON body
+        { params: { to } }
+      )
       .then((res) => res.data),
 };

@@ -7,6 +7,7 @@ import type {
   GetInvoicesParams,
   CreateInvoicePayload,
   UpdateInvoicePayload,
+  ExportInvoicesEmailParams,
 } from "@/types/invoice.types";
 
 export const INVOICES_QUERY_KEY = "invoices";
@@ -143,6 +144,55 @@ export function useDownloadInvoicePdf() {
     },
     onError: (error) => {
       toast.error(getErrorMessage(error, "حدث خطأ أثناء تحميل الفاتورة"));
+    },
+  });
+}
+
+function downloadBlob(blob: Blob, filename: string) {
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(url);
+}
+
+export function useExportInvoicesPdf() {
+  return useMutation({
+    mutationFn: (params: GetInvoicesParams = {}) => invoiceService.exportInvoicesPdf(params),
+    onSuccess: (blob) => {
+      downloadBlob(blob, `invoices-${new Date().toISOString().slice(0, 10)}.pdf`);
+      toast.success("تم تنزيل الملف بنجاح");
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error, "تعذر تصدير الملف"));
+    },
+  });
+}
+
+export function useExportInvoicesExcel() {
+  return useMutation({
+    mutationFn: (params: GetInvoicesParams = {}) => invoiceService.exportInvoicesExcel(params),
+    onSuccess: (blob) => {
+      downloadBlob(blob, `invoices-${new Date().toISOString().slice(0, 10)}.xlsx`);
+      toast.success("تم تنزيل الملف بنجاح");
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error, "تعذر تصدير الملف"));
+    },
+  });
+}
+
+export function useExportInvoicesEmail() {
+  return useMutation({
+    mutationFn: (params: ExportInvoicesEmailParams) => invoiceService.exportInvoicesEmail(params),
+    onSuccess: (res) => {
+      toast.success(res.message || "تم إرسال الملف بالبريد الإلكتروني بنجاح");
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error, "تعذر إرسال الملف بالبريد الإلكتروني"));
     },
   });
 }

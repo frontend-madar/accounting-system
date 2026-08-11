@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { Loader2, Mail, CheckCircle, Clock, ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -13,7 +13,7 @@ import { toast } from "sonner";
 
 const RESEND_INTERVAL_SECONDS = 60;
 
-export default function VerifyOtp() {
+function VerifyOtpForm() {
   const searchParams = useSearchParams();
   const email = searchParams.get("email") ?? "";
 
@@ -219,5 +219,22 @@ export default function VerifyOtp() {
         {" "} الخاصة بالنظام.
       </div>
     </div>
+  );
+}
+
+function VerifyOtpFallback() {
+  return (
+    <div className="w-full md:p-6 flex flex-col justify-center items-center min-h-screen md:min-h-auto gap-3">
+      <Loader2 className="h-8 w-8 animate-spin text-[#40369F]" />
+      <p className="text-sm text-[#6C7075]">جارِ التحميل...</p>
+    </div>
+  );
+}
+
+export default function VerifyOtp() {
+  return (
+    <Suspense fallback={<VerifyOtpFallback />}>
+      <VerifyOtpForm />
+    </Suspense>
   );
 }

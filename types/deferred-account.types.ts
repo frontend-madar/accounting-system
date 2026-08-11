@@ -105,3 +105,14 @@ export interface UpdateDeferredAccountPayload {
   status?: string;
   payments?: UpdateDeferredAccountPaymentPayload[];
 }
+
+
+export interface ExportDeferredAccountsEmailParams {
+  to: string;
+}
+
+export interface ExportDeferredAccountsResponse {
+  success: boolean;
+  message: string;
+  data?: Blob | any;
+}

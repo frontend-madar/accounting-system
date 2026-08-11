@@ -2,30 +2,27 @@
 
 import * as React from "react";
 import { useMemo, useState } from "react";
-import { Plus, Download, Loader2 } from "lucide-react";
+import { Plus } from "lucide-react";
 
 import { DataTable } from "../DataTable";
 import { DataTablePagination } from "../Pagination";
 import { getVendorColumns } from "./Vendorscolumns";
 import { UpdateSupplierForm } from "./UpdateSupplierForm";
 import MainButton from "../shared/MainButton";
-import SecondaryButton from "../shared/SecondaryButton";
+import { ExportDropdown } from "../shared/ExportDropdown";
 import SearchInput from "../SearchInput";
-import { useSuppliers, useDeleteSupplier, useExportSuppliersPdf } from "@/hooks/use-supplier";
+import {
+  useSuppliers,
+  useDeleteSupplier,
+  useExportSuppliersPdf,
+  useExportSuppliersExcel,
+  useExportSuppliersEmail,
+} from "@/hooks/use-supplier";
 import { useDebounce } from "@/hooks/use-debounce";
 import type { SupplierData } from "@/types/supplier.types";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { ConfirmDeleteDialog } from "../shared/ConfirmDeleteDialog";
 
-const PAGE_SIZE = 9;
+const PAGE_SIZE = 10;
 
 interface VendorsTableSectionProps {
   title?: string;
@@ -59,7 +56,9 @@ export function VendorsTableSection({
     search: debouncedQuery || undefined,
   });
   const { mutate: deleteSupplier, isPending: isDeleting } = useDeleteSupplier();
-  const { mutate: exportPdf, isPending: isExporting } = useExportSuppliersPdf();
+  const { mutate: exportPdf, isPending: isExportingPdf } = useExportSuppliersPdf();
+  const { mutate: exportExcel, isPending: isExportingExcel } = useExportSuppliersExcel();
+  const { mutate: exportEmail, isPending: isExportingEmail } = useExportSuppliersEmail();
 
   const rows = suppliersRes?.data.data ?? [];
   const totalRecords = suppliersRes?.data.total ?? 0;
@@ -69,10 +68,17 @@ export function VendorsTableSection({
     setPage(1);
   }
 
-  function handleExport() {
-    // Export honors the current search filter, matching what the user is looking at.
+  function handleExportPdf() {
     exportPdf({ search: debouncedQuery || undefined });
   }
+
+  function handleExportExcel() {
+    exportExcel({ search: debouncedQuery || undefined });
+  }
+
+  function handleExportEmail(email: string) {
+  exportEmail({ to: email });
+}
 
   function confirmDelete() {
     if (!supplierToDelete) return;
@@ -99,19 +105,17 @@ export function VendorsTableSection({
         </div>
 
         <div className="flex flex-col sm:flex-row items-center w-full sm:w-auto gap-2">
-          <SecondaryButton
-            text={exportButtonLabel}
-            icon={
-              isExporting ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Download className="h-4 w-4" />
-              )
-            }
+          <ExportDropdown
+            label={exportButtonLabel}
             className="sm:!w-[111px] w-full"
-            onClick={handleExport}
-            disabled={isExporting}
+            isExportingPdf={isExportingPdf}
+            isExportingExcel={isExportingExcel}
+            isExportingEmail={isExportingEmail}
+            onExportPdf={handleExportPdf}
+            onExportExcel={handleExportExcel}
+            onExportEmail={handleExportEmail}
           />
+
           <MainButton
             text={addButtonLabel}
             icon={<Plus className="h-4 w-4" />}
@@ -153,25 +157,14 @@ export function VendorsTableSection({
         />
       </section>
 
-      <AlertDialog
+      <ConfirmDeleteDialog
         open={!!supplierToDelete}
         onOpenChange={(open) => !open && setSupplierToDelete(null)}
-      >
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
-            <AlertDialogDescription>
-              هل أنت متأكد من حذف المورد {supplierToDelete?.supplierName}؟ لا يمكن التراجع عن هذا الإجراء.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>إلغاء</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} disabled={isDeleting}>
-              حذف
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+        isLoading={isDeleting}
+        title="تأكيد الحذف"
+        description={`هل أنت متأكد من حذف المورد ${supplierToDelete?.supplierName}؟ لا يمكن التراجع عن هذا الإجراء.`}
+        onConfirm={confirmDelete}
+      />
 
       <UpdateSupplierForm
         supplierId={supplierIdToEdit}

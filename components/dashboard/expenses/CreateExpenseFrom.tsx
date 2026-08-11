@@ -6,9 +6,6 @@ import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Save, X } from "lucide-react";
 
-import { Textarea } from "@/components/ui/textarea";
-import { Card } from "@/components/ui/card";
-
 import { FormSection } from "../invoice/FormSection";
 import { InvoiceTextField } from "../invoice/TextField";
 import { SelectField } from "../invoice/SelectField";
@@ -25,8 +22,8 @@ import type { ExpenseCurrency } from "@/types/expense.types";
 import { DateField } from "../Datefield";
 import { useExpenseOptionsStore } from "@/store/expense.store";
 import { NotesCard } from "../shared/NotesCard";
+import { CreatableSelectField } from "../shared/CreatableSelectField";
 
-// Fixed currency list from the API contract.
 const CURRENCY_OPTIONS = [
     { label: "SAR", value: "SAR" },
     { label: "EGP", value: "EGP" },
@@ -80,7 +77,7 @@ export function CreateExpenseForm({ onSuccess }: CreateExpenseFormProps) {
     const paymentMethodOptions = useExpenseOptionsStore((s) => s.paymentMethodOptions);
     const accountOptions = useExpenseOptionsStore((s) => s.accountOptions);
 
-    function handleAttachmentSelect(file: File) {
+    function handleAttachmentSelect(file: File | null) {
         attachmentRef.current = file;
     }
 
@@ -156,9 +153,9 @@ export function CreateExpenseForm({ onSuccess }: CreateExpenseFormProps) {
                         control={control}
                         name="category"
                         render={({ field }) => (
-                            <SelectField
+                            <CreatableSelectField
                                 label="فئة المصروف"
-                                placeholder="اختر فئة المصروف"
+                                placeholder="اختر فئة المصروف أو اكتب فئة جديدة"
                                 value={field.value}
                                 onChange={field.onChange}
                                 options={categoryOptions}
@@ -209,7 +206,7 @@ export function CreateExpenseForm({ onSuccess }: CreateExpenseFormProps) {
                 </FormSection>
 
                 <div className="h-full w-full col" >
-                    <SingleAttachmentDropzone onFileSelect={handleAttachmentSelect}  />
+                    <SingleAttachmentDropzone onFileSelect={handleAttachmentSelect} />
                 </div>
             </div>
 
@@ -237,7 +234,7 @@ export function CreateExpenseForm({ onSuccess }: CreateExpenseFormProps) {
                 {...register("notes")}
             />
 
-            <div className="flex flex-col md:flex-row items-center justify-end gap-3 pt-5">
+            <div className="flex flex-col md:flex-row items-center justify-start gap-3 pt-5">
                 <MainButton
                     type="button"
                     onClick={onSubmitPaid}

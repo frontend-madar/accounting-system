@@ -7,6 +7,7 @@ import type {
   CreateSupplierPayload,
   UpdateSupplierPayload,
   GetSuppliersParams,
+  ExportSuppliersEmailParams,
 } from "@/types/supplier.types";
 
 export const SUPPLIERS_QUERY_KEY = "suppliers";
@@ -18,7 +19,6 @@ export function useSuppliers(params: GetSuppliersParams = {}) {
   });
 }
 
-/** Fetches a single supplier by id — used to populate the update form. Disabled until an id is provided. */
 export function useSupplier(id: string | null) {
   return useQuery({
     queryKey: [SUPPLIERS_QUERY_KEY, id],
@@ -75,22 +75,51 @@ export function useDeleteSupplier() {
   });
 }
 
+function downloadBlob(blob: Blob, filename: string) {
+  const url = window.URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+  window.URL.revokeObjectURL(url);
+}
+
 export function useExportSuppliersPdf() {
   return useMutation({
     mutationFn: (params: GetSuppliersParams = {}) => supplierService.exportSuppliersPdf(params),
     onSuccess: (blob) => {
-      const url = window.URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `suppliers-${new Date().toISOString().slice(0, 10)}.pdf`;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      window.URL.revokeObjectURL(url);
+      downloadBlob(blob, `suppliers-${new Date().toISOString().slice(0, 10)}.pdf`);
       toast.success("تم تنزيل الملف بنجاح");
     },
     onError: (error) => {
       toast.error(getErrorMessage(error, "تعذر تصدير الملف"));
+    },
+  });
+}
+
+export function useExportSuppliersExcel() {
+  return useMutation({
+    mutationFn: (params: GetSuppliersParams = {}) => supplierService.exportSuppliersExcel(params),
+    onSuccess: (blob) => {
+      downloadBlob(blob, `suppliers-${new Date().toISOString().slice(0, 10)}.xlsx`);
+      toast.success("تم تنزيل الملف بنجاح");
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error, "تعذر تصدير الملف"));
+    },
+  });
+}
+
+export function useExportSuppliersEmail() {
+  return useMutation({
+    mutationFn: (params: ExportSuppliersEmailParams) => supplierService.exportSuppliersEmail(params),
+    onSuccess: (res) => {
+      toast.success(res.message || "تم إرسال الملف بالبريد الإلكتروني بنجاح");
+    },
+    onError: (error) => {
+      toast.error(getErrorMessage(error, "تعذر إرسال الملف بالبريد الإلكتروني"));
     },
   });
 }

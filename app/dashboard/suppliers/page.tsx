@@ -1,7 +1,6 @@
 import { VendorsTableSection } from '@/components/dashboard/suppliers/Vendorstablesection'
 import { Topbar } from '@/components/dashboard/Topbar'
-import { vendors } from '@/data/data'
-import React from 'react'
+ 
 
 const page = () => {
     return (

@@ -15,6 +15,7 @@ import { useClickOutside } from "@/hooks/UseClickOutside";
 import { DailyLimitsIcon, DashboardIcon, EmployeesIcon, ExpemsessIcon, ForwardAccountsIcon, InvitePersonIcon, IvoicesIcons, LogoutIcon, SalariesIcon, SuppliersIcon } from "@/icons";
 import { InviteFrom } from "../auth/InviteFrom";
 import { useUiStore } from "@/store/ui-store";
+import { useProfileStore } from "@/store/profile.store";
 
 // ---- Types ----
 type SubLink = {
@@ -67,6 +68,7 @@ const NAV_ITEMS: NavItem[] = [
         children: [
             { key: "manage-employees", label: "ادارة الموظفين", href: "/dashboard/employees" },
             { key: "add-employee", label: "اضافة موظف", href: "/dashboard/employees/create" },
+            { key: "reports", label: "التقارير", href: "/dashboard/employees/reports" },
         ],
     },
     {
@@ -99,6 +101,24 @@ const collapsibleLabel = (visible: boolean, extra?: string) =>
         extra
     );
 
+// Gap between icon and label must collapse to 0 alongside the label itself —
+// otherwise a collapsed (zero-width) label still leaves its `gap-*` behind,
+// nudging the icon off-center in the collapsed rail.
+const collapsibleGap = (visible: boolean) => (visible ? "gap-3" : "gap-0");
+
+/** Small floating label shown on hover when the sidebar is collapsed, so the
+ * item's meaning isn't lost just because the text is hidden. Only rendered
+ * (not just hidden) when collapsed, to avoid needless DOM/listeners while expanded. */
+function CollapsedTooltip({ label }: { label: string }) {
+    return (
+        <span
+            className="pointer-events-none absolute right-full top-1/2 z-50 mr-3 -translate-y-1/2 whitespace-nowrap rounded-md bg-[#1B1464] px-2.5 py-1.5 text-[13px] font-medium text-white opacity-0 shadow-lg transition-opacity duration-150 group-hover:opacity-100"
+        >
+            {label}
+        </span>
+    );
+}
+
 export function Sidebar({
     companyName = "اسم الشركة",
     userName = "mohamed ali",
@@ -106,6 +126,11 @@ export function Sidebar({
     avatarSrc = "/user.png",
 }: SidebarProps) {
     const pathname = usePathname();
+    const profile = useProfileStore((s) => s.profile);
+
+    const displayUserName = profile?.name || userName;
+    const displayUserEmail = profile?.email || userEmail;
+    const displayAvatarSrc = profile?.avatar || avatarSrc;
 
     // Auto-open the dropdown whose child matches the current path
     const initialOpen = NAV_ITEMS.find(
@@ -178,17 +203,46 @@ export function Sidebar({
         setOpenDropdown((prev) => (prev === key ? null : key));
     }
 
+    // When the rail is collapsed, a dropdown parent has nowhere to show its
+    // children (they only render while showContent is true) — so clicking
+    // one first expands the sidebar, then opens that dropdown, instead of
+    // silently doing nothing.
+    function handleDropdownClick(key: string) {
+        if (!showContent) {
+            if (isMobileScreen) {
+                setMobileSidebarOpen(true);
+            } else {
+                setIsExpanded(true);
+            }
+            setOpenDropdown(key);
+            return;
+        }
+        toggleDropdown(key);
+    }
+
     return (
-        <aside
-            ref={sidebarRef}
-            className={cn(
-                "flex flex-col rounded-2xl text-white bg-[#695BE1] bg-[linear-gradient(180deg,_#25198A_0%,_rgba(37,25,138,0.35)_104.8%,_rgba(37,25,138,0)_169.64%)] transition-all duration-300 ease-in-out shrink-0 z-[1]",
-                "fixed top-4 bottom-4 right-4 lg:relative lg:top-0 lg:bottom-0 lg:right-0 lg:h-full",
-                isMobileScreen
-                    ? (isMobileSidebarOpen ? "translate-x-0 w-[283px]" : "translate-x-[120%]")
-                    : (isExpanded ? "translate-x-0 w-[283px]" : "translate-x-0 w-[80px]")
-            )}
-        >
+        <>
+            {/* Backdrop overlay for mobile screen */}
+            <div
+                className={cn(
+                    "fixed inset-0 z-40 bg-black/50 transition-opacity duration-300 lg:hidden",
+                    isMobileScreen && isMobileSidebarOpen
+                        ? "opacity-100 pointer-events-auto"
+                        : "opacity-0 pointer-events-none"
+                )}
+                onClick={() => setMobileSidebarOpen(false)}
+            />
+
+            <aside
+                ref={sidebarRef}
+                className={cn(
+                    "flex flex-col rounded-2xl text-white bg-[#695BE1] bg-[linear-gradient(180deg,_#25198A_0%,_rgba(37,25,138,0.35)_104.8%,_rgba(37,25,138,0)_169.64%)] transition-all duration-300 ease-in-out shrink-0 z-50 lg:z-1",
+                    "fixed top-4 bottom-4 right-4 lg:relative lg:top-0 lg:bottom-0 lg:right-0 lg:h-full",
+                    isMobileScreen
+                        ? (isMobileSidebarOpen ? "translate-x-0 w-[283px]" : "translate-x-[120%]")
+                        : (isExpanded ? "translate-x-0 w-[283px]" : "translate-x-0 w-[80px]")
+                )}
+            >
             {/* decorative background pattern */}
             <Image
                 src="/menu-bg.png"
@@ -202,7 +256,13 @@ export function Sidebar({
             <div className="relative z-10 flex h-full flex-col">
                 {/* header / company switcher */}
                 <div className="p-3">
-                    <div className={cn("bg-[#0E1B6B99] flex items-center gap-3 h-[65px] px-3 rounded-xl transition-all duration-300 ease-in-out", !showContent ? "justify-center" : "justify-between")} >
+                    <div
+                        className={cn(
+                            "bg-[#0E1B6B99] flex items-center h-[65px] px-3 rounded-xl transition-all duration-300 ease-in-out",
+                            collapsibleGap(showContent),
+                            !showContent ? "justify-center" : "justify-between"
+                        )}
+                    >
                         <div className={collapsibleLabel(showContent, "flex items-center gap-2")}>
                             <span className="flex-1 text-center text-[17px] font-semibold">
                                 {companyName}
@@ -240,7 +300,8 @@ export function Sidebar({
                                         href={item.href ?? "#"}
                                         type="Link"
                                         className={cn(
-                                            "flex w-full items-center gap-3 rounded-lg px-3 py-3 text-[15px] transition-colors",
+                                            "group relative flex w-full items-center rounded-lg px-3 py-3 text-[15px] transition-all duration-300 ease-in-out",
+                                            collapsibleGap(showContent),
                                             !showContent ? "justify-center" : "justify-start",
                                             "hover:bg-[#0E1B6B99]",
                                             item.href && (
@@ -256,14 +317,17 @@ export function Sidebar({
                                             <item.icon className="h-5 w-5" />
                                         </span>
                                         <span className={collapsibleLabel(showContent, "flex-1 text-right")}>{item.label}</span>
+                                        {!showContent && !isMobileScreen && <CollapsedTooltip label={item.label} />}
                                     </Link>
                                 ) : (
                                     <div>
                                         <button
                                             type="button"
-                                            onClick={() => toggleDropdown(item.key)}
+                                            onClick={() => handleDropdownClick(item.key)}
                                             className={cn(
-                                                "flex w-full items-center gap-3 rounded-lg px-3 py-3 text-[15px] transition-colors hover:bg-[#0E1B6B99]",
+                                                "group relative flex w-full items-center rounded-lg px-3 py-3 text-[15px] transition-all duration-300 ease-in-out hover:bg-[#0E1B6B99]",
+                                                collapsibleGap(showContent),
+                                                !showContent ? "justify-center" : "justify-start",
                                                 item.type === "dropdown" &&
                                                     item.children.some(
                                                         (sub) => pathname === sub.href || pathname.startsWith(sub.href + "/")
@@ -283,6 +347,7 @@ export function Sidebar({
                                                     <ChevronDown className="h-4 w-4 shrink-0" />
                                                 )}
                                             </span>
+                                            {!showContent && !isMobileScreen && <CollapsedTooltip label={item.label} />}
                                         </button>
 
                                         {/* sub-links */}
@@ -363,17 +428,19 @@ export function Sidebar({
                     <div
                         onClick={() => setShowUserMenu((v) => !v)}
                         className={cn(
-                            "flex items-center gap-3 px-5 py-4 border-t border-white/10 cursor-pointer hover:bg-white/5 transition-colors",
+                            "group relative flex items-center px-5 py-4 border-t border-white/10 cursor-pointer hover:bg-white/5 transition-colors",
+                            collapsibleGap(showContent),
                             !showContent ? "justify-center" : "justify-start"
                         )}
                     >
                         <div className="relative h-10 w-10 shrink-0 rounded-full overflow-hidden">
-                            <Image src={avatarSrc} alt={userName} fill className="object-cover" />
+                            <Image src={displayAvatarSrc} alt={displayUserName} fill className="object-cover" />
                         </div>
                         <div className={collapsibleLabel(showContent, "min-w-0 text-right")}>
-                            <p className="truncate text-[16px] font-medium">{userName}</p>
-                            <p className="truncate text-[16px] font-medium opacity-80">{userEmail}</p>
+                            <p className="truncate text-[16px] font-medium">{displayUserName}</p>
+                            <p className="truncate text-[16px] font-medium opacity-80">{displayUserEmail}</p>
                         </div>
+                        {!showContent && !isMobileScreen && <CollapsedTooltip label={displayUserName} />}
                     </div>
                 </div>
 
@@ -381,6 +448,7 @@ export function Sidebar({
 
             </div>
         </aside>
+    </>
     );
 }
 

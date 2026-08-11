@@ -1,5 +1,6 @@
 export interface SignupPayload {
   businessName: string;
+  name: string;
   email: string;
   countryCode: string;
   phone: string;
@@ -26,12 +27,26 @@ export interface AuthUser {
   email: string;
   countryCode: string;
   phone: string;
+  departments: string[];
   isVerified: boolean;
+  role: string;
+  companyId: string;
   provider: string | null;
   socialId: string | null;
   createdAt: string;
   updatedAt: string;
 }
+
+export interface AuthSession {
+  accessToken: string;
+  tokenType: string;
+  expiresIn: number;        // access token TTL (seconds)
+  refreshExpiresIn: number; // refresh token TTL (seconds)
+  user: AuthUser;
+}
+
+export type RefreshTokenResponse = ApiResponse<AuthSession>;
+export type LogoutResponse = ApiResponse<Record<string, never>>;
 
 export interface AuthSession {
   accessToken: string;

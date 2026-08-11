@@ -8,7 +8,7 @@ import { useMemo } from "react";
 import { FormSection } from "../invoice/FormSection";
 import { InvoiceTextField } from "../invoice/TextField";
 import { SelectField } from "../invoice/SelectField";
-import { MultiSelectField } from "../invoice/MultiSelectField"; 
+import { MultiSelectField } from "../invoice/MultiSelectField";
 import MainButton from "../shared/MainButton";
 import SecondaryButton from "../shared/SecondaryButton";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -25,6 +25,7 @@ import {
     SupplierFormValues,
     SUPPLIER_CURRENCY_OPTIONS,
     SUPPLIER_SERVICE_TYPE_OPTIONS,
+    SUPPLIER_STATUS_SELECT_OPTIONS,
 } from "@/validations/supplier-schema";
 import type { UpdateSupplierPayload } from "@/types/supplier.types";
 import { useSyncCurrencies } from "@/hooks/useSyncCurrencies";
@@ -80,6 +81,16 @@ function UpdateSupplierFormSkeleton() {
                 </div>
             </div>
 
+            <div>
+                <Skeleton className="h-5 w-24 mb-4" />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <div className="space-y-2">
+                        <Skeleton className="h-4 w-24" />
+                        <Skeleton className="h-11 w-full rounded-xl" />
+                    </div>
+                </div>
+            </div>
+
             <div className="flex items-center justify-end gap-3 border-t border-border pt-5">
                 <Skeleton className="h-11 w-[130px] rounded-xl" />
                 <Skeleton className="h-11 w-[150px] rounded-xl" />
@@ -126,6 +137,7 @@ export function UpdateSupplierForm({ supplierId, open, onOpenChange }: UpdateSup
                 currency: supplier.currency,
                 servicePrice: String(supplier.servicePrice),
                 amountPaid: String(supplier.amountPaid),
+                status: supplier.status,
             }
             : undefined,
     });
@@ -145,6 +157,7 @@ export function UpdateSupplierForm({ supplierId, open, onOpenChange }: UpdateSup
         if (dirtyFields.currency) payload.currency = values.currency;
         if (dirtyFields.servicePrice) payload.servicePrice = Number(values.servicePrice);
         if (dirtyFields.amountPaid) payload.amountPaid = Number(values.amountPaid);
+        if (dirtyFields.status) payload.status = values.status;
 
         if (Object.keys(payload).length === 0) {
             onOpenChange(false);
@@ -260,9 +273,26 @@ export function UpdateSupplierForm({ supplierId, open, onOpenChange }: UpdateSup
                             <InvoiceTextField
                                 label="المدفوع"
                                 placeholder="ادخل المبلغ المدفوع"
-                                inputMode="numeric"
+                                type="number"
                                 error={errors.amountPaid?.message}
                                 {...register("amountPaid")}
+                            />
+                        </FormSection>
+
+                        <FormSection title="الحالة" gridClassName="!grid-cols-3">
+                            <Controller
+                                control={control}
+                                name="status"
+                                render={({ field }) => (
+                                    <SelectField
+                                        label="حالة المورد"
+                                        placeholder="اختر الحالة"
+                                        value={field.value}
+                                        onChange={field.onChange}
+                                        options={SUPPLIER_STATUS_SELECT_OPTIONS}
+                                        error={errors.status?.message}
+                                    />
+                                )}
                             />
                         </FormSection>
 

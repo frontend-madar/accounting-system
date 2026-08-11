@@ -3,12 +3,16 @@
 import { Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import MainButton from "@/components/dashboard/shared/MainButton";
-import SecondaryButton from "@/components/dashboard/shared/SecondaryButton";
 import { PayrollDetailTableSection } from "@/components/dashboard/payroll/Payrolldetailtablesection";
 import { Topbar } from "@/components/dashboard/Topbar";
-import { Download } from "lucide-react";
+import { ExportDropdown } from "@/components/dashboard/shared/ExportDropdown";
 import { usePayrollRunById, useUpdatePayrollRunStatus } from "@/hooks/use-payroll";
 import { PayrollStatusBadge } from "@/components/dashboard/payroll/Payrollstatusbadge";
+import {
+  useExportPayrollRunPdf,
+  useExportPayrollRunExcel,
+  useExportPayrollRunEmail,
+} from "@/hooks/use-payroll";
 
 function formatDate(iso?: string) {
   if (!iso) return "";
@@ -26,6 +30,11 @@ function PayrollDetailsContent() {
   const { data: runRes, isLoading } = usePayrollRunById(id);
   const { mutate: updateStatus, isPending: isUpdatingStatus } = useUpdatePayrollRunStatus();
 
+  // Export hooks
+  const { mutate: exportPdf, isPending: isExportingPdf } = useExportPayrollRunPdf();
+  const { mutate: exportExcel, isPending: isExportingExcel } = useExportPayrollRunExcel();
+  const { mutate: exportEmail, isPending: isExportingEmail } = useExportPayrollRunEmail();
+
   const run = runRes?.data;
   const periodText = run
     ? `فترة ${formatDate(run.startDate)} – ${formatDate(run.endDate)} · ${(run.details?.length ?? 0)} موظف`
@@ -36,16 +45,22 @@ function PayrollDetailsContent() {
     updateStatus({ id, payload: { status: "معتمدة" } });
   };
 
+  // Export handlers
+  const handleExportPdf = () => {
+    if (id) exportPdf(id);
+  };
+
+  const handleExportExcel = () => {
+    if (id) exportExcel(id);
+  };
+
+  const handleExportEmail = (email: string) => {
+    if (id) exportEmail({ id, to: email });
+  };
+
   return (
     <div className="px-4 space-y-4">
-      <Topbar
-        title=""
-        path="قائمة المرتبات"
-        nestedLink="تفاصيل مسير رواتب"
-        nestedLinkPath="payroll-details"
-        middleNestedLink="تشغيل مسير رواتب"
-        middleNestedLinkPath="/dashboard/payroll"
-      />
+      <Topbar title="تفاصيل مسير الرواتب" />
       <div className="flex flex-col gap-1">
         <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
           <div>
@@ -61,10 +76,15 @@ function PayrollDetailsContent() {
           </div>
 
           <div className="flex flex-col md:flex-row items-center justify-center gap-3">
-            <SecondaryButton
-              text="تصدير"
-              icon={<Download className="h-4 w-4" />}
+            <ExportDropdown
+              label="تصدير"
               className="md:!w-[110px] !w-[100%]"
+              isExportingPdf={isExportingPdf}
+              isExportingExcel={isExportingExcel}
+              isExportingEmail={isExportingEmail}
+              onExportPdf={handleExportPdf}
+              onExportExcel={handleExportExcel}
+              onExportEmail={handleExportEmail}
             />
             {run?.status !== "معتمدة" && (
               <MainButton

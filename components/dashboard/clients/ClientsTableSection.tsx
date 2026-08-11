@@ -13,19 +13,10 @@ import MainButton from "../shared/MainButton";
 import SecondaryButton from "../shared/SecondaryButton";
 import { useClients, useDeleteClient } from "@/hooks/use-client";
 import { ClientData, GetClientsParams } from "@/types/client.types";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
+import { ConfirmDeleteDialog } from "../shared/ConfirmDeleteDialog";
 import { UpdateClientForm } from "./UpdateClientForm";
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 10;
 
 interface ClientsTableSectionProps {
   title?: string;
@@ -93,7 +84,7 @@ export function ClientsTableSection({
             <SecondaryButton
               text={""}
               icon={<RefreshCw className="h-4 w-4" />}
-              className="!w-[187px] sm:!w-12"
+              className="!w-[187px] sm:!w-12 !flex !items-center !justify-center "
               onClick={handleRefresh}
             />
             <MainButton text={addButtonLabel} icon={<Plus className="h-4 w-4" />} className="!w-[187px]" href="clients/create" />
@@ -113,22 +104,14 @@ export function ClientsTableSection({
         />
       </div>
 
-      <AlertDialog open={!!clientToDelete} onOpenChange={(open) => !open && setClientToDelete(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>تأكيد الحذف</AlertDialogTitle>
-            <AlertDialogDescription>
-              هل أنت متأكد من حذف العميل {clientToDelete?.name}؟ لا يمكن التراجع عن هذا الإجراء.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>إلغاء</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmDelete} disabled={isDeleting}>
-              حذف
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      <ConfirmDeleteDialog
+        open={!!clientToDelete}
+        onOpenChange={(open) => !open && setClientToDelete(null)}
+        isLoading={isDeleting}
+        title="تأكيد الحذف"
+        description={`هل أنت متأكد من حذف العميل ${clientToDelete?.name}؟ لا يمكن التراجع عن هذا الإجراء.`}
+        onConfirm={confirmDelete}
+      />
 
       <UpdateClientForm
         client={clientToEdit}

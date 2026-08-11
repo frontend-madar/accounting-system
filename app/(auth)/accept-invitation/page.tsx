@@ -1,10 +1,12 @@
-
-import { AcceptInvitationForm } from "@/components/auth/AcceptInvitationForm"
+import { Suspense } from "react";
+import { AcceptInvitationForm } from "@/components/auth/AcceptInvitationForm";
 
 const page = () => {
   return (
-    <AcceptInvitationForm />    
-  )
-}
+    <Suspense>
+      <AcceptInvitationForm />
+    </Suspense>
+  );
+};
 
-export default page
+export default page;
