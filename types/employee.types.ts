@@ -73,3 +73,9 @@ export interface GetEmployeesParams {
   limit?: number;
   sortBy?: "asc" | "desc";
 }
+
+export interface GetEmployeeByIdResponse {
+    success: boolean;
+    data: EmployeeData;
+    message: string;
+}

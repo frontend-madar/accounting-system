@@ -4,6 +4,12 @@ import { Topbar } from "@/components/dashboard/Topbar";
 import { EmployeeReportIcon, EmployeeTargetIcon } from "@/icons";
 import { useEmployeeReports } from "@/hooks/use-employee-report";
 import { EmployeeReportsTableSection } from "@/components/dashboard/employee-report/EmployeeReportsTableSection";
+import SearchInput from "@/components/dashboard/SearchInput";
+import { InvoiceTextField } from "@/components/dashboard/invoice/TextField";
+import { useMemo, useState } from "react";
+import { SelectField } from "@/components/dashboard/invoice/SelectField";
+import { useEmployees } from "@/hooks/use-employee";
+import { useExpensePeriods } from "@/hooks/useExpenses";
 
 export default function EmployeeReportsPage() {
   const { data: reportsRes } = useEmployeeReports({
@@ -12,39 +18,52 @@ export default function EmployeeReportsPage() {
   });
 
   const totalTarget = reportsRes?.data.totalTarget ?? 0;
-  const totalClients = reportsRes?.data.totalClients ?? 0;
+
+  const [selectedEmployeeId, setSelectedEmployeeId] = useState("");
+  const [selectedPeriod, setSelectedPeriod] = useState("");
+  const { data: employeesRes } = useEmployees({ limit: 100 });
+  const employeeList = useMemo(() => employeesRes?.data?.data || [], [employeesRes]);
+  const { data: periodsRes } = useExpensePeriods();
+
+  const employeeOptions = useMemo(
+    () => employeeList.map((e) => ({ label: e.fullName, value: e.id })),
+    [employeeList]
+  );
+
+  const periodOptions = useMemo(
+    () => (periodsRes?.data ?? []).map((p) => ({ label: p.label, value: p.value })),
+    [periodsRes]
+  );
 
   return (
     <div className="space-y-5 px-4">
       <Topbar title="التقارير" />
 
-      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {/* Employee Performance Card */}
-        <div className="rounded-2xl ctm-shadow bg-white p-5 col-span-2">
-          <div className="flex gap-2 items-center mb-5">
+      <div className='grid md:grid-cols-2 lg:grid-cols-3 gap-5' >
+
+        <div className='rounded-2xl ctm-shadow bg-white p-5 lg:col-span-2' >
+          <div className='flex gap-2 items-center mb-5' >
             <EmployeeReportIcon />
-            <h3 className="text-[22px] text-[#0F1219] font-medium">
-              أداء الموظفين
-            </h3>
+            <h3 className=" text-[22px] text-[#0F1219] font-medium ">     اداء الموظفيين   </h3>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-4">
+          <div className="grid md:grid-cols-2 gap-4 "  >
             <div>
-              <p className="text-[14px] font-semibold text-[#232323] md:text-[17px] mb-2">
-                إجمالي التارجت
-              </p>
-              <h2 className="text-[32px] font-bold text-[#40369F]">
-                {totalTarget.toLocaleString()} ر.س
-              </h2>
+              <SelectField
+                label="اسم الموظف المسؤول"
+                placeholder="اختر الموظف المسؤول"
+                options={employeeOptions}
+                value={selectedEmployeeId}
+                onChange={setSelectedEmployeeId}
+              />
             </div>
-            <div>
-              <p className="text-[14px] font-semibold text-[#232323] md:text-[17px] mb-2">
-                إجمالي العملاء
-              </p>
-              <h2 className="text-[32px] font-bold text-[#40369F]">
-                {totalClients}
-              </h2>
-            </div>
+            <SelectField
+              label="الفترة"
+              placeholder="آخر 30 يوم"
+              options={periodOptions}
+              value={selectedPeriod}
+              onChange={setSelectedPeriod}
+            />
           </div>
         </div>
 

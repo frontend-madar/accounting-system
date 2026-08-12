@@ -13,6 +13,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { ExportDropdown } from "../shared/ExportDropdown";
 import { ConfirmDeleteDialog } from "../shared/ConfirmDeleteDialog";
 import { ExpenseForm } from "./UpdateExpenseFrom";
+import { Button } from "@/components/ui/button";
 
 interface ExpensesTableSectionProps {
     title?: string;
@@ -130,7 +131,7 @@ export function ExpensesTableSection({
     return (
         <>
             <section className={`rounded-2xl bg-white ctm-shadow p-5 ${className ?? ""}`}>
-                <div className="flex items-center justify-between gap-4">
+                <div className="flex md:items-center flex-col md:flex-row  justify-between gap-4">
                     <h2 className="text-[18px] font-semibold text-[#232323]">{title}</h2>
 
                     <div className="flex items-center gap-2">
@@ -145,31 +146,31 @@ export function ExpensesTableSection({
                             onExportEmail={handleExportEmail}
                         />
 
-                        <button
+                        <Button
                             type="button"
                             onClick={onRefresh}
                             aria-label="تحديث"
-                            className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#E4E2E9]"
+                            className="bg-white text-[#1B1B1B] flex h-11 w-11 items-center justify-center rounded-xl border border-[#E4E2E9] hover:bg-[#F8F7FF] hover:border-[#BFB5F2]"
                         >
                             <RefreshCw
-                                className={`h-4 w-4 text-muted-foreground ${isLoading ? "animate-spin" : ""
+                                className={`h-4 w-4 text-[#1B1B1B] ${isLoading ? "animate-spin" : ""
                                     }`}
                             />
-                        </button>
+                        </Button>
 
-                        <button
+                        <Button
                             type="button"
                             onClick={onSortToggle}
                             aria-label="ترتيب"
-                            className="flex h-11 w-11 items-center justify-center rounded-xl border border-[#E4E2E9]"
+                            className="bg-white text-[#1B1B1B] flex h-11 w-11 items-center justify-center rounded-xl border border-[#E4E2E9] hover:bg-[#F8F7FF] hover:border-[#BFB5F2]"
                         >
-                            <ArrowUpDown className="h-4 w-4 text-muted-foreground" />
-                        </button>
+                            <ArrowUpDown className="h-4 w-4 text-[#1B1B1B]" />
+                        </Button>
                     </div>
                 </div>
 
                 <div className="mt-4 overflow-x-auto">
-                    <DataTable columns={columns} data={data} />
+                    <DataTable columns={columns} data={data} isLoading={isLoading} />
                 </div>
 
                 <DataTablePagination

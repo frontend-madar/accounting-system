@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import { useEffect, useMemo } from "react";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -282,7 +281,7 @@ export function UpdateDailyEntryForm({ entryId }: UpdateDailyEntryFormProps) {
           name="employeeId"
           render={({ field }) => (
             <SelectField
-              label="اسم الموظف المسؤول"
+              label="اسم الموظف المسؤول"  
               placeholder="اختر الموظف المسؤول"
               value={field.value}
               onChange={field.onChange}

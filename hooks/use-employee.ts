@@ -20,6 +20,15 @@ export function useEmployees(params: GetEmployeesParams = {}) {
   });
 }
 
+export function useEmployeeById(id: string | null) {
+  return useQuery({
+    queryKey: [EMPLOYEES_QUERY_KEY, "detail", id],
+    queryFn: () => employeeService.getEmployeeById(id as string),
+    select: (res) => res.data,
+    enabled: !!id,
+  });
+}
+
 export function useCreateEmployee() {
   const router = useRouter();
   const queryClient = useQueryClient();

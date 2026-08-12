@@ -21,16 +21,6 @@ import {
 } from "@/hooks/use-deferred-account";
 import { useDebounce } from "@/hooks/use-debounce";
 import type { DeferredAccountItem } from "@/types/deferred-account.types";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/components/ui/alert-dialog";
 import { ConfirmDeleteDialog } from "../shared/ConfirmDeleteDialog";
 
 const PAGE_SIZE = 10;
@@ -117,7 +107,7 @@ export function CreditAccountsTableSection({
         <EmptyState
           title="لا يوجد حسابات آجلة حتى الآن"
           description="إضافة بيانات عميل جديد لتسجيل معاملاته المالية ومتابعة أرصدته المستحقة."
-          buttonText={addButtonLabel}
+          buttonText={"اضافة حساب"}
           href="/dashboard/credit-accounts/create"
         />
       ) : (

@@ -20,6 +20,7 @@ import { MultiSelectField } from "./MultiSelectField";
 import { DateField } from "../Datefield";
 import MainButton from "../shared/MainButton";
 import SecondaryButton from "../shared/SecondaryButton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import { useClients } from "@/hooks/use-client";
 import { useEmployees } from "@/hooks/use-employee";
@@ -30,6 +31,67 @@ import { useCurrencyStore } from "@/store/currency.store";
 
 interface UpdateInvoiceFormProps {
     invoiceId: string;
+}
+
+function UpdateInvoiceFormSkeleton() {
+    return (
+        <div className="space-y-8 rounded-2xl ctm-shadow bg-white p-2 md:p-6">
+            <Skeleton className="mx-auto h-8 w-52 md:mx-0" />
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="col-span-2 space-y-3">
+                    <Skeleton className="h-5 w-28" />
+                    <div className="grid md:grid-cols-2 gap-4">
+                        {Array.from({ length: 2 }).map((_, i) => (
+                            <div key={i} className="space-y-2">
+                                <Skeleton className="h-4 w-20" />
+                                <Skeleton className="h-11 w-full rounded-md" />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+                <div className="space-y-3">
+                    <Skeleton className="h-5 w-24" />
+                    <div className="space-y-2">
+                        <Skeleton className="h-4 w-20" />
+                        <Skeleton className="h-11 w-full rounded-md" />
+                    </div>
+                </div>
+            </div>
+
+            <div className="space-y-3">
+                <Skeleton className="h-5 w-28" />
+                <div className="grid md:grid-cols-2 gap-4">
+                    {Array.from({ length: 2 }).map((_, i) => (
+                        <div key={i} className="space-y-2">
+                            <Skeleton className="h-4 w-20" />
+                            <Skeleton className="h-11 w-full rounded-md" />
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <div className="space-y-3">
+                <Skeleton className="h-5 w-24" />
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {Array.from({ length: 3 }).map((_, i) => (
+                        <div key={i} className="space-y-2">
+                            <Skeleton className="h-4 w-20" />
+                            <Skeleton className="h-11 w-full rounded-md" />
+                        </div>
+                    ))}
+                </div>
+                <Skeleton className="h-6 w-24" />
+                <Skeleton className="h-24 w-full rounded-md" />
+                <Skeleton className="h-11 w-full rounded-md" />
+            </div>
+
+            <div className="flex flex-col md:flex-row md:items-center gap-3 border-t border-border pt-5">
+                <Skeleton className="h-11 w-[150px] rounded-md" />
+                <Skeleton className="h-11 w-[110px] rounded-md" />
+            </div>
+        </div>
+    );
 }
 
 export function UpdateInvoiceForm({ invoiceId }: UpdateInvoiceFormProps) {
@@ -131,11 +193,7 @@ export function UpdateInvoiceForm({ invoiceId }: UpdateInvoiceFormProps) {
     }
 
     if (isInvoiceLoading || !invoice) {
-        return (
-            <div className="flex h-40 items-center justify-center rounded-2xl bg-white ctm-shadow text-muted-foreground">
-                جاري التحميل...
-            </div>
-        );
+        return <UpdateInvoiceFormSkeleton />;
     }
 
     return (

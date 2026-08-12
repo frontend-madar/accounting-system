@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import SecondaryButton from "./SecondaryButton";
 import { EmailPromptDialog } from "./mailPromptDialog";
- 
+
 interface ExportDropdownProps {
   label?: string;
   className?: string;
@@ -40,30 +40,26 @@ export function ExportDropdown({
     onExportEmail(email);
   }
 
-  // Close the dialog once the email export settles (success or error handled by caller's toast).
-  React.useEffect(() => {
-    if (!isExportingEmail && emailDialogOpen) {
-      // Only auto-close after a submit was actually in flight.
-    }
-  }, [isExportingEmail]);
-
   return (
     <>
       <DropdownMenu>
-        <DropdownMenuTrigger disabled={isExporting}>
-          <SecondaryButton
-            text={label}
-            icon={
-              isExporting ? (
-                <Loader2 className="h-4 w-4 animate-spin" />
-              ) : (
-                <Download className="h-4 w-4" />
-              )
-            }
-            className={className}
-            disabled={isExporting}
-          />
-        </DropdownMenuTrigger>
+        <DropdownMenuTrigger
+          disabled={isExporting}
+          render={
+            <SecondaryButton
+              text={label}
+              icon={
+                isExporting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Download className="h-4 w-4" />
+                )
+              }
+              className={className}
+              disabled={isExporting}
+            />
+          }
+        />
         <DropdownMenuContent align="end" className="w-48">
           <DropdownMenuItem
             onClick={onExportPdf}

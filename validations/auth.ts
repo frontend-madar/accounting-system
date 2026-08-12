@@ -63,16 +63,15 @@ export const inviteAccountantSchema = z.object({
 
 // validations/auth.ts — add this
 
-export const acceptInvitationSchema = z
-  .object({
+export const acceptInvitationSchema = z.object({
     token: z.string().min(1),
     email: z.string().email(),
     name: z.string().min(1, "الاسم مطلوب"),
     phone: z.string().min(1, "رقم الهاتف مطلوب"),
+    countryCode: z.string().min(1, "رمز الدولة مطلوب"),
     password: z.string().min(8, "كلمة المرور يجب أن تكون 8 أحرف على الأقل"),
-    confirmPassword: z.string().min(1, "تأكيد كلمة المرور مطلوب"),
-  })
-  .refine((data) => data.password === data.confirmPassword, {
-    message: "كلمة المرور وتأكيدها غير متطابقين",
+    confirmPassword: z.string(),
+}).refine((data) => data.password === data.confirmPassword, {
+    message: "كلمتا المرور غير متطابقتين",
     path: ["confirmPassword"],
-  });
+});

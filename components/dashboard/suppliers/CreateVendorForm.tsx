@@ -11,8 +11,8 @@ import { MultiSelectField } from "../invoice/MultiSelectField";
 import {
     supplierFormSchema,
     SupplierFormValues,
-    SUPPLIER_CURRENCY_OPTIONS,
     SUPPLIER_SERVICE_TYPE_OPTIONS,
+    SUPPLIER_STATUS_SELECT_OPTIONS,
 } from "@/validations/supplier-schema";
 import { useCreateSupplier } from "@/hooks/use-supplier";
 import { useGetClients } from "@/hooks/use-client";
@@ -32,6 +32,7 @@ const EMPTY_VALUES: SupplierFormValues = {
     currency: "SAR",
     servicePrice: "",
     amountPaid: "",
+    status: "غير مكتمل",
 };
 
 export function CreateSupplierForm() {
@@ -73,6 +74,7 @@ export function CreateSupplierForm() {
             currency: values.currency,
             servicePrice: Number(values.servicePrice),
             amountPaid: Number(values.amountPaid),
+            status: values.status,
         });
     }
 
@@ -198,6 +200,20 @@ export function CreateSupplierForm() {
                     type="number"
                     error={errors.amountPaid?.message}
                     {...register("amountPaid")}
+                />
+                <Controller
+                    control={control}
+                    name="status"
+                    render={({ field }) => (
+                        <SelectField
+                            label="الحالة"
+                            placeholder="اختر الحالة"
+                            value={field.value}
+                            onChange={field.onChange}
+                            options={SUPPLIER_STATUS_SELECT_OPTIONS}
+                            error={errors.status?.message}
+                        />
+                    )}
                 />
             </FormSection>
 

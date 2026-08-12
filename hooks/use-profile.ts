@@ -4,6 +4,7 @@ import { profileService } from "@/services/profile.service";
 import { getErrorMessage } from "@/lib/axios";
 import { useProfileStore } from "@/store/profile.store";
 import type { UpdateProfilePayload } from "@/types/profile.types";
+import { accountService } from "@/services/supplier.service";
 
 export const PROFILE_QUERY_KEY = ["profile"];
 
@@ -56,6 +57,32 @@ export function useUpdateAvatar() {
         },
         onError: (error) => {
             toast.error(getErrorMessage(error, "حدث خطأ أثناء تحديث الصورة الشخصية"));
+        },
+    });
+}
+
+
+export const accountsQueryKey = ["accounts"] as const;
+
+export function useAccounts() {
+    return useQuery({
+        queryKey: accountsQueryKey,
+        queryFn: () => accountService.getAccounts(),
+        select: (res) => res.data,
+    });
+}
+
+export function useDeleteAccount() {
+    const queryClient = useQueryClient();
+
+    return useMutation({
+        mutationFn: (id: string) => accountService.deleteAccount(id),
+        onSuccess: (res) => {
+            toast.success(res.message ?? "تم حذف المحاسب بنجاح");
+            queryClient.invalidateQueries({ queryKey: accountsQueryKey });
+        },
+        onError: (error) => {
+            toast.error(getErrorMessage(error, "تعذر حذف المحاسب"));
         },
     });
 }

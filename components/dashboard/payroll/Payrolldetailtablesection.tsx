@@ -8,7 +8,7 @@ import { DataTable } from "../DataTable";
 import { getPayrollDetailColumns } from "./Payrolldetailcolumns";
 import { usePayrollDetails, useUpdatePayrollDetail } from "@/hooks/use-payroll";
 
-const PAGE_SIZE = 9;
+const PAGE_SIZE = 10;
 
 interface PayrollDetailTableSectionProps {
     payrollRunId?: string;

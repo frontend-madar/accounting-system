@@ -16,7 +16,7 @@ import { EmployeeData } from "@/types/employee.types";
 import { ConfirmDeleteDialog } from "../shared/ConfirmDeleteDialog";
 import { UpdateEmployeeForm } from "./UpdateEmployeeForm";
 
-const PAGE_SIZE = 5;
+const PAGE_SIZE = 10;
 
 interface EmployeesTableSectionProps {
   title?: string;
@@ -33,6 +33,8 @@ export function EmployeesTableSection({
   const [filters, setFilters] = useState({ search: "", department: "" });
   const [sortBy, setSortBy] = useState<"asc" | "desc" | undefined>(undefined);
   const [employeeToDelete, setEmployeeToDelete] = useState<EmployeeData | null>(null);
+
+  const [employeeToEditId, setEmployeeToEditId] = useState<string | null>(null);
 
   const { data: employeesRes, isLoading, refetch } = useEmployees({
     ...filters,
@@ -79,7 +81,7 @@ export function EmployeesTableSection({
 
   const columns = useMemo(() =>
     getEmployeeColumns({
-      onEdit: (employee) => setEmployeeToEdit(employee),
+      onEdit: (id) => setEmployeeToEditId(id),
       onDelete: (employee) => setEmployeeToDelete(employee),
     }),
     []
@@ -87,7 +89,7 @@ export function EmployeesTableSection({
 
   return (
     <section className={className ?? ""}>
-     
+
 
       {showEmptyState ? (
         <div className="mt-4">
@@ -100,11 +102,11 @@ export function EmployeesTableSection({
         </div>
       ) : (
         <>
-         <StaffDownsizing onFilterChange={handleFilterChange} />
+          <StaffDownsizing onFilterChange={handleFilterChange} />
           <div className="rounded-2xl bg-white ctm-shadow p-4 mt-4">
-            <div className="flex flex-col md:flex-row items-center justify-between w-full gap-4">
+            <div className="flex flex-col md:flex-row md:items-center justify-between w-full gap-4">
               <h2 className="text-[18px] font-semibold text-[#232323]">{title}</h2>
-              <div className="flex flex-col sm:flex-row items-center gap-2">
+              <div className="flex flex-col md:flex-row md:items-center w-full md:w-auto   gap-2">
                 <SecondaryButton
                   text={""}
                   icon={<RefreshCw className="h-4 w-4" />}
@@ -146,9 +148,9 @@ export function EmployeesTableSection({
       />
 
       <UpdateEmployeeForm
-        employee={employeeToEdit}
-        open={!!employeeToEdit}
-        onOpenChange={(open) => !open && setEmployeeToEdit(null)}
+        employeeId={employeeToEditId}
+        open={!!employeeToEditId}
+        onOpenChange={(open) => !open && setEmployeeToEditId(null)}
       />
     </section>
   );

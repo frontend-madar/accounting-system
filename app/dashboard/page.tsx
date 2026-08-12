@@ -1,3 +1,4 @@
+import { CreditAccountsTableSection } from "@/components/dashboard/credit-accounts/CreditAccountsTableSection";
 import { FinanceChartCard } from "@/components/dashboard/FinanceChartCard";
 import { Invoice } from "@/components/dashboard/InvoicesColumns";
 import { InvoicesStatusCard } from "@/components/dashboard/InvoicesStatusCard";
@@ -58,7 +59,8 @@ export default function DashboardOverviewPage() {
             </div>
 
             <div className="rounded-2xl ctm-shadow bg-white p-5">
-                <InvoicesTableSection data={INVOICES} />
+                {/* <InvoicesTableSection data={INVOICES} /> */}
+                <CreditAccountsTableSection />
             </div>
 
             <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,1fr)]">

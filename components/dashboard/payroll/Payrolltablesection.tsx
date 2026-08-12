@@ -13,8 +13,9 @@ import { UpdatePayrollRunForm } from "./UpdatePayrollRunForm";
 import { usePayrollRuns, useDeletePayrollRun } from "@/hooks/use-payroll";
 import { useRouter } from "next/navigation";
 import type { PayrollRunListItem } from "@/types/payroll.types";
+import FilterButton from "../FillterButton";
 
-const PAGE_SIZE = 9;
+const PAGE_SIZE = 10;
 
 const MONTH_OPTIONS = [
     { label: "الكل", value: "all" },
@@ -119,38 +120,33 @@ export function PayrollTableSection({
                         placeholder="بحث برقم المسير..."
                     />
                 </div>
-                <div className="flex items-center gap-4" >
-
-                    <div className="flex h-12 items-center gap-3 rounded-2xl border border-[#D8D2F6] bg-[#FCFCFE] px-4 shadow-sm transition-all duration-200 hover:border-[#B9B1EC] focus-within:border-[#40369F] focus-within:ring-2 focus-within:ring-[#40369F]/10">
-                        <span className="text-[15px] font-medium text-[#232323] whitespace-nowrap">
-                            الشهر
-                        </span>
-
-                        <SelectFilter
-                            value={month}
-                            onChange={(value) => {
-                                setMonth(value);
+                <div className="flex items-center gap-4">
+                    <FilterButton
+                        options={MONTH_OPTIONS.map((o) => o.label)}
+                        selectedFilter={
+                            MONTH_OPTIONS.find((o) => o.value === month)?.label ?? MONTH_OPTIONS[0].label
+                        }
+                        onFilterChange={(label) => {
+                            const found = MONTH_OPTIONS.find((o) => o.label === label);
+                            if (found) {
+                                setMonth(found.value);
                                 resetToFirstPage();
-                            }}
-                            options={MONTH_OPTIONS}
-                        />
-                    </div>
-                    <div className="flex h-12 items-center gap-3 rounded-2xl border border-[#D8D2F6] bg-[#FCFCFE] px-4 shadow-sm transition-all duration-200 hover:border-[#B9B1EC] focus-within:border-[#40369F] focus-within:ring-2 focus-within:ring-[#40369F]/10">
-                        <span className="text-[15px] font-medium text-[#232323] whitespace-nowrap">
-                            السنة
-                        </span>
+                            }
+                        }}
+                        className="min-w-[170px]"
+                    />
 
-                        <SelectFilter
-                            value={year}
-                            onChange={(value) => {
-                                setYear(value);
-                                resetToFirstPage();
-                            }}
-                            options={YEAR_OPTIONS}
-                            className="w-[130px]"
-                        />
-                    </div>
+                    <FilterButton
+                        options={YEAR_OPTIONS.map((o) => o.value)}
+                        selectedFilter={year}
+                        onFilterChange={(value) => {
+                            setYear(value);
+                            resetToFirstPage();
+                        }}
+                        className="min-w-[130px]"
+                    />
                 </div>
+
             </div>
 
             <div className="mt-10 overflow-hidden bg-white p-4 rounded-2xl ctm-shadow">

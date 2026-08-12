@@ -8,6 +8,7 @@ import type {
   UpdateEmployeeResponse,
   GetEmployeesParams,
   GetEmployeesResponse,
+  GetEmployeeByIdResponse,
 } from "@/types/employee.types";
 
 function buildEmployeeFormData(payload: CreateEmployeePayload): FormData {
@@ -57,6 +58,9 @@ export const employeeService = {
 
   getEmployees: (params: GetEmployeesParams = {}) =>
     api.get<GetEmployeesResponse>("/employees", { params }).then((res) => res.data),
+  
+  getEmployeeById: (id: string) =>
+    api.get<GetEmployeeByIdResponse>(`/employees/${id}`).then((res) => res.data),
 
   updateEmployee: (id: string, payload: UpdateEmployeePayload) =>
     api

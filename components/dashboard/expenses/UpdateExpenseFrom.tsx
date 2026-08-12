@@ -10,6 +10,7 @@ import { InvoiceTextField } from "../invoice/TextField";
 import { SelectField } from "../invoice/SelectField";
 import MainButton from "../shared/MainButton";
 import SecondaryButton from "../shared/SecondaryButton";
+import { Skeleton } from "@/components/ui/skeleton";
 
 import { AmountField } from "./AmountField";
 import { SingleAttachmentDropzone } from "./SingleAttachmentDropzone";
@@ -40,6 +41,57 @@ interface ExpenseFormProps {
     expenseId?: string | null;
     onSuccess?: () => void;
     onCancel?: () => void;
+}
+
+function ExpenseFormSkeleton() {
+    return (
+        <div className="space-y-8 rounded-2xl bg-white p-6 ctm-shadow">
+            <div className="space-y-2">
+                <Skeleton className="h-7 w-56" />
+                <Skeleton className="h-5 w-80" />
+            </div>
+
+            <div className="grid lg:grid-cols-3 items-start gap-4">
+                <div className="lg:col-span-2 space-y-4">
+                    <Skeleton className="h-5 w-32" />
+                    <div className="grid md:grid-cols-2 gap-4">
+                        {Array.from({ length: 5 }).map((_, i) => (
+                            <div key={i} className="space-y-2">
+                                <Skeleton className="h-4 w-24" />
+                                <Skeleton className="h-11 w-full rounded-md" />
+                            </div>
+                        ))}
+                    </div>
+                </div>
+
+                <div className="h-full w-full">
+                    <Skeleton className="h-[220px] w-full rounded-2xl" />
+                </div>
+            </div>
+
+            <div className="border-t border-b py-10 space-y-4">
+                <Skeleton className="h-5 w-28" />
+                <div className="grid md:grid-cols-2 gap-4">
+                    {Array.from({ length: 2 }).map((_, i) => (
+                        <div key={i} className="space-y-2">
+                            <Skeleton className="h-4 w-24" />
+                            <Skeleton className="h-11 w-full rounded-md" />
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <div className="space-y-2">
+                <Skeleton className="h-5 w-24" />
+                <Skeleton className="h-[120px] w-full rounded-md" />
+            </div>
+
+            <div className="flex flex-col md:flex-row items-center justify-end gap-3 pt-5">
+                <Skeleton className="h-11 w-[150px] rounded-md" />
+                <Skeleton className="h-11 w-[140px] rounded-md" />
+            </div>
+        </div>
+    );
 }
 
 export function ExpenseForm({ mode, expenseId, onSuccess, onCancel }: ExpenseFormProps) {
@@ -165,17 +217,10 @@ export function ExpenseForm({ mode, expenseId, onSuccess, onCancel }: ExpenseFor
     const onSubmitDraft = handleSubmit((values) => submitExpense(values, DRAFT_STATUS));
 
     const isPending = createExpense.isPending || updateExpense.isPending;
-    const isLoading = isLoadingExpense;
+    const isLoading = mode === "update" && isLoadingExpense;
 
     if (isLoading) {
-        return (
-            <div className="flex items-center justify-center p-12">
-                <div className="text-center">
-                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
-                    <p className="mt-4 text-muted-foreground">جاري تحميل بيانات المصروف...</p>
-                </div>
-            </div>
-        );
+        return <ExpenseFormSkeleton />;
     }
 
     return (

@@ -79,12 +79,13 @@ export interface InviteAccountantPayload {
 
 
 export interface AcceptInvitationPayload {
-  token: string;
-  email: string;
-  name: string;
-  phone: string;
-  password: string;
-  confirmPassword: string;
+    token: string;
+    email: string;
+    name: string;
+    phone: string;
+    countryCode: string;
+    password: string;
+    confirmPassword: string;
 }
 
 

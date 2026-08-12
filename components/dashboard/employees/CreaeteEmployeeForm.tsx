@@ -124,7 +124,7 @@ export function CreaeteEmployeeForm({
                 <InvoiceTextField
                     label="رقم الجوال"
                     placeholder="ادخل رقم الجوال"
-                    inputMode="tel"
+                    type="number"
                     error={errors.mobile?.message}
                     {...register("mobile")}
                 />
@@ -250,6 +250,7 @@ export function CreaeteEmployeeForm({
                     label={`الراتب الأساسي (${EMPLOYEE_CURRENCY})`}
                     placeholder="0.00"
                     inputMode="numeric"
+                    type="number"
                     error={errors.basicSalary?.message}
                     {...register("basicSalary", { valueAsNumber: true })}
                 />

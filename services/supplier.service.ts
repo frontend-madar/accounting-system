@@ -1,4 +1,5 @@
 import { api } from "@/lib/axios";
+import { DeleteAccountResponse, GetAccountsResponse } from "@/types/accountant.types";
 import type {
   CreateSupplierPayload,
   CreateSupplierResponse,
@@ -49,4 +50,12 @@ export const supplierService = {
         { params: { to } }
       )
       .then((res) => res.data),
+};
+
+export const accountService = {
+  getAccounts: () =>
+    api.get<GetAccountsResponse>("/users/accounts").then((res) => res.data),
+
+  deleteAccount: (id: string) =>
+    api.delete<DeleteAccountResponse>(`/users/accounts/${id}`).then((res) => res.data),
 };

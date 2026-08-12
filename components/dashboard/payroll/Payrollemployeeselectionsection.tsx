@@ -120,13 +120,14 @@ export function PayrollEmployeeSelectionSection({
                         placeholder="بحث عن موظف..."
                     />
 
-                    <FillterButton
+                    <FillterButton 
                         options={departmentOptions}
                         selectedFilter={department}
                         onFilterChange={handleDepartmentFilterChange}
+                      className="min-w-[170px]"
                     />
                 </div>
-                <div className=" text-center  md:text-[18px] text-[#676A6E]">
+                <div className=" text-center  md:text-[16px] text-[#676A6E]">
                     تم تحديد {selectedCount} من {totalRecords}
                 </div>
 

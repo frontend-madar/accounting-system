@@ -1,21 +1,29 @@
 "use client";
 
-import { useEffect } from "react";
-import { useForm } from "react-hook-form";
+import { useMemo } from "react";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
+import { Save, X, Info } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Switch } from "@/components/ui/switch";
+import { FormSection } from "../invoice/FormSection";
+import { InvoiceTextField } from "../invoice/TextField";
+import { SelectField } from "../invoice/SelectField";
+import { FieldLabel } from "../invoice/FieldLabel";
+import { DateField } from "../Datefield";
+import MainButton from "../shared/MainButton";
+import SecondaryButton from "../shared/SecondaryButton";
 import { useEmployeeReport, useUpdateEmployeeReport } from "@/hooks/use-employee-report";
-import { Loader2 } from "lucide-react";
+import { useEmployees } from "@/hooks/use-employee";
 
 const updateReportSchema = z.object({
-  employeeId: z.string().min(1, "معرف الموظف مطلوب"),
+  employeeId: z.string().min(1, "الموظف مطلوب"),
   clientName: z.string().min(1, "اسم العميل مطلوب"),
   paymentDate: z.string().min(1, "تاريخ الدفع مطلوب"),
   target: z.number().min(0, "التارجت يجب أن يكون أكبر من 0"),
+  manuallyOverridden: z.boolean(),
 });
 
 type UpdateReportFormValues = z.infer<typeof updateReportSchema>;
@@ -26,135 +34,207 @@ interface UpdateEmployeeReportFormProps {
   onOpenChange: (open: boolean) => void;
 }
 
+const ORIGIN_LABELS: Record<string, string> = {
+  MANUAL: "يدوي",
+  JOURNAL: "قيد يومية",
+};
+
+function formatDateTime(iso: string) {
+  return new Date(iso).toLocaleString("ar-EG", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+const MONTH_LABELS = [
+  "يناير", "فبراير", "مارس", "ابريل", "مايو", "يونيو",
+  "يوليو", "أغسطس", "سبتمبر", "أكتوبر", "نوفمبر", "ديسمبر",
+];
+
+function UpdateReportFormSkeleton() {
+  return (
+    <div className="space-y-8 pt-2">
+      <div className="space-y-3">
+        <Skeleton className="h-5 w-32" />
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="space-y-2">
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-11 w-full rounded-md" />
+            </div>
+          ))}
+        </div>
+      </div>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Skeleton key={i} className="h-16 w-full rounded-lg" />
+        ))}
+      </div>
+      <div className="flex items-center justify-end gap-3 border-t border-border pt-5">
+        <Skeleton className="h-11 w-[110px] rounded-md" />
+        <Skeleton className="h-11 w-[150px] rounded-md" />
+      </div>
+    </div>
+  );
+}
+
 export function UpdateEmployeeReportForm({
   reportId,
   open,
   onOpenChange,
 }: UpdateEmployeeReportFormProps) {
-  const { data: reportRes, isLoading: isLoadingReport } = useEmployeeReport(reportId || undefined);
+  const { data: reportRes, isLoading: isLoadingReport } = useEmployeeReport(
+    open ? reportId || undefined : undefined
+  );
   const { mutate: updateReport, isPending: isUpdating } = useUpdateEmployeeReport();
 
+  const { data: employeesRes } = useEmployees({ limit: 100 });
+  const employeeList = useMemo(() => employeesRes?.data?.data ?? [], [employeesRes]);
+  const employeeOptions = useMemo(
+    () => employeeList.map((e) => ({ label: e.fullName, value: e.id })),
+    [employeeList]
+  );
+
+  const report = reportRes?.data;
+
   const {
+    control,
     register,
     handleSubmit,
-    reset,
     formState: { errors },
   } = useForm<UpdateReportFormValues>({
     resolver: zodResolver(updateReportSchema),
+    values: report
+      ? {
+          employeeId: report.employeeId,
+          clientName: report.clientName,
+          paymentDate: report.paymentDate.split("T")[0],
+          target: report.target,
+          manuallyOverridden: report.manuallyOverridden,
+        }
+      : undefined,
   });
 
-  useEffect(() => {
-    if (reportRes?.data) {
-      reset({
-        employeeId: reportRes.data.employeeId,
-        clientName: reportRes.data.clientName,
-        paymentDate: reportRes.data.paymentDate.split("T")[0],
-        target: reportRes.data.target,
-      });
-    }
-  }, [reportRes, reset]);
-
-  const onSubmit = (data: UpdateReportFormValues) => {
+  function onSubmit(values: UpdateReportFormValues) {
     if (!reportId) return;
     updateReport(
-      { id: reportId, payload: data },
+      { id: reportId, payload: values },
       {
         onSuccess: () => {
           onOpenChange(false);
-          reset();
         },
       }
     );
-  };
+  }
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
-        <DialogHeader>
+      <DialogContent className="w-[90vw] max-w-5xl overflow-y-auto">
+        <DialogHeader className="mt-4">
           <DialogTitle>تعديل تقرير الموظف</DialogTitle>
         </DialogHeader>
 
-        {isLoadingReport ? (
-          <div className="flex justify-center py-8">
-            <Loader2 className="h-8 w-8 animate-spin text-[#40369F]" />
-          </div>
+        {isLoadingReport || !report ? (
+          <UpdateReportFormSkeleton />
         ) : (
-          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-            <div>
-              <Label htmlFor="employeeId">معرف الموظف</Label>
-              <Input
-                id="employeeId"
-                {...register("employeeId")}
-                placeholder="أدخل معرف الموظف"
-                className="mt-1"
-              />
-              {errors.employeeId && (
-                <p className="text-sm text-red-500 mt-1">{errors.employeeId.message}</p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="clientName">اسم العميل</Label>
-              <Input
-                id="clientName"
-                {...register("clientName")}
-                placeholder="أدخل اسم العميل"
-                className="mt-1"
-              />
-              {errors.clientName && (
-                <p className="text-sm text-red-500 mt-1">{errors.clientName.message}</p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="paymentDate">تاريخ الدفع</Label>
-              <Input
-                id="paymentDate"
-                type="date"
-                {...register("paymentDate")}
-                className="mt-1"
-              />
-              {errors.paymentDate && (
-                <p className="text-sm text-red-500 mt-1">{errors.paymentDate.message}</p>
-              )}
-            </div>
-
-            <div>
-              <Label htmlFor="target">التارجت</Label>
-              <Input
-                id="target"
-                type="number"
-                {...register("target", { valueAsNumber: true })}
-                placeholder="أدخل قيمة التارجت"
-                className="mt-1"
-              />
-              {errors.target && (
-                <p className="text-sm text-red-500 mt-1">{errors.target.message}</p>
-              )}
-            </div>
-
-            <div className="flex justify-end gap-2 pt-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-              >
-                إلغاء
-              </Button>
-              <Button
-                type="submit"
-                disabled={isUpdating}
-                className="bg-[#40369F] hover:bg-[#322A7C]"
-              >
-                {isUpdating ? (
-                  <>
-                    <Loader2 className="h-4 w-4 animate-spin ml-2" />
-                    جاري التحديث...
-                  </>
-                ) : (
-                  "تحديث"
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-8 pt-2">
+            <FormSection title="بيانات التقرير" gridClassName="!grid-cols-1 md:!grid-cols-2">
+              <Controller
+                control={control}
+                name="employeeId"
+                render={({ field }) => (
+                  <SelectField
+                    label="الموظف"
+                    placeholder="اختر الموظف"
+                    value={field.value}
+                    onChange={field.onChange}
+                    options={employeeOptions}
+                    error={errors.employeeId?.message}
+                  />
                 )}
-              </Button>
+              />
+              <InvoiceTextField
+                label="اسم العميل"
+                placeholder="أدخل اسم العميل"
+                error={errors.clientName?.message}
+                {...register("clientName")}
+              />
+              <Controller
+                control={control}
+                name="paymentDate"
+                render={({ field }) => (
+                  <DateField
+                    label="تاريخ الدفع"
+                    value={field.value}
+                    onChange={field.onChange}
+                    error={errors.paymentDate?.message}
+                  />
+                )}
+              />
+              <InvoiceTextField
+                label="التارجت"
+                type="number"
+                placeholder="أدخل قيمة التارجت"
+                inputMode="decimal"
+                error={errors.target?.message}
+                {...register("target", { valueAsNumber: true })}
+              />
+            </FormSection>
+            
+
+            {/* Read-only metadata */}
+            <div>
+              <FieldLabel htmlFor="meta" dropdown={false} className="mb-2">
+                <span className="flex items-center gap-1.5 text-[#232323] text-[14px] md:text-[16px]">
+                  <Info className="h-4 w-4 text-muted-foreground" />
+                  معلومات إضافية
+                </span>
+              </FieldLabel>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="rounded-lg border border-[#EEEEF0] p-3">
+                    <p className="text-[12px] text-muted-foreground">الفترة</p>
+                    <p className="mt-1 text-[14px] font-medium text-[#232323]">
+                        {MONTH_LABELS[report.month - 1]} {report.year}
+                    </p>
+                </div>
+                <div className="rounded-lg border border-[#EEEEF0] p-3">
+                    <p className="text-[12px] text-muted-foreground">المصدر</p>
+                    <p className="mt-1 text-[14px] font-medium text-[#232323]">
+                        {ORIGIN_LABELS[report.origin] ?? report.origin}
+                    </p>
+                </div>
+                <div className="rounded-lg border border-[#EEEEF0] p-3">
+                    <p className="text-[12px] text-muted-foreground">تاريخ الإنشاء</p>
+                    <p className="mt-1 text-[14px] font-medium text-[#232323]">
+                        {formatDateTime(report.createdAt)}
+                    </p>
+                </div>
+                <div className="rounded-lg border border-[#EEEEF0] p-3">
+                    <p className="text-[12px] text-muted-foreground">آخر تحديث</p>
+                    <p className="mt-1 text-[14px] font-medium text-[#232323]">
+                        {formatDateTime(report.updatedAt)}
+                    </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex items-center justify-end gap-3 border-t border-border pt-5">
+              <SecondaryButton
+                type="button"
+                text="إلغاء"
+                icon={<X className="h-4 w-4" />}
+                onClick={() => onOpenChange(false)}
+                className="!w-[110px]"
+              />
+              <MainButton
+                text="تحديث"
+                icon={<Save className="h-4 w-4" />}
+                className="!w-[150px]"
+                disabled={isUpdating}
+              />
             </div>
           </form>
         )}

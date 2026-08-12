@@ -37,33 +37,34 @@ export function AcceptInvitationForm() {
         if (dialCode) setCountryCode(`+${dialCode}`);
     }
 
-    function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-        event.preventDefault();
+   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault();
 
-        const formData = new FormData(event.currentTarget);
-        const raw = {
-            token,
-            email,
-            name: String(formData.get("name") ?? ""),
-            phone,
-            password: String(formData.get("password") ?? ""),
-            confirmPassword: String(formData.get("confirmPassword") ?? ""),
-        };
+    const formData = new FormData(event.currentTarget);
+    const raw = {
+        token,
+        email,
+        name: String(formData.get("name") ?? ""),
+        phone,
+        countryCode,
+        password: String(formData.get("password") ?? ""),
+        confirmPassword: String(formData.get("confirmPassword") ?? ""),
+    };
 
-        const result = acceptInvitationSchema.safeParse(raw);
-        if (!result.success) {
-            const errors: FieldErrors = {};
-            for (const issue of result.error.issues) {
-                const key = issue.path[0] as keyof AcceptInvitationFormValues;
-                if (!errors[key]) errors[key] = issue.message;
-            }
-            setFieldErrors(errors);
-            return;
+    const result = acceptInvitationSchema.safeParse(raw);
+    if (!result.success) {
+        const errors: FieldErrors = {};
+        for (const issue of result.error.issues) {
+            const key = issue.path[0] as keyof AcceptInvitationFormValues;
+            if (!errors[key]) errors[key] = issue.message;
         }
-
-        setFieldErrors({});
-        acceptInvitationMutation.mutate(result.data);
+        setFieldErrors(errors);
+        return;
     }
+
+    setFieldErrors({});
+    acceptInvitationMutation.mutate(result.data);
+}
 
     return (
         <div className="w-full md:p-6 flex flex-col justify-between min-h-screen md:min-h-auto">
@@ -221,7 +222,6 @@ export function AcceptInvitationForm() {
                                     !fieldErrors.password && focusedField === "password" && "border-[#40369F]"
                                 )}
                             />
-                            <Lock className="absolute right-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-[#9A9DA2] pointer-events-none transition-colors duration-200" />
                             <button
                                 type="button"
                                 onClick={() => setShowPassword((prev) => !prev)}
@@ -276,7 +276,6 @@ export function AcceptInvitationForm() {
                                     !fieldErrors.confirmPassword && focusedField === "confirmPassword" && "border-[#40369F]"
                                 )}
                             />
-                            <Lock className="absolute right-3.5 top-1/2 -translate-y-1/2 h-5 w-5 text-[#9A9DA2] pointer-events-none transition-colors duration-200" />
                             <button
                                 type="button"
                                 onClick={() => setShowConfirmPassword((prev) => !prev)}

@@ -12,6 +12,7 @@ import { ProfileCompanyIcon, ProfileEmailIcon, ProfilePhoneIcon } from "@/icons"
 import { useGetProfile, useUpdateAvatar } from "@/hooks/use-profile";
 
 import { Skeleton } from "@/components/ui/skeleton";
+import AccountantsManagements from "@/components/dashboard/profile/AccountantsManagements";
 
 const ProfilePage = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -149,8 +150,10 @@ const ProfilePage = () => {
 
                 <div className="lg:col-span-2">
                     <ProfileForm />
+                   <AccountantsManagements />
                 </div>
             </div>
+
         </div>
     );
 };

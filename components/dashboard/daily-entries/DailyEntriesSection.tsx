@@ -21,7 +21,7 @@ import {
   useExportDailyEntriesEmail,
 } from "@/hooks/use-daily-entry";
 
-const PAGE_SIZE = 6;
+const PAGE_SIZE = 10;
 
 interface DailyEntriesSectionProps {
   className?: string;

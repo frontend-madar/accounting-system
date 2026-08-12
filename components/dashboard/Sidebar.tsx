@@ -12,7 +12,7 @@ import {
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useClickOutside } from "@/hooks/UseClickOutside";
-import { DailyLimitsIcon, DashboardIcon, EmployeesIcon, ExpemsessIcon, ForwardAccountsIcon, InvitePersonIcon, IvoicesIcons, LogoutIcon, SalariesIcon, SuppliersIcon } from "@/icons";
+import { DailyLimitsIcon, DashboardIcon, DropLineIcon, DropLineTwoIcon, EmployeesIcon, ExpemsessIcon, ForwardAccountsIcon, InvitePersonIcon, IvoicesIcons, LogoutIcon, SalariesIcon, SuppliersIcon } from "@/icons";
 import { InviteFrom } from "../auth/InviteFrom";
 import { useUiStore } from "@/store/ui-store";
 import { useProfileStore } from "@/store/profile.store";
@@ -243,95 +243,72 @@ export function Sidebar({
                         : (isExpanded ? "translate-x-0 w-[283px]" : "translate-x-0 w-[80px]")
                 )}
             >
-            {/* decorative background pattern */}
-            <Image
-                src="/menu-bg.png"
-                alt=""
-                fill
-                priority
-                className="pointer-events-none select-none object-cover rounded-2xl opacity-20"
-            />
+                {/* decorative background pattern */}
+                <Image
+                    src="/menu-bg.png"
+                    alt=""
+                    fill
+                    priority
+                    className="pointer-events-none select-none object-cover rounded-2xl opacity-20"
+                />
 
-            {/* content sits above the pattern */}
-            <div className="relative z-10 flex h-full flex-col">
-                {/* header / company switcher */}
-                <div className="p-3">
-                    <div
-                        className={cn(
-                            "bg-[#0E1B6B99] flex items-center h-[65px] px-3 rounded-xl transition-all duration-300 ease-in-out",
-                            collapsibleGap(showContent),
-                            !showContent ? "justify-center" : "justify-between"
-                        )}
-                    >
-                        <div className={collapsibleLabel(showContent, "flex items-center gap-2")}>
-                            <span className="flex-1 text-center text-[17px] font-semibold">
-                                {companyName}
-                            </span>
-                            <ChevronDown className="h-4 w-4 shrink-0" />
-                        </div>
-
-                        <button
-                            type="button"
-                            onClick={() => {
-                                if (isMobileScreen) {
-                                    setMobileSidebarOpen(!isMobileSidebarOpen);
-                                } else {
-                                    setIsExpanded(!isExpanded);
-                                }
-                            }}
-                            className="focus:outline-none hover:opacity-80 transition-opacity shrink-0"
+                {/* content sits above the pattern */}
+                <div className="relative z-10 flex h-full flex-col">
+                    {/* header / company switcher */}
+                    <div className="p-3">
+                        <div
+                            className={cn(
+                                "bg-[#0E1B6B99] flex items-center h-[65px] px-3 rounded-xl transition-all duration-300 ease-in-out",
+                                collapsibleGap(showContent),
+                                !showContent ? "justify-center" : "justify-between"
+                            )}
                         >
-                            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
-                                <path d="M16.9173 4.08333V23.9167M25.6673 14C25.6673 9.625 25.6673 7.4375 24.5532 5.9045C24.1934 5.40936 23.758 4.97392 23.2628 4.61417C21.7298 3.5 19.5412 3.5 15.1673 3.5H12.834C8.45898 3.5 6.27148 3.5 4.73848 4.61417C4.24344 4.97357 3.808 5.40861 3.44815 5.90333C2.33398 7.4375 2.33398 9.62617 2.33398 14C2.33398 18.3738 2.33398 20.5625 3.44815 22.0955C3.80791 22.5906 4.24335 23.0261 4.73848 23.3858C6.27148 24.5 8.46015 24.5 12.834 24.5H15.1673C19.5423 24.5 21.7298 24.5 23.2628 23.3858C23.758 23.0261 24.1934 22.5906 24.5532 22.0955C25.6673 20.5625 25.6673 18.3738 25.6673 14Z" stroke="white" strokeWidth="1.5" strokeLinejoin="round" />
-                                <path d="M22.1673 8.16699H20.4173M22.1673 12.8337H20.4173M9.33398 11.667L10.7655 12.9002C11.3663 13.4193 11.6673 13.6783 11.6673 14.0003C11.6673 14.3223 11.3663 14.5813 10.7655 15.1005L9.33398 16.3337" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                            </svg>
-                        </button>
+                            <div className={collapsibleLabel(showContent, "flex items-center gap-2")}>
+                                <span className="flex-1 text-center text-[17px] font-semibold">
+                                    {companyName}
+                                </span>
+                                <ChevronDown className="h-4 w-4 shrink-0" />
+                            </div>
 
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    if (isMobileScreen) {
+                                        setMobileSidebarOpen(!isMobileSidebarOpen);
+                                    } else {
+                                        setIsExpanded(!isExpanded);
+                                    }
+                                }}
+                                className="focus:outline-none hover:opacity-80 transition-opacity shrink-0"
+                            >
+                                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
+                                    <path d="M16.9173 4.08333V23.9167M25.6673 14C25.6673 9.625 25.6673 7.4375 24.5532 5.9045C24.1934 5.40936 23.758 4.97392 23.2628 4.61417C21.7298 3.5 19.5412 3.5 15.1673 3.5H12.834C8.45898 3.5 6.27148 3.5 4.73848 4.61417C4.24344 4.97357 3.808 5.40861 3.44815 5.90333C2.33398 7.4375 2.33398 9.62617 2.33398 14C2.33398 18.3738 2.33398 20.5625 3.44815 22.0955C3.80791 22.5906 4.24335 23.0261 4.73848 23.3858C6.27148 24.5 8.46015 24.5 12.834 24.5H15.1673C19.5423 24.5 21.7298 24.5 23.2628 23.3858C23.758 23.0261 24.1934 22.5906 24.5532 22.0955C25.6673 20.5625 25.6673 18.3738 25.6673 14Z" stroke="white" strokeWidth="1.5" strokeLinejoin="round" />
+                                    <path d="M22.1673 8.16699H20.4173M22.1673 12.8337H20.4173M9.33398 11.667L10.7655 12.9002C11.3663 13.4193 11.6673 13.6783 11.6673 14.0003C11.6673 14.3223 11.3663 14.5813 10.7655 15.1005L9.33398 16.3337" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                            </button>
+
+                        </div>
                     </div>
-                </div>
 
-                {/* nav */}
-                <nav className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-5">
-                    <ul className="space-y-1">
-                        {NAV_ITEMS.map((item) => (
-                            <li key={item.key}>
-                                {item.type === "link" ? (
-                                    <Link
-                                        href={item.href ?? "#"}
-                                        type="Link"
-                                        className={cn(
-                                            "group relative flex w-full items-center rounded-lg px-3 py-3 text-[15px] transition-all duration-300 ease-in-out",
-                                            collapsibleGap(showContent),
-                                            !showContent ? "justify-center" : "justify-start",
-                                            "hover:bg-[#0E1B6B99]",
-                                            item.href && (
-                                                item.exact
-                                                    ? pathname === item.href
-                                                    : pathname === item.href || pathname.startsWith(item.href + "/")
-                                            )
-                                                ? "bg-[#0E1B6B99]"
-                                                : ""
-                                        )}
-                                    >
-                                        <span className="flex h-5 w-5 shrink-0 items-center justify-center [&>svg]:h-5 [&>svg]:w-5">
-                                            <item.icon className="h-5 w-5" />
-                                        </span>
-                                        <span className={collapsibleLabel(showContent, "flex-1 text-right")}>{item.label}</span>
-                                        {!showContent && !isMobileScreen && <CollapsedTooltip label={item.label} />}
-                                    </Link>
-                                ) : (
-                                    <div>
-                                        <button
-                                            type="button"
-                                            onClick={() => handleDropdownClick(item.key)}
+                    {/* nav */}
+                    <nav className="flex-1 overflow-y-auto overflow-x-hidden px-3 py-5">
+                        <ul className="space-y-1">
+                            {NAV_ITEMS.map((item) => (
+                                <li key={item.key}>
+                                    {item.type === "link" ? (
+                                        <Link
+                                            href={item.href ?? "#"}
+                                            type="Link"
                                             className={cn(
-                                                "group relative flex w-full items-center rounded-lg px-3 py-3 text-[15px] transition-all duration-300 ease-in-out hover:bg-[#0E1B6B99]",
+                                                "group relative flex w-full items-center rounded-lg px-3 py-3 text-[15px] transition-all duration-300 ease-in-out",
                                                 collapsibleGap(showContent),
                                                 !showContent ? "justify-center" : "justify-start",
-                                                item.type === "dropdown" &&
-                                                    item.children.some(
-                                                        (sub) => pathname === sub.href || pathname.startsWith(sub.href + "/")
-                                                    )
+                                                "hover:bg-[#0E1B6B99]",
+                                                item.href && (
+                                                    item.exact
+                                                        ? pathname === item.href
+                                                        : pathname === item.href || pathname.startsWith(item.href + "/")
+                                                )
                                                     ? "bg-[#0E1B6B99]"
                                                     : ""
                                             )}
@@ -340,115 +317,135 @@ export function Sidebar({
                                                 <item.icon className="h-5 w-5" />
                                             </span>
                                             <span className={collapsibleLabel(showContent, "flex-1 text-right")}>{item.label}</span>
-                                            <span className={collapsibleLabel(showContent, "shrink-0")}>
-                                                {openDropdown === item.key ? (
-                                                    <ChevronUp className="h-4 w-4 shrink-0" />
-                                                ) : (
-                                                    <ChevronDown className="h-4 w-4 shrink-0" />
-                                                )}
-                                            </span>
                                             {!showContent && !isMobileScreen && <CollapsedTooltip label={item.label} />}
-                                        </button>
+                                        </Link>
+                                    ) : (
+                                        <div>
+                                            <button
+                                                type="button"
+                                                onClick={() => handleDropdownClick(item.key)}
+                                                className={cn(
+                                                    "group relative flex w-full items-center rounded-lg px-3 py-3 text-[15px] transition-all duration-300 ease-in-out hover:bg-[#0E1B6B99]",
+                                                    collapsibleGap(showContent),
+                                                    !showContent ? "justify-center" : "justify-start",
+                                                    item.type === "dropdown" &&
+                                                        item.children.some(
+                                                            (sub) => pathname === sub.href || pathname.startsWith(sub.href + "/")
+                                                        )
+                                                        ? "bg-[#0E1B6B99]"
+                                                        : ""
+                                                )}
+                                            >
+                                                <span className="flex h-5 w-5 shrink-0 items-center justify-center [&>svg]:h-5 [&>svg]:w-5">
+                                                    <item.icon className="h-5 w-5" />
+                                                </span>
+                                                <span className={collapsibleLabel(showContent, "flex-1 text-right")}>{item.label}</span>
+                                                <span className={collapsibleLabel(showContent, "shrink-0")}>
+                                                    {openDropdown === item.key ? (
+                                                        <ChevronUp className="h-4 w-4 shrink-0" />
+                                                    ) : (
+                                                        <ChevronDown className="h-4 w-4 shrink-0" />
+                                                    )}
+                                                </span>
+                                                {!showContent && !isMobileScreen && <CollapsedTooltip label={item.label} />}
+                                            </button>
 
-                                        {/* sub-links */}
-                                        <div
-                                            className={cn(
-                                                "grid overflow-hidden relative transition-[grid-template-rows] duration-300 ease-in-out",
-                                                openDropdown === item.key && showContent
-                                                    ? "grid-rows-[1fr]"
-                                                    : "grid-rows-[0fr]"
-                                            )}
-                                        >
-                                            <div className={cn("absolute top-2 right-5 transition-opacity duration-300 ease-in-out", !showContent ? "opacity-0" : "opacity-100")} >
-                                                <svg width="11" height="62" viewBox="0 0 11 62" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                    <path d="M10 4V9.5C10 15.0228 5.52285 19.5 0 19.5" stroke="white" strokeWidth="0.5" />
-                                                    <path d="M10 0V51C10 56.5228 5.52285 61 0 61" stroke="white" strokeWidth="0.5" />
-                                                </svg>
-                                            </div>
+                                            {/* sub-links */}
+                                            <div
+                                                className={cn(
+                                                    "grid overflow-hidden relative transition-[grid-template-rows] duration-300 ease-in-out",
+                                                    openDropdown === item.key && showContent
+                                                        ? "grid-rows-[1fr]"
+                                                        : "grid-rows-[0fr]"
+                                                )}
+                                            >
+                                                <div className={cn("absolute top-2 right-5 transition-opacity duration-300 ease-in-out", !showContent ? "opacity-0" : "opacity-100")} >
+                                                    {item.children.length === 2 ? <DropLineTwoIcon /> : <DropLineIcon />}
+                                                </div>
 
-                                            <div className="min-h-0">
-                                                <ul className="relative mr-6 mt-1 space-y-1 pr-4">
-                                                    {item.children.map((sub) => (
-                                                        <li key={sub.key}>
-                                                            <Link
-                                                                type="Link"
-                                                                href={sub.href}
-                                                                className={cn(
-                                                                    "block w-full rounded-lg px-3 py-2.5 text-right text-[14px] transition-all duration-300 ease-in-out",
-                                                                    "hover:bg-[#0E1B6B99]",
-                                                                    pathname === sub.href
-                                                                        ? "bg-[#0E1B6B99]"
-                                                                        : "",
-                                                                    !showContent ? "opacity-0 pointer-events-none" : "opacity-100"
-                                                                )}
-                                                            >
-                                                                {sub.label}
-                                                            </Link>
-                                                        </li>
-                                                    ))}
-                                                </ul>
+                                                <div className="min-h-0">
+                                                    <ul className="relative mr-6 mt-1 space-y-1 pr-4">
+                                                        {item.children.map((sub) => (
+                                                            <li key={sub.key}>
+                                                                <Link
+                                                                    type="Link"
+                                                                    href={sub.href}
+                                                                    className={cn(
+                                                                        "block w-full rounded-lg px-3 py-2.5 text-right text-[14px] transition-all duration-300 ease-in-out",
+                                                                        "hover:bg-[#0E1B6B99]",
+                                                                        pathname === sub.href
+                                                                            ? "bg-[#0E1B6B99]"
+                                                                            : "",
+                                                                        !showContent ? "opacity-0 pointer-events-none" : "opacity-100"
+                                                                    )}
+                                                                >
+                                                                    {sub.label}
+                                                                </Link>
+                                                            </li>
+                                                        ))}
+                                                    </ul>
+                                                </div>
                                             </div>
                                         </div>
-                                    </div>
-                                )}
-                            </li>
-                        ))}
-                    </ul>
-                </nav>
+                                    )}
+                                </li>
+                            ))}
+                        </ul>
+                    </nav>
 
-                {/* footer / current user */}
-                <div ref={userMenuRef} className="relative">
-                    {/* Popup */}
-                    <div
-                        className={cn(
-                            "absolute bottom-full mb-2 left-2 w-[260px] p-4 shadow-[0px_1px_10px_0px_#00000040] bg-white rounded-xl z-50 transition-all duration-200 ease-out",
-                            showUserMenu
-                                ? "opacity-100 translate-y-0 pointer-events-auto"
-                                : "opacity-0 translate-y-2 pointer-events-none"
-                        )}
-                    >
-                        <div onClick={() => setShowInvite(true)} className="flex items-center gap-3 px-2 py-1.5 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
-                            <InvitePersonIcon />
-                            <p className="text-[18px] font-medium text-[#1E2128]">دعوة اشخاص</p>
-                        </div>
-                        <div className="my-2 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
-                        <Link
-                            href="/"
-                            className="flex items-center gap-3 px-2 py-1.5 rounded-lg hover:bg-red-50 transition-colors group"
-                            onClick={() => setShowUserMenu(false)}
+                    {/* footer / current user */}
+                    <div ref={userMenuRef} className="relative">
+                        {/* Popup */}
+                        <div
+                            className={cn(
+                                "absolute bottom-full mb-2 left-2 w-[260px] p-4 shadow-[0px_1px_10px_0px_#00000040] bg-white rounded-xl z-50 transition-all duration-200 ease-out",
+                                showUserMenu
+                                    ? "opacity-100 translate-y-0 pointer-events-auto"
+                                    : "opacity-0 translate-y-2 pointer-events-none"
+                            )}
                         >
-                            <LogoutIcon />
-                            <p className="text-[18px] font-medium text-[#B01212] group-hover:text-red-700 transition-colors">
-                                تسجيل خروج
-                            </p>
-                        </Link>
+                            <div onClick={() => setShowInvite(true)} className="flex items-center gap-3 px-2 py-1.5 rounded-lg hover:bg-gray-50 transition-colors cursor-pointer">
+                                <InvitePersonIcon />
+                                <p className="text-[18px] font-medium text-[#1E2128]">دعوة اشخاص</p>
+                            </div>
+                            <div className="my-2 h-px bg-gradient-to-r from-transparent via-gray-200 to-transparent" />
+                            <Link
+                                href="/"
+                                className="flex items-center gap-3 px-2 py-1.5 rounded-lg hover:bg-red-50 transition-colors group"
+                                onClick={() => setShowUserMenu(false)}
+                            >
+                                <LogoutIcon />
+                                <p className="text-[18px] font-medium text-[#B01212] group-hover:text-red-700 transition-colors">
+                                    تسجيل خروج
+                                </p>
+                            </Link>
+                        </div>
+
+                        {/* Trigger */}
+                        <div
+                            onClick={() => setShowUserMenu((v) => !v)}
+                            className={cn(
+                                "group relative flex items-center px-5 py-4 border-t border-white/10 cursor-pointer hover:bg-white/5 transition-colors",
+                                collapsibleGap(showContent),
+                                !showContent ? "justify-center" : "justify-start"
+                            )}
+                        >
+                            <div className="relative h-10 w-10 shrink-0 rounded-full overflow-hidden">
+                                <Image src={displayAvatarSrc} alt={displayUserName} fill className="object-cover" />
+                            </div>
+                            <div className={collapsibleLabel(showContent, "min-w-0 text-right")}>
+                                <p className="truncate text-[16px] font-medium">{displayUserName}</p>
+                                <p className="truncate text-[16px] font-medium opacity-80">{displayUserEmail}</p>
+                            </div>
+                            {!showContent && !isMobileScreen && <CollapsedTooltip label={displayUserName} />}
+                        </div>
                     </div>
 
-                    {/* Trigger */}
-                    <div
-                        onClick={() => setShowUserMenu((v) => !v)}
-                        className={cn(
-                            "group relative flex items-center px-5 py-4 border-t border-white/10 cursor-pointer hover:bg-white/5 transition-colors",
-                            collapsibleGap(showContent),
-                            !showContent ? "justify-center" : "justify-start"
-                        )}
-                    >
-                        <div className="relative h-10 w-10 shrink-0 rounded-full overflow-hidden">
-                            <Image src={displayAvatarSrc} alt={displayUserName} fill className="object-cover" />
-                        </div>
-                        <div className={collapsibleLabel(showContent, "min-w-0 text-right")}>
-                            <p className="truncate text-[16px] font-medium">{displayUserName}</p>
-                            <p className="truncate text-[16px] font-medium opacity-80">{displayUserEmail}</p>
-                        </div>
-                        {!showContent && !isMobileScreen && <CollapsedTooltip label={displayUserName} />}
-                    </div>
+                    {showInvite && <InviteFrom onClose={() => setShowInvite(false)} />}
+
                 </div>
-
-                {showInvite && <InviteFrom onClose={() => setShowInvite(false)} />}
-
-            </div>
-        </aside>
-    </>
+            </aside>
+        </>
     );
 }
 

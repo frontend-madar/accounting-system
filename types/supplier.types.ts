@@ -14,6 +14,7 @@ export interface CreateSupplierPayload {
   currency: SupplierCurrency;
   servicePrice: number;
   amountPaid: number;
+  status: SupplierStatus
 }
 
 

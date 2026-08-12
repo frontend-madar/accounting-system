@@ -15,7 +15,7 @@ import {
 
 import { Checkbox } from "@/components/ui/checkbox";
 interface GetEmployeeColumnsProps {
-  onEdit?: (employee: EmployeeData) => void;
+  onEdit?: (id: string) => void;    
   onDelete?: (employee: EmployeeData) => void;
 }
 
@@ -85,7 +85,7 @@ export function getEmployeeColumns({
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end">
             <DropdownMenuItem
-              onClick={() => onEdit?.(row.original)}
+              onClick={() => onEdit?.(row.original.id)}
             >
               <Pencil className="h-4 w-4" />
               تعديل

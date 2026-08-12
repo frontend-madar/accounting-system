@@ -24,6 +24,7 @@ import { useUiStore } from "@/store/ui-store";
 import { useUnreadNotificationsCount } from "@/hooks/use-notification";
 import { useGetProfile } from "@/hooks/use-profile";
 import { useProfileStore } from "@/store/profile.store";
+import { Button } from "../ui/button";
 
 interface LanguageOption {
     code: string;
@@ -131,13 +132,13 @@ export function Topbar({
 
 
 
-                <button
+                <Button
                     type="button"
                     onClick={toggleMobileSidebar}
-                    className="lg:hidden p-2 rounded-lg hover:bg-gray-100 transition-colors  flex h-9 w-9 items-center justify-center rounded-full border border-border"
+                    className="lg:hidden p-2 rounded-lg bg-transparent hover:bg-gray-100 transition-colors  flex h-9 w-9 items-center justify-center rounded-full border border-border"
                 >
                     <Menu className="rounded-full text-[#0F1219]" />
-                </button>
+                </Button>
 
                 {/* Language */}
                 {/* <DropdownMenu>

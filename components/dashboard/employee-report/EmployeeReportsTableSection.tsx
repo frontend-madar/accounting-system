@@ -89,51 +89,40 @@ export function EmployeeReportsTableSection({
   return (
     <div className={className}>
       <section className="rounded-2xl bg-white ctm-shadow p-5">
-        <div className="flex flex-col md:flex-row items-start justify-between gap-4">
-          <div>
-            <h2 className="text-[24px] font-bold text-[#0F1219]">تقارير الأداء</h2>
-            <p className="mt-1 font-medium text-[16px] text-[#676A6E]">
-              إجمالي التارجت: <span className="text-[#40369F]">{totalTarget.toLocaleString()} ر.س</span> · 
-              إجمالي العملاء: <span className="text-[#40369F]">{totalClients}</span>
-            </p>
-          </div>
+        <div className="flex flex-col md:flex-row  justify-between">
 
-          <div className="flex flex-col sm:flex-row items-center w-full sm:w-auto gap-2">
-            <ExportDropdown
-              label="تصدير"
-              className="sm:!w-[111px] w-full"
-              isExportingPdf={isExportingPdf}
-              isExportingExcel={isExportingExcel}
-              isExportingEmail={isExportingEmail}
-              onExportPdf={handleExportPdf}
-              onExportExcel={handleExportExcel}
-              onExportEmail={handleExportEmail}
-            />
 
-            <MainButton
-              text="إضافة تقرير"
-              icon={<Plus className="h-4 w-4" />}
-              className="sm:!w-[155px] w-full"
-              href="/dashboard/employee-reports/create"
-            />
-          </div>
-        </div>
+            <div className="flex items-center gap-2">
+              <h2 className="sm:text-[24px] text-[18px] font-semibold text-[#0F1219]">
+                قائمة التقارير
+              </h2>
+              <span className="rounded-full bg-[#E6F6F4] px-3 py-1 text-[13px] font-medium text-[#1BA915]">
+                {totalRecords} تقرير
+              </span>
+            </div>
 
-        <div className="mt-4 flex flex-col sm:flex-row items-center justify-between gap-2">
-          <div className="flex-row flex sm:flex-col items-center gap-2">
-            <h2 className="sm:text-[24px] text-[18px] font-semibold text-[#0F1219]">
-              قائمة التقارير
-            </h2>
-            <span className="rounded-full bg-[#E6F6F4] px-3 py-1 text-[13px] font-medium text-[#1BA915]">
-              {totalRecords} تقرير
-            </span>
-          </div>
-          <div>
-            <SearchInput
-              query={query}
-              setQuery={handleSearchChange}
-              placeholder="ابحث عن موظف أو عميل..."
-            />
+
+          <div className="flex flex-col md:flex-row items-start justify-between gap-4">
+            <div className="flex flex-col sm:flex-row items-center w-full sm:w-auto gap-2">
+              <ExportDropdown
+                label="تصدير"
+                className="sm:!w-[111px] w-full"
+                isExportingPdf={isExportingPdf}
+                isExportingExcel={isExportingExcel}
+                isExportingEmail={isExportingEmail}
+                onExportPdf={handleExportPdf}
+                onExportExcel={handleExportExcel}
+                onExportEmail={handleExportEmail}
+              />
+
+              <div className="w-full" >
+                <SearchInput
+                  query={query}
+                  setQuery={handleSearchChange}
+                  placeholder="ابحث عن موظف أو عميل..."
+                />
+              </div>
+            </div>
           </div>
         </div>
 

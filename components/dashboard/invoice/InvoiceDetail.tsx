@@ -3,7 +3,7 @@
 import * as React from "react";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Pencil, Printer, Trash2, X } from "lucide-react";
+import { Pencil, Printer, Trash2, X, Calendar, User, Tag, DollarSign, CreditCard, FileText, Package, Users } from "lucide-react";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import MainButton from "../shared/MainButton";
@@ -15,6 +15,7 @@ import {
   useDeleteInvoicePayment,
   useDownloadInvoicePdf,
 } from "@/hooks/use-invoice";
+import { cn } from "@/lib/utils";
 
 interface InvoiceDetailProps {
   invoiceId: string;
@@ -25,13 +26,34 @@ function formatDate(dateStr?: string): string {
   return dateStr.includes("T") ? dateStr.split("T")[0] : dateStr;
 }
 
-function InfoField({ label, value }: { label: string; value: React.ReactNode }) {
+function getStatusStyles(status: string): string {
+  const statusMap: Record<string, string> = {
+    "مكتملة": "bg-[#E6F6F4] text-[#1BA915] border-[#1BA915]/20",
+    "كنسل": "bg-[#FCEADF] text-[#E0673A] border-[#E0673A]/20",
+    "باقي الدفع": "bg-[#FBF3D9] text-[#C79A1E] border-[#C79A1E]/20",
+    "قيد المراجعة": "bg-[#E8EEFD] text-[#3D6BEA] border-[#3D6BEA]/20",
+  };
+  return statusMap[status] || "bg-[#F1F1F3] text-[#5C5F63] border-[#5C5F63]/20";
+}
+
+function InfoField({ 
+  label, 
+  value, 
+  icon: Icon,
+  className 
+}: { 
+  label: string; 
+  value: React.ReactNode; 
+  icon?: React.ElementType;
+  className?: string;
+}) {
   return (
-    <div className="space-y-1.5">
-      <span className="text-[14px] font-semibold text-[#232323] md:text-[17px]">
+    <div className={cn("space-y-1.5", className)}>
+      <span className="text-[13px] font-medium text-[#6C7075] flex items-center gap-1.5">
+        {Icon && <Icon className="h-4 w-4 text-[#8B8E92]" />}
         {label}
       </span>
-      <div className="flex h-[47px] w-full items-center rounded-xl border border-[#C8C2FC] bg-white px-4 text-[15px] font-medium text-[#232323]">
+      <div className="flex min-h-[47px] w-full items-center rounded-xl border border-[#E4E5E7] bg-[#FAFBFC] px-4 text-[15px] font-medium text-[#171A1F] transition-all duration-200 hover:border-[#40369F]/30 hover:bg-white">
         {value}
       </div>
     </div>
@@ -40,19 +62,22 @@ function InfoField({ label, value }: { label: string; value: React.ReactNode }) 
 
 function InvoiceDetailSkeleton() {
   return (
-    <div className="space-y-8 rounded-2xl ctm-shadow bg-white p-2 md:p-6">
+    <div className="space-y-8 rounded-3xl ctm-shadow bg-white p-4 md:p-8">
       <div className="flex items-center justify-between">
-        <Skeleton className="h-8 w-40" />
+        <div className="space-y-2">
+          <Skeleton className="h-8 w-48" />
+          <Skeleton className="h-4 w-32" />
+        </div>
         <div className="flex gap-2">
-          <Skeleton className="h-10 w-24 rounded-xl" />
-          <Skeleton className="h-10 w-24 rounded-xl" />
-          <Skeleton className="h-10 w-24 rounded-xl" />
+          <Skeleton className="h-11 w-24 rounded-xl" />
+          <Skeleton className="h-11 w-24 rounded-xl" />
+          <Skeleton className="h-11 w-24 rounded-xl" />
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {Array.from({ length: 6 }).map((_, i) => (
           <div key={i} className="space-y-2">
-            <Skeleton className="h-4 w-20" />
+            <Skeleton className="h-4 w-24" />
             <Skeleton className="h-[47px] w-full rounded-xl" />
           </div>
         ))}
@@ -78,72 +103,123 @@ export function InvoiceDetail({ invoiceId }: InvoiceDetailProps) {
   }
 
   return (
-    <div className="space-y-8 rounded-2xl ctm-shadow bg-white p-2 md:p-6">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-[20px] md:text-[28px] font-bold text-[#171A1F]">
-            فاتورة #{invoice.invoiceNumber}
-          </h1>
-          <p className="mt-1 text-[14px] text-muted-foreground">
-            تاريخ الإنشاء: {formatDate(invoice.createdAt)}
-          </p>
-        </div>
+    <div className="space-y-8">
+      {/* Header Card */}
+      <div className="rounded-3xl ctm-shadow bg-white p-4 md:p-8">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <div className="hidden md:flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-to-br from-[#40369F] to-[#322A7C] shadow-lg shadow-[#40369F]/20">
+              <FileText className="h-7 w-7 text-white" />
+            </div>
+            <div>
+              <h1 className="text-[22px] md:text-[28px] font-bold text-[#171A1F]">
+                فاتورة #{invoice.invoiceNumber}
+              </h1>
+              <div className="flex items-center gap-3 mt-1">
+                <span className="flex items-center gap-1.5 text-[14px] text-[#6C7075]">
+                  <Calendar className="h-4 w-4" />
+                  {formatDate(invoice.createdAt)}
+                </span>
+                <span className={`inline-flex items-center rounded-full px-3 py-1 text-[13px] font-medium border ${getStatusStyles(invoice.status)}`}>
+                  {invoice.status}
+                </span>
+              </div>
+            </div>
+          </div>
 
-        <div className="flex flex-wrap items-center gap-2">
-          <SecondaryButton
-            text={isDownloading ? "جاري التحميل..." : "طباعة"}
-            icon={<Printer className="h-4 w-4" />}
-            disabled={isDownloading}
-            onClick={() =>
-              downloadPdf({ invoiceId: invoice.id, invoiceNumber: invoice.invoiceNumber })
-            }
-          />
-          <MainButton
-            text="تعديل"
-            icon={<Pencil className="h-4 w-4" />}
-            onClick={() => router.push(`/dashboard/invoices/${invoice.id}/edit`)}
-          />
-          <button
-            type="button"
-            onClick={() => setIsDeleteDialogOpen(true)}
-            className="flex items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-[14px] font-medium text-red-600 hover:bg-red-100"
-          >
-            <Trash2 className="h-4 w-4" />
-            حذف
-          </button>
+          <div className="flex flex-wrap items-center gap-2">
+            <SecondaryButton
+              text={isDownloading ? "جاري التحميل..." : "طباعة"}
+              icon={<Printer className="h-4 w-4" />}
+              disabled={isDownloading}
+              onClick={() =>
+                downloadPdf({ invoiceId: invoice.id, invoiceNumber: invoice.invoiceNumber })
+              }
+              className="shadow-sm hover:shadow-md transition-all duration-300"
+            />
+            <MainButton
+              text="تعديل"
+              icon={<Pencil className="h-4 w-4" />}
+              onClick={() => router.push(`/dashboard/invoices/${invoice.id}/edit`)}
+              className="shadow-sm hover:shadow-md transition-all duration-300"
+            />
+            <button
+              type="button"
+              onClick={() => setIsDeleteDialogOpen(true)}
+              className="flex items-center gap-1.5 rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-[14px] font-medium text-red-600 transition-all duration-300 hover:bg-red-100 hover:border-red-300 hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <Trash2 className="h-4 w-4" />
+              حذف
+            </button>
+          </div>
         </div>
       </div>
 
-      <div>
-        <h2 className="mb-3 text-[18px] font-bold text-[#0F1219]">بيانات العميل والموظف</h2>
+      {/* Client & Employee Info */}
+      <div className="rounded-3xl ctm-shadow bg-white p-4 md:p-8">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-1 h-8 rounded-full bg-gradient-to-b from-[#40369F] to-[#322A7C]"></div>
+          <h2 className="text-[20px] font-bold text-[#171A1F]">بيانات العميل والموظف</h2>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <InfoField label="اسم العميل" value={invoice.clientName} />
-          <InfoField label="اسم الموظف" value={invoice.employeeName} />
-          <InfoField label="الحالة" value={invoice.status} />
+          <InfoField 
+            label="اسم العميل" 
+            value={invoice.clientName} 
+            icon={User}
+          />
+          <InfoField 
+            label="اسم الموظف" 
+            value={invoice.employeeName} 
+            icon={Users}
+          />
+          <InfoField 
+            label="الحالة" 
+            value={
+              <span className={`inline-flex items-center rounded-full px-3 py-1 text-[13px] font-medium border ${getStatusStyles(invoice.status)}`}>
+                {invoice.status}
+              </span>
+            } 
+            icon={Tag}
+          />
         </div>
       </div>
 
-      <div>
-        <h2 className="mb-3 text-[18px] font-bold text-[#0F1219]">تفاصيل الخدمة</h2>
+      {/* Service Details */}
+      <div className="rounded-3xl ctm-shadow bg-white p-4 md:p-8">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-1 h-8 rounded-full bg-gradient-to-b from-[#40369F] to-[#322A7C]"></div>
+          <h2 className="text-[20px] font-bold text-[#171A1F]">تفاصيل الخدمة</h2>
+        </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <InfoField label="الخدمة" value={invoice.service} />
+          <InfoField 
+            label="الخدمة" 
+            value={invoice.service} 
+            icon={Package}
+          />
           <InfoField
             label="السعر الاجمالي"
-            value={`${invoice.totalPrice.toLocaleString()} ${invoice.currency || ""}`}
+            value={
+              <span className="text-[#40369F] font-bold">
+                {invoice.totalPrice.toLocaleString()} {invoice.currency || "ر.س"}
+              </span>
+            } 
+            icon={DollarSign}
           />
         </div>
 
         {invoice.includes.length > 0 && (
-          <div className="mt-4 space-y-2">
-            <span className="text-[14px] font-semibold text-[#232323] md:text-[17px]">
+          <div className="mt-6 pt-6 border-t border-[#F0F0F2]">
+            <span className="text-[14px] font-semibold text-[#232323] flex items-center gap-2 mb-3">
+              <Package className="h-4 w-4 text-[#40369F]" />
               يشمل
             </span>
             <div className="flex flex-wrap gap-2">
               {invoice.includes.map((item, index) => (
                 <span
                   key={`${item}-${index}`}
-                  className="inline-flex items-center gap-1 rounded-full bg-[#EFEBFB] px-3 py-1.5 text-[13px] text-[#463BAF]"
+                  className="inline-flex items-center gap-1.5 rounded-full bg-gradient-to-r from-[#F5F6FF] to-[#EDEEFF] px-4 py-2 text-[13px] font-medium text-[#40369F] border border-[#D8D2F6] shadow-sm transition-all duration-200 hover:shadow-md hover:scale-[1.02]"
                 >
+                  <span className="w-1.5 h-1.5 rounded-full bg-[#40369F]"></span>
                   {item}
                 </span>
               ))}
@@ -152,43 +228,75 @@ export function InvoiceDetail({ invoiceId }: InvoiceDetailProps) {
         )}
       </div>
 
-      <div>
-        <div className="flex items-center justify-between mb-3">
-          <h2 className="text-[18px] font-bold text-[#0F1219]">الدفعات</h2>
-          <InfoField
-            label=""
-            value={`المتبقي: ${invoice.remainingAmount.toLocaleString()} ${invoice.currency || ""}`}
-          />
+      {/* Payments Section */}
+      <div className="rounded-3xl ctm-shadow bg-white p-4 md:p-8">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
+          <div className="flex items-center gap-3">
+            <div className="w-1 h-8 rounded-full bg-gradient-to-b from-[#40369F] to-[#322A7C]"></div>
+            <h2 className="text-[20px] font-bold text-[#171A1F]">الدفعات</h2>
+          </div>
+          <div className="bg-gradient-to-r from-[#F5F6FF] to-[#EDEEFF] rounded-xl px-4 py-2.5 border border-[#D8D2F6]">
+            <span className="text-[14px] font-medium text-[#6C7075]">المتبقي: </span>
+            <span className="text-[16px] font-bold text-[#40369F]">
+              {invoice.remainingAmount.toLocaleString()} {invoice.currency || "ر.س"}
+            </span>
+          </div>
         </div>
 
         {invoice.payments.length === 0 ? (
-          <p className="text-muted-foreground text-[14px]">لا توجد دفعات مسجلة</p>
+          <div className="flex flex-col items-center justify-center py-12 bg-[#FAFBFC] rounded-2xl border-2 border-dashed border-[#E4E5E7]">
+            <CreditCard className="h-12 w-12 text-[#B1B2B4] mb-3" />
+            <p className="text-[16px] font-medium text-[#6C7075]">لا توجد دفعات مسجلة</p>
+            <p className="text-[14px] text-[#8B8E92] mt-1">سيتم عرض الدفعات هنا عند إضافتها</p>
+          </div>
         ) : (
-          <div className="space-y-3">
-            {invoice.payments.map((payment) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {invoice.payments.map((payment, index) => (
               <div
                 key={payment.id}
-                className="grid grid-cols-1 md:grid-cols-3 gap-4 shadow-md p-4 rounded-md bg-white relative"
+                className="group relative rounded-2xl border border-[#E4E5E7] bg-[#FAFBFC] p-5 transition-all duration-300 hover:border-[#40369F]/30 hover:bg-white hover:shadow-lg hover:shadow-[#40369F]/5"
               >
                 <button
                   type="button"
                   onClick={() => setDeletingPaymentId(payment.id)}
-                  className="absolute left-3 top-3 text-muted-foreground hover:text-red-600"
+                  className="absolute -top-2 -right-2 opacity-0 group-hover:opacity-100 transition-all duration-300 hover:scale-110 active:scale-95"
                 >
-                  <X className="h-4 w-4" />
+                  <div className="flex h-7 w-7 items-center justify-center rounded-full bg-red-50 text-red-500 shadow-md hover:bg-red-500 hover:text-white transition-all duration-300">
+                    <X className="h-3.5 w-3.5" />
+                  </div>
                 </button>
 
-                <InfoField
-                  label="المبلغ المدفوع"
-                  value={payment.paidAmount.toLocaleString()}
-                />
-                <InfoField label="تاريخ الدفع" value={formatDate(payment.paymentDate)} />
+                <div className="flex items-center gap-2 mb-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-[#40369F]/10 to-[#322A7C]/10">
+                    <CreditCard className="h-5 w-5 text-[#40369F]" />
+                  </div>
+                  <div>
+                    <p className="text-[13px] font-medium text-[#6C7075]">الدفعة #{index + 1}</p>
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[13px] text-[#6C7075]">المبلغ</span>
+                    <span className="text-[16px] font-bold text-[#171A1F]">
+                      {payment.paidAmount.toLocaleString()} {invoice.currency || "ر.س"}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-[13px] text-[#6C7075]">التاريخ</span>
+                    <span className="text-[14px] font-medium text-[#171A1F] flex items-center gap-1">
+                      <Calendar className="h-3.5 w-3.5 text-[#8B8E92]" />
+                      {formatDate(payment.paymentDate)}
+                    </span>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
         )}
       </div>
 
+      {/* Delete Confirmation Dialogs */}
       <ConfirmDeleteDialog
         open={isDeleteDialogOpen}
         onOpenChange={setIsDeleteDialogOpen}
@@ -220,3 +328,4 @@ export function InvoiceDetail({ invoiceId }: InvoiceDetailProps) {
     </div>
   );
 }
+ 
