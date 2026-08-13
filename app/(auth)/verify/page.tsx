@@ -2,7 +2,7 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
-import { Loader2, Mail, CheckCircle, Clock, ArrowLeft } from "lucide-react";
+import { Mail, CheckCircle, Clock, ArrowLeft, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -10,6 +10,7 @@ import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useResendOtp, useVerifyOtp } from "@/hooks/use-auth";
 import { toast } from "sonner";
+import MainButton from "@/components/dashboard/shared/MainButton";
 
 const RESEND_INTERVAL_SECONDS = 60;
 
@@ -54,19 +55,12 @@ function VerifyOtpForm() {
   }
 
   return (
-    <div className="w-full md:p-6 flex flex-col justify-between min-h-screen md:min-h-auto">
-      {/* Brand Header - Mobile */}
-      <div className="md:hidden text-center pt-8 pb-4">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-[#40369F] to-[#322A7C] shadow-lg shadow-[#40369F]/25 mb-3">
-          <span className="text-2xl font-bold text-white">D</span>
-        </div>
-        <h1 className="text-2xl font-bold text-[#171A1F]">تحقق من بريدك الإلكتروني</h1>
-        <p className="text-sm text-[#6C7075] mt-1">أدخل رمز التحقق المكون من 6 أرقام</p>
-      </div>
+    <div className="w-full md:p-6 flex flex-col min-h-screen md:min-h-auto gap-4">
+      
 
       <div className="bg-white rounded-3xl shadow-xl shadow-[#40369F]/5 border border-[#F0F0F2] p-6 md:p-10 transition-all hover:shadow-2xl hover:shadow-[#40369F]/8">
         {/* Desktop Header */}
-        <div className="hidden md:block">
+        <div className="">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-1.5 h-8 rounded-full bg-gradient-to-b from-[#40369F] to-[#322A7C]"></div>
             <h1 className="text-[32px] font-bold text-[#171A1F]">تحقق من بريدك الإلكتروني</h1>
@@ -139,29 +133,20 @@ function VerifyOtpForm() {
               </p>
             </div>
 
-            {/* Submit Button */}
-            <Button
+            {/* Submit Button with MainButton */}
+            <MainButton
               type="submit"
+              text="تفعيل الحساب"
+              icon={<ArrowLeft className="h-5 w-5" />}
+              variant="primary"
+              size="lg"
+              loading={verifyOtpMutation.isPending}
               disabled={verifyOtpMutation.isPending || otp.length !== 6}
               className={cn(
-                "w-full h-[56px] text-[17px] font-semibold flex items-center justify-center gap-3 transition-all duration-300 rounded-xl shadow-lg",
-                otp.length === 6
-                  ? "bg-gradient-to-r from-[#40369F] to-[#322A7C] hover:from-[#322A7C] hover:to-[#2A226B] shadow-[#40369F]/25 hover:shadow-xl hover:shadow-[#40369F]/35 hover:scale-[1.01] active:scale-[0.98] group"
-                  : "bg-[#E4E5E7] text-[#9A9DA2] cursor-not-allowed"
+                "w-full h-[56px] ",
+                otp.length !== 6 && "opacity-60 cursor-not-allowed pointer-events-none"
               )}
-            >
-              {verifyOtpMutation.isPending ? (
-                <>
-                  <Loader2 className="h-5 w-5 animate-spin" />
-                  جارِ التحقق...
-                </>
-              ) : (
-                <>
-                  تفعيل الحساب
-                  <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform duration-300" />
-                </>
-              )}
-            </Button>
+            />
           </form>
         </div>
 

@@ -116,3 +116,9 @@ export interface ExportDeferredAccountsResponse {
   message: string;
   data?: Blob | any;
 }
+
+export interface GetDeferredAccountByIdResponse {
+    success: boolean;
+    data: DeferredAccountItem;
+    message: string;
+}

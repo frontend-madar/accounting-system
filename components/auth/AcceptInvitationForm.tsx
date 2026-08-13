@@ -37,49 +37,41 @@ export function AcceptInvitationForm() {
         if (dialCode) setCountryCode(`+${dialCode}`);
     }
 
-   function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault();
+    function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
+        event.preventDefault();
 
-    const formData = new FormData(event.currentTarget);
-    const raw = {
-        token,
-        email,
-        name: String(formData.get("name") ?? ""),
-        phone,
-        countryCode,
-        password: String(formData.get("password") ?? ""),
-        confirmPassword: String(formData.get("confirmPassword") ?? ""),
-    };
+        const formData = new FormData(event.currentTarget);
+        const raw = {
+            token,
+            email,
+            name: String(formData.get("name") ?? ""),
+            phone,
+            countryCode,
+            password: String(formData.get("password") ?? ""),
+            confirmPassword: String(formData.get("confirmPassword") ?? ""),
+        };
 
-    const result = acceptInvitationSchema.safeParse(raw);
-    if (!result.success) {
-        const errors: FieldErrors = {};
-        for (const issue of result.error.issues) {
-            const key = issue.path[0] as keyof AcceptInvitationFormValues;
-            if (!errors[key]) errors[key] = issue.message;
+        const result = acceptInvitationSchema.safeParse(raw);
+        if (!result.success) {
+            const errors: FieldErrors = {};
+            for (const issue of result.error.issues) {
+                const key = issue.path[0] as keyof AcceptInvitationFormValues;
+                if (!errors[key]) errors[key] = issue.message;
+            }
+            setFieldErrors(errors);
+            return;
         }
-        setFieldErrors(errors);
-        return;
+
+        setFieldErrors({});
+        acceptInvitationMutation.mutate(result.data);
     }
 
-    setFieldErrors({});
-    acceptInvitationMutation.mutate(result.data);
-}
-
     return (
-        <div className="w-full md:p-6 flex flex-col justify-between min-h-screen md:min-h-auto">
-            {/* Brand Header - Mobile */}
-            <div className="md:hidden text-center pt-8 pb-4">
-                <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-[#40369F] to-[#322A7C] shadow-lg shadow-[#40369F]/25 mb-3">
-                    <span className="text-2xl font-bold text-white">D</span>
-                </div>
-                <h1 className="text-2xl font-bold text-[#171A1F]">مرحباً بك في الفريق</h1>
-                <p className="text-sm text-[#6C7075] mt-1">أكمل بياناتك لتفعيل الحساب</p>
-            </div>
+        <div className="w-full md:p-6 flex flex-col min-h-screen md:min-h-auto gap-4">
 
             <div className="bg-white rounded-3xl shadow-xl shadow-[#40369F]/5 border border-[#F0F0F2] p-6 md:p-10 transition-all hover:shadow-2xl hover:shadow-[#40369F]/8">
                 {/* Desktop Header */}
-                <div className="hidden md:block">
+                <div className="">
                     <div className="flex items-center gap-3 mb-2">
                         <div className="w-1.5 h-8 rounded-full bg-gradient-to-b from-[#40369F] to-[#322A7C]"></div>
                         <h1 className="text-[32px] font-bold text-[#171A1F]">مرحبًا بك في فريق العمل</h1>
@@ -251,7 +243,7 @@ export function AcceptInvitationForm() {
                     {/* Confirm Password Field */}
                     <div className="space-y-1.5">
                         <Label htmlFor="confirmPassword" className="text-sm font-medium text-[#171A1F] flex items-center gap-2">
-                           
+
                             تأكيد كلمة المرور
                         </Label>
                         <div className={cn(
@@ -339,7 +331,7 @@ export function AcceptInvitationForm() {
             </div>
 
             {/* Footer Terms */}
-             <FooterTerm />
+            <FooterTerm />
         </div>
     );
 }

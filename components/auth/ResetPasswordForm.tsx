@@ -11,6 +11,7 @@ import Link from "next/link";
 import { resetPasswordSchema } from "@/validations/auth";
 import { z } from "zod";
 import { useResetPassword } from "@/hooks/use-auth";
+import MainButton from "../dashboard/shared/MainButton";
 
 type ResetPasswordFormValues = z.infer<typeof resetPasswordSchema>;
 type FieldErrors = Partial<Record<keyof ResetPasswordFormValues, string>>;
@@ -53,19 +54,11 @@ function ResetPasswordFormInner() {
   }
 
   return (
-    <div className="w-full md:p-6 flex flex-col justify-between min-h-screen md:min-h-auto">
-      {/* Brand Header - Mobile */}
-      <div className="md:hidden text-center pt-8 pb-4">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-[#40369F] to-[#322A7C] shadow-lg shadow-[#40369F]/25 mb-3">
-          <span className="text-2xl font-bold text-white">D</span>
-        </div>
-        <h1 className="text-2xl font-bold text-[#171A1F]">إعادة تعيين كلمة المرور</h1>
-        <p className="text-sm text-[#6C7075] mt-1">أدخل الرمز وكلمة المرور الجديدة</p>
-      </div>
+    <div className="w-full md:p-6 flex flex-col min-h-screen md:min-h-auto gap-4">
 
       <div className="bg-white rounded-3xl shadow-xl shadow-[#40369F]/5 border border-[#F0F0F2] p-6 md:p-10 transition-all hover:shadow-2xl hover:shadow-[#40369F]/8">
         {/* Desktop Header */}
-        <div className="hidden md:block">
+        <div className="">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-1.5 h-8 rounded-full bg-gradient-to-b from-[#40369F] to-[#322A7C]"></div>
             <h1 className="text-[32px] font-bold text-[#171A1F]">إعادة تعيين كلمة المرور</h1>
@@ -77,8 +70,8 @@ function ResetPasswordFormInner() {
             <p className="mt-2 text-[15px] font-medium text-[#40369F] pr-4 flex items-center gap-2">
               {email}
               <span className="text-[#6C7075] font-normal text-sm">•</span>
-              <Link 
-                href="/forgot-password" 
+              <Link
+                href="/forgot-password"
                 className="text-[#40369F] hover:text-[#322A7C] hover:underline transition-colors duration-200 text-sm font-medium"
               >
                 تغيير البريد الإلكتروني
@@ -111,7 +104,7 @@ function ResetPasswordFormInner() {
                   "placeholder:text-[#9A9DA2] placeholder:text-sm text-center tracking-[0.3em] font-mono",
                   "focus:bg-white focus:border-[#40369F]",
                   fieldErrors.otp &&
-                    "border-red-500 focus-visible:ring-red-500 bg-red-50/40",
+                  "border-red-500 focus-visible:ring-red-500 bg-red-50/40",
                   !fieldErrors.otp && focusedField === "otp" && "border-[#40369F]"
                 )}
               />
@@ -152,7 +145,7 @@ function ResetPasswordFormInner() {
                   "placeholder:text-[#9A9DA2] placeholder:text-sm tracking-wider",
                   "focus:bg-white focus:border-[#40369F]",
                   fieldErrors.password &&
-                    "border-red-500 focus-visible:ring-red-500 bg-red-50/40",
+                  "border-red-500 focus-visible:ring-red-500 bg-red-50/40",
                   !fieldErrors.password && focusedField === "password" && "border-[#40369F]"
                 )}
               />
@@ -205,7 +198,7 @@ function ResetPasswordFormInner() {
                   "placeholder:text-[#9A9DA2] placeholder:text-sm tracking-wider",
                   "focus:bg-white focus:border-[#40369F]",
                   fieldErrors.confirm_password &&
-                    "border-red-500 focus-visible:ring-red-500 bg-red-50/40",
+                  "border-red-500 focus-visible:ring-red-500 bg-red-50/40",
                   !fieldErrors.confirm_password && focusedField === "confirm_password" && "border-[#40369F]"
                 )}
               />
@@ -235,24 +228,15 @@ function ResetPasswordFormInner() {
             )}
           </div>
 
-          {/* Submit Button */}
-          <Button
+          <MainButton
             type="submit"
-            disabled={resetPasswordMutation.isPending}
-            className="w-full bg-gradient-to-r from-[#40369F] to-[#322A7C] h-[56px] text-[17px] font-semibold hover:from-[#322A7C] hover:to-[#2A226B] focus-visible:ring-4 focus-visible:ring-[#40369F]/30 flex items-center justify-center gap-3 transition-all duration-300 rounded-xl shadow-lg shadow-[#40369F]/25 hover:shadow-xl hover:shadow-[#40369F]/35 hover:scale-[1.01] active:scale-[0.98] group"
-          >
-            {resetPasswordMutation.isPending ? (
-              <>
-                <Loader2 className="h-5 w-5 animate-spin" />
-                جارِ إعادة التعيين...
-              </>
-            ) : (
-              <>
-                إعادة تعيين كلمة المرور
-                <ArrowLeft className="h-5 w-5 group-hover:-translate-x-1 transition-transform duration-300" />
-              </>
-            )}
-          </Button>
+            text=" إعادة تعيين كلمة المرور"
+            icon={<ArrowLeft className="h-4 w-4" />}
+            loading={resetPasswordMutation.isPending}
+            variant="primary"
+            size="md"
+            className="h-[50px] !w-full"
+          />
         </form>
 
         {/* Login Link */}
