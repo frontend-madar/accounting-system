@@ -4,8 +4,6 @@ import { Topbar } from "@/components/dashboard/Topbar";
 import { EmployeeReportIcon, EmployeeTargetIcon } from "@/icons";
 import { useEmployeeReports } from "@/hooks/use-employee-report";
 import { EmployeeReportsTableSection } from "@/components/dashboard/employee-report/EmployeeReportsTableSection";
-import SearchInput from "@/components/dashboard/SearchInput";
-import { InvoiceTextField } from "@/components/dashboard/invoice/TextField";
 import { useMemo, useState } from "react";
 import { SelectField } from "@/components/dashboard/invoice/SelectField";
 import { useEmployees } from "@/hooks/use-employee";

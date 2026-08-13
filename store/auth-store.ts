@@ -19,7 +19,7 @@ export const useAuthStore = create<AuthState>()(
       setSession: (user, token, expiresInSeconds) => {
         tokenStorage.set(token, expiresInSeconds);
         set({ user, isAuthenticated: true });
-      },
+      }, 
       logout: () => {
         tokenStorage.clear();
         set({ user: null, isAuthenticated: false });

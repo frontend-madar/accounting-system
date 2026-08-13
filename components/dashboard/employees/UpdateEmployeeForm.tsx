@@ -310,7 +310,7 @@ export function UpdateEmployeeForm({ employeeId, open, onOpenChange }: UpdateEmp
                                     name="employmentType"
                                     render={({ field }) => (
                                         <RadioGroup
-                                            value={field.value}
+                                            value={field.value ?? ""}
                                             onValueChange={field.onChange}
                                             className="flex items-center gap-4"
                                         >

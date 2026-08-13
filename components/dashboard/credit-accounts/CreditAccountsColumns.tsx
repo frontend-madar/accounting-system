@@ -45,7 +45,7 @@ function formatDate(dateStr?: string): string {
 
 interface GetCreditAccountColumnsArgs {
   onStatusChange?: (id: string, status: CreditAccountStatus) => void;
-  onEdit?: (account: CreditAccount) => void;
+  onEdit?: (id: string) => void;
   onDelete?: (account: CreditAccount) => void;
 }
 
@@ -155,7 +155,7 @@ export function getCreditAccountColumns({
       cell: ({ row }) => (
         <TableRowActions
           row={row.original}
-          onEdit={onEdit}
+          onEdit={onEdit ? () => onEdit(row.original.id) : undefined}
           onDelete={onDelete}
         />
       ),

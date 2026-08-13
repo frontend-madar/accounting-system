@@ -23,15 +23,8 @@ import { DateField } from "../Datefield";
 import { useExpenseOptionsStore } from "@/store/expense.store";
 import { NotesCard } from "../shared/NotesCard";
 import { CreatableSelectField } from "../shared/CreatableSelectField";
-
-const CURRENCY_OPTIONS = [
-    { label: "SAR", value: "SAR" },
-    { label: "EGP", value: "EGP" },
-    { label: "AED", value: "AED" },
-    { label: "USD", value: "USD" },
-    { label: "EUR", value: "EUR" },
-    { label: "GBP", value: "GBP" },
-];
+import { useSyncCurrencies } from "@/hooks/useSyncCurrencies";
+import { useCurrencyStore } from "@/store/currency.store";
 
 // The two statuses the API accepts. Not user-facing — decided by which
 // button (draft vs submit) the user clicks.
@@ -76,6 +69,9 @@ export function CreateExpenseForm({ onSuccess }: CreateExpenseFormProps) {
     const categoryOptions = useExpenseOptionsStore((s) => s.categoryOptions);
     const paymentMethodOptions = useExpenseOptionsStore((s) => s.paymentMethodOptions);
     const accountOptions = useExpenseOptionsStore((s) => s.accountOptions);
+
+    useSyncCurrencies();
+    const currencyOptions = useCurrencyStore((s) => s.currencyOptions);
 
     function handleAttachmentSelect(file: File | null) {
         attachmentRef.current = file;
@@ -140,7 +136,7 @@ export function CreateExpenseForm({ onSuccess }: CreateExpenseFormProps) {
                                         label="المبلغ"
                                         currency={currencyField.value}
                                         onCurrencyChange={currencyField.onChange}
-                                        currencyOptions={CURRENCY_OPTIONS}
+                                        currencyOptions={currencyOptions}
                                         amount={amountField.value}
                                         onAmountChange={amountField.onChange}
                                         error={errors.amount?.message || errors.currency?.message}
