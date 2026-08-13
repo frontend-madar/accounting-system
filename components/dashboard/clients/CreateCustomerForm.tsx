@@ -71,17 +71,6 @@ export function CreateCustomerForm({
     useSyncCurrencies();
     const currencyOptions = useCurrencyStore((s) => s.currencyOptions);
 
-    const handleFileSelect = (file: File) => {
-        if (file.type !== "application/pdf") {
-            toast.error("الملف يجب أن يكون بصيغة PDF فقط");
-            return;
-        }
-        if (file.size > 10 * 1024 * 1024) {
-            toast.error("حجم الملف يجب ألا يتجاوز 10 ميجابايت");
-            return;
-        }
-        setSelectedFile(file);
-    };
 
     function onSubmit(values: ClientFormValues) {
         createClient({

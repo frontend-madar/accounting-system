@@ -37,6 +37,15 @@ export function useCreateDeferredAccount() {
   });
 }
 
+export function useDeferredAccount(accountId: string | null) {
+  return useQuery({
+    queryKey: [DEFERRED_ACCOUNTS_QUERY_KEY, "detail", accountId],
+    queryFn: () => deferredAccountService.getDeferredAccountById(accountId as string),
+    select: (res) => res.data,
+    enabled: !!accountId,
+  });
+}
+
 export function useUpdateDeferredAccount() {
   const queryClient = useQueryClient();
 

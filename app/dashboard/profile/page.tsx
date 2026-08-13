@@ -10,6 +10,7 @@ import SecondaryButton from "@/components/dashboard/shared/SecondaryButton";
 import { Topbar } from "@/components/dashboard/Topbar";
 import { ProfileCompanyIcon, ProfileEmailIcon, ProfilePhoneIcon } from "@/icons";
 import { useGetProfile, useUpdateAvatar } from "@/hooks/use-profile";
+import { useAuthStore } from "@/store/auth-store";
 
 import { Skeleton } from "@/components/ui/skeleton";
 import AccountantsManagements from "@/components/dashboard/profile/AccountantsManagements";
@@ -18,6 +19,8 @@ const ProfilePage = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const { data: profileResponse, isLoading } = useGetProfile();
     const { mutate: updateAvatar, isPending: isAvatarUploading } = useUpdateAvatar();
+    const role = useAuthStore((s) => s.user?.role);
+    const isManager = role === "MANAGER";
 
     const profile = profileResponse?.data;
 
@@ -150,7 +153,7 @@ const ProfilePage = () => {
 
                 <div className="lg:col-span-2">
                     <ProfileForm />
-                   <AccountantsManagements />
+                    {isManager && <AccountantsManagements />}
                 </div>
             </div>
 

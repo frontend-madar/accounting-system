@@ -63,6 +63,7 @@ export function CreditAccountsTableSection({
     setPage(1);
   };
 
+  const [editingAccountId, setEditingAccountId] = useState<string | null>(null);
   const [editingAccount, setEditingAccount] = useState<DeferredAccountItem | null>(null);
   const [deletingAccount, setDeletingAccount] = useState<DeferredAccountItem | null>(null);
 
@@ -76,7 +77,7 @@ export function CreditAccountsTableSection({
   const columns = useMemo(
     () =>
       getCreditAccountColumns({
-        onEdit: (account) => setEditingAccount(account as unknown as DeferredAccountItem),
+        onEdit: (id) => setEditingAccountId(id),
         onDelete: (account) => setDeletingAccount(account as unknown as DeferredAccountItem),
       }),
     []
@@ -123,7 +124,7 @@ export function CreditAccountsTableSection({
                 onFilterChange={handleStatusFilterChange}
                 className="md:w-auto w-full"
               />
-              
+
               {/* NEW: Export Dropdown */}
               <ExportDropdown
                 label="تصدير"
@@ -160,9 +161,9 @@ export function CreditAccountsTableSection({
       )}
 
       <UpdateCreditAccountForm
-        account={editingAccount}
-        open={!!editingAccount}
-        onOpenChange={(open) => !open && setEditingAccount(null)}
+        accountId={editingAccountId}
+        open={!!editingAccountId}
+        onOpenChange={(open) => !open && setEditingAccountId(null)}
       />
 
       <ConfirmDeleteDialog

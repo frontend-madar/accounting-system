@@ -16,9 +16,8 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useLogout } from "@/hooks/use-auth";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
 import Link from "next/link";
-import { TopbarHomeIcon, TopbarNotificationIcon } from "@/icons";
+import { TopbarNotificationIcon } from "@/icons";
 import { useAuthStore } from "@/store/auth-store";
 import { useUiStore } from "@/store/ui-store";
 import { useUnreadNotificationsCount } from "@/hooks/use-notification";
@@ -59,15 +58,9 @@ interface TopbarProps {
 export function Topbar({
     title,
     avatarSrc = "/user.png",
-    searchPlaceholder = "بحث",
     onSearch,
     className,
     path,
-    search,
-    nestedLink,
-    nestedLinkPath,
-    middleNestedLink,
-    middleNestedLinkPath,
     defaultLanguage = LANGUAGE_OPTIONS[0].code,
     onLanguageChange,
     isNested
