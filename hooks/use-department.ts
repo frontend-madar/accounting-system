@@ -19,7 +19,7 @@ export function useCreateDepartments() {
         onSuccess: (response) => {
             toast.success(response.message || "تم إضافة الأقسام بنجاح");
             refetchDepartments();
-            router.push("/dashboard");
+            router.push("/company-info");
         },
         onError: (error) => {
             toast.error(getErrorMessage(error, "تعذر إضافة الأقسام"));

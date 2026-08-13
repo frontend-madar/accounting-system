@@ -348,7 +348,7 @@ export function ExpenseForm({ mode, expenseId, onSuccess, onCancel }: ExpenseFor
                 {...register("notes")}
             />
 
-            <div className="flex flex-col md:flex-row items-center justify-end gap-3 pt-5">
+            <div className="flex flex-col md:flex-row items-center gap-3 pt-5">
                 <MainButton
                     type="button"
                     onClick={onSubmitPaid}

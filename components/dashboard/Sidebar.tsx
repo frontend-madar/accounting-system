@@ -12,7 +12,7 @@ import {
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import { useClickOutside } from "@/hooks/UseClickOutside";
-import { DailyLimitsIcon, DashboardIcon, DropLineIcon, DropLineTwoIcon, EmployeesIcon, ExpemsessIcon, ForwardAccountsIcon, InvitePersonIcon, IvoicesIcons, LogoutIcon, SalariesIcon, SuppliersIcon } from "@/icons";
+import { DailyLimitsIcon, DashboardIcon, DropLineIcon, DropLineTwoIcon, EmployeesIcon, ExpemsessIcon, ForwardAccountsIcon, InvitePersonIcon, IvoicesIcons, LogoutIcon, SalariesIcon, SuppliersIcon, ToggelSidebar } from "@/icons";
 import { InviteFrom } from "../auth/InviteFrom";
 import { useUiStore } from "@/store/ui-store";
 import { useProfileStore } from "@/store/profile.store";
@@ -220,6 +220,15 @@ export function Sidebar({
         toggleDropdown(key);
     }
 
+    // Closes the mobile drawer after an actual navigation (link click) —
+    // desktop expand/collapse state is untouched. Dropdown toggle buttons
+    // don't call this since they don't navigate anywhere.
+    function handleNavigate() {
+        if (isMobileScreen) {
+            setMobileSidebarOpen(false);
+        }
+    }
+
     return (
         <>
             {/* Backdrop overlay for mobile screen */}
@@ -249,6 +258,7 @@ export function Sidebar({
                     alt=""
                     fill
                     priority
+                    sizes="283px"
                     className="pointer-events-none select-none object-cover rounded-2xl opacity-20"
                 />
 
@@ -281,10 +291,7 @@ export function Sidebar({
                                 }}
                                 className="focus:outline-none hover:opacity-80 transition-opacity shrink-0"
                             >
-                                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg" className="shrink-0">
-                                    <path d="M16.9173 4.08333V23.9167M25.6673 14C25.6673 9.625 25.6673 7.4375 24.5532 5.9045C24.1934 5.40936 23.758 4.97392 23.2628 4.61417C21.7298 3.5 19.5412 3.5 15.1673 3.5H12.834C8.45898 3.5 6.27148 3.5 4.73848 4.61417C4.24344 4.97357 3.808 5.40861 3.44815 5.90333C2.33398 7.4375 2.33398 9.62617 2.33398 14C2.33398 18.3738 2.33398 20.5625 3.44815 22.0955C3.80791 22.5906 4.24335 23.0261 4.73848 23.3858C6.27148 24.5 8.46015 24.5 12.834 24.5H15.1673C19.5423 24.5 21.7298 24.5 23.2628 23.3858C23.758 23.0261 24.1934 22.5906 24.5532 22.0955C25.6673 20.5625 25.6673 18.3738 25.6673 14Z" stroke="white" strokeWidth="1.5" strokeLinejoin="round" />
-                                    <path d="M22.1673 8.16699H20.4173M22.1673 12.8337H20.4173M9.33398 11.667L10.7655 12.9002C11.3663 13.4193 11.6673 13.6783 11.6673 14.0003C11.6673 14.3223 11.3663 14.5813 10.7655 15.1005L9.33398 16.3337" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
+                                <ToggelSidebar />
                             </button>
 
                         </div>
@@ -299,6 +306,7 @@ export function Sidebar({
                                         <Link
                                             href={item.href ?? "#"}
                                             type="Link"
+                                            onClick={handleNavigate}
                                             className={cn(
                                                 "group relative flex w-full items-center rounded-lg px-3 py-3 text-[15px] transition-all duration-300 ease-in-out",
                                                 collapsibleGap(showContent),
@@ -370,6 +378,7 @@ export function Sidebar({
                                                                 <Link
                                                                     type="Link"
                                                                     href={sub.href}
+                                                                    onClick={handleNavigate}
                                                                     className={cn(
                                                                         "block w-full rounded-lg px-3 py-2.5 text-right text-[14px] transition-all duration-300 ease-in-out",
                                                                         "hover:bg-[#0E1B6B99]",
@@ -412,7 +421,10 @@ export function Sidebar({
                             <Link
                                 href="/"
                                 className="flex items-center gap-3 px-2 py-1.5 rounded-lg hover:bg-red-50 transition-colors group"
-                                onClick={() => setShowUserMenu(false)}
+                                onClick={() => {
+                                    setShowUserMenu(false);
+                                    handleNavigate();
+                                }}
                             >
                                 <LogoutIcon />
                                 <p className="text-[18px] font-medium text-[#B01212] group-hover:text-red-700 transition-colors">
@@ -431,7 +443,7 @@ export function Sidebar({
                             )}
                         >
                             <div className="relative h-10 w-10 shrink-0 rounded-full overflow-hidden">
-                                <Image src={displayAvatarSrc} alt={displayUserName} fill className="object-cover" />
+                                <Image src={displayAvatarSrc} alt={displayUserName} fill sizes="40px" className="object-cover" />
                             </div>
                             <div className={collapsibleLabel(showContent, "min-w-0 text-right")}>
                                 <p className="truncate text-[16px] font-medium">{displayUserName}</p>

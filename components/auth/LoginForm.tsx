@@ -14,6 +14,7 @@ import { useLogin } from "@/hooks/use-auth";
 import { FacebookIcon, GoogleIcon } from "@/icons";
 import SocialLoginButtons from "./SocialLoginButtons";
 import FooterTerm from "./FooterTerm";
+import MainButton from "../dashboard/shared/MainButton";
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 type FieldErrors = Partial<Record<keyof LoginFormValues, string>>;
@@ -49,19 +50,11 @@ export function LoginForm() {
   }
 
   return (
-    <div className="w-full md:p-6 flex flex-col justify-between min-h-screen md:min-h-auto">
-      {/* Brand Header - Mobile */}
-      <div className="md:hidden text-center pt-8 pb-4">
-        <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-gradient-to-br from-[#40369F] to-[#322A7C] shadow-lg shadow-[#40369F]/25 mb-3">
-          <span className="text-2xl font-bold text-white">D</span>
-        </div>
-        <h1 className="text-2xl font-bold text-[#171A1F]">مرحباً بك</h1>
-        <p className="text-sm text-[#6C7075] mt-1">سجل الدخول لإدارة أعمالك</p>
-      </div>
+    <div className="w-full md:p-6 flex flex-col min-h-screen md:min-h-auto gap-4">
 
       <div className="bg-white rounded-3xl shadow-xl shadow-[#40369F]/5 border border-[#F0F0F2] p-6 md:p-10 transition-all hover:shadow-2xl hover:shadow-[#40369F]/8">
         {/* Desktop Header */}
-        <div className="hidden md:block">
+        <div className=" block">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-1.5 h-8 rounded-full bg-gradient-to-b from-[#40369F] to-[#322A7C]"></div>
             <h1 className="text-[32px] font-bold text-[#171A1F]">تسجيل الدخول</h1>
@@ -176,24 +169,15 @@ export function LoginForm() {
             )}
           </div>
 
-          {/* Submit Button */}
-          <Button
+          <MainButton
             type="submit"
-            disabled={loginMutation.isPending}
-            className="w-full bg-gradient-to-r from-[#40369F] to-[#322A7C] h-[56px] text-[17px] font-semibold hover:from-[#322A7C] hover:to-[#2A226B] focus-visible:ring-4 focus-visible:ring-[#40369F]/30 flex items-center justify-center gap-3 transition-all duration-300 rounded-xl shadow-lg shadow-[#40369F]/25 hover:shadow-xl hover:shadow-[#40369F]/35 hover:scale-[1.01] active:scale-[0.98] group"
-          >
-            {loginMutation.isPending ? (
-              <>
-                <Loader2 className="h-5 w-5 animate-spin" />
-                جارِ تسجيل الدخول...
-              </>
-            ) : (
-              <>
-                تسجيل الدخول
-                <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
-              </>
-            )}
-          </Button>
+            text="  تسجيل الدخول    "
+            icon={<ArrowRight className="h-4 w-4" />}
+            variant="primary"
+            size="md"
+            loading={loginMutation.isPending}
+            className="h-[50px] !w-full"
+          />
         </form>
 
         {/* Divider */}

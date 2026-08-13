@@ -8,12 +8,18 @@ import type {
   UpdateDeferredAccountResponse,
   DeleteDeferredAccountResponse,
   ExportDeferredAccountsEmailParams,
+  GetDeferredAccountByIdResponse,
 } from "@/types/deferred-account.types";
 
 export const deferredAccountService = {
   getDeferredAccounts: (params: GetDeferredAccountsParams = {}) =>
     api
       .get<GetDeferredAccountsResponse>("/deferred-accounts", { params })
+      .then((res) => res.data),
+
+  getDeferredAccountById: (accountId: string) =>
+    api
+      .get<GetDeferredAccountByIdResponse>(`/deferred-accounts/${accountId}`)
       .then((res) => res.data),
 
   createDeferredAccount: (payload: CreateDeferredAccountPayload) =>
